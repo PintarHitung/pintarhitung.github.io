@@ -1,2007 +1,831 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
-  <title>Notepad Online</title>
-  <meta name="description" content="Notepad Online adalah alat pencatat ringan berbasis web dengan fitur otomatis seperti numbering, bullet list, dan dukungan markdown.">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad Online</title>
-    <meta name="description" content="Notepad Online Gratis dengan fitur pintar, untuk menulis, menyimpan, dan mengatur catatan dengan mudah dan aman">
+    <title>Kalkulator Nilai Akademik - PintarHitung</title>
 
-    <link rel="icon" href="https://cdn.xtermai.xyz/ujAl3.jpg" type="image/jpeg">
-
-    <meta property="og:title" content="Notepad Online">
-    <meta property="og:description" content="Notepad Online modern gratis dengan fitur pintar untuk pengalaman menulis yang lebih baik.">
-    <meta property="og:image" content="https://files.catbox.moe/og6mpt.jpg">
+    <meta name="description" content="Kalkulator akademik untuk nilai akhir, IPK, PPDB, rata-rata rapor, dan lainnya. Gratis dan mudah digunakan.">
+    <meta name="keywords" content="kalkulator nilai, ipk, rapor, ppdb, akademik, sekolah, pintarhitung, hitung nilai">
+    <meta property="og:title" content="Kalkulator Nilai Akademik - PintarHitung">
+    <meta property="og:description" content="Alat bantu hitung nilai sekolah dan kuliah secara otomatis dan akurat.">
+    <meta property="og:image" content="https://cdn.xtermai.xyz/fOONh.jpg">
     <meta property="og:type" content="website">
-    <meta name="keywords" content="notepad online, catatan online, catatan gratis, editor teks, notepad aesthetic, online notepad indonesia, auto numbering, auto bullet, text formatter">
-    <meta name="author" content="Notepad Online (Enhanced by AI)">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #f9f9f9;
-            --text-color: #333333;
-            --primary-color: #4a90e2;
-            --secondary-color: #ffffff;
-            --gradient-start: #4a90e2;
-            --gradient-end: #64b9f1;
-            --toast-bg: #4caf50;
-            --error-bg: #f44336;
-            --border-color: #e0e0e0;
-            --placeholder-color: #aaaaaa;
-            --sidebar-width: 250px;
-            --sidebar-bg: #ffffff;
-            --sidebar-text: #333333;
-            --highlight-bg: rgba(255, 230, 100, 0.5); /* Warna untuk highlight pencarian */
-            --search-bg: rgba(255, 255, 255, 0.2);
-        }
-
-        .dark-mode {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --secondary-color: #2d2d2d;
-            --gradient-start: #6c63ff;
-            --gradient-end: #805fac;
-            --toast-bg: #2e7d32;
-            --error-bg: #c62828;
-            --border-color: #444444;
-            --placeholder-color: #666666;
-            --sidebar-bg: #2d2d2d;
-            --sidebar-text: #f0f0f0;
-            --highlight-bg: rgba(74, 144, 226, 0.4);
-            --search-bg: rgba(0, 0, 0, 0.3);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Optimasi transisi */
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Sidebar Styles (Existing) --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease, width 0.3s ease; /* Tambah transisi width */
-            overflow: hidden;
-            z-index: 100;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-            width: 0;
-            border-right: none; /* Sembunyikan border saat collapsed */
-        }
-
-        .sidebar-header {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            min-height: 60px;
-        }
-
-        .sidebar-title {
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden; /* Pastikan judul tidak keluar saat sidebar menyempit */
-            text-overflow: ellipsis;
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px 0;
-        }
-
-        .search-container { /* Search di Sidebar */
-            position: relative;
-            margin: 10px;
-        }
-
-        #searchNotes {
-            width: 100%;
-            padding: 8px 30px 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-        }
-
-        .search-container i {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--placeholder-color);
-            pointer-events: none; /* Agar icon tidak menghalangi klik input */
-        }
-
-        .note-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 4px;
-            margin: 2px 5px; /* Sedikit penyesuaian margin */
-            transition: background-color 0.2s ease;
-            white-space: nowrap; /* Cegah item wrap */
-        }
-
-        .note-item:hover {
-            background-color: rgba(74, 144, 226, 0.1);
-        }
-
-        .note-item.active {
-            background-color: rgba(74, 144, 226, 0.2);
-            font-weight: 500;
-        }
-
-        .note-item .note-title {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-right: 10px; /* Jarak antara judul dan tanggal */
-        }
-
-        .note-item .note-date {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            margin-left: auto; /* Dorong tanggal ke kanan */
-             white-space: nowrap;
-        }
-
-        .note-item .delete-btn {
-            color: var(--error-bg);
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            padding: 5px;
-            margin-left: 8px; /* Jarak dari tanggal */
-            background: none; /* Hapus background default */
-            border: none; /* Hapus border default */
-            cursor: pointer;
-        }
-
-        .note-item:hover .delete-btn {
-            opacity: 1;
-        }
-
-        .add-note-btn {
-            padding: 12px 15px;
-            margin: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: background-color 0.2s ease;
-        }
-
-        .add-note-btn:hover {
-            background-color: #3a7bc8; /* Warna hover */
-        }
-
-        /* --- Main Content Styles (Sebagian Besar Existing) --- */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            transition: margin-left 0.3s ease;
-            margin-left: var(--sidebar-width); /* Gunakan variabel */
-        }
-
-        .sidebar.collapsed + .main-content {
-            margin-left: 0;
-        }
-
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: calc(100vh - 60px); /* Adjust height calculation if footer height changes */
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            padding: 1.2rem;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .note-title-input {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.4rem;
-            font-weight: 500;
-            border: none;
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.15);
-            color: white;
-            margin-bottom: 15px; /* Tambah jarak bawah */
-        }
-
-        .note-title-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-            font-style: italic;
-        }
-
-        /* Toolbar Layout */
-        .toolbar {
-            display: flex;
-            gap: 8px; /* Sedikit kurangi gap */
-            flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 10px; /* Jarak ke editor search */
-        }
-
-        /* Editor Search Bar */
-        .editor-search-bar {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 10px;
-            align-items: center;
-            background-color: var(--search-bg);
-            padding: 5px;
-            border-radius: 6px;
-            display: none; /* Sembunyikan secara default */
-        }
-
-        .editor-search-bar input[type="text"] {
-            flex-grow: 1;
-            padding: 6px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            font-size: 0.9rem;
-        }
-
-        .editor-search-bar button {
-            background-color: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: background-color 0.2s ease;
-        }
-         .dark-mode .editor-search-bar button {
-             background-color: rgba(0, 0, 0, 0.2);
-             color: var(--text-color);
-         }
-
-        .editor-search-bar button:hover {
-            background-color: rgba(255, 255, 255, 0.25);
-        }
-        .dark-mode .editor-search-bar button:hover {
-            background-color: rgba(0, 0, 0, 0.35);
-        }
-
-
-        .editor-search-bar button i {
-             margin-right: 3px;
-        }
-
-         #searchResultCount {
-             font-size: 0.8rem;
-             color: var(--placeholder-color);
-             margin: 0 5px;
-             min-width: 50px; /* Agar tidak geser saat angka berubah */
-             text-align: right;
-         }
-
-        /* Text Controls Container */
-        .text-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px; /* Sesuaikan gap */
-            margin-left: auto; /* Dorong ke kanan */
-        }
-
-        /* Individual Controls (Existing Styles Mostly Reused) */
-        .btn, .text-size-btn, .font-weight-btn, .undo-btn, .redo-btn, .new-note-btn, .copy-btn {
-            padding: 8px 12px; /* Ukuran tombol seragam */
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            background-color: rgba(255, 255, 255, 0.15);
-            color: white;
-            display: inline-flex; /* Agar icon dan text sejajar */
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem; /* Ukuran font tombol */
-            font-weight: 500;
-            transition: all 0.2s ease;
-            white-space: nowrap; /* Pastikan teks tidak wrap */
-        }
-
-        .btn:hover, .text-size-btn:hover, .font-weight-btn:hover, .undo-btn:hover, .redo-btn:hover, .new-note-btn:hover, .copy-btn:hover {
-            background-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-1px);
-        }
-         .btn i, .text-size-btn i, .font-weight-btn i, .undo-btn i, .redo-btn i, .new-note-btn i, .copy-btn i {
-             font-size: 1em; /* Ukuran icon relatif */
-         }
-
-        /* Ukuran spesifik untuk tombol kecil */
-        .text-size-btn, .undo-btn, .redo-btn, .new-note-btn {
-            width: 34px; /* Ukuran tetap */
-            height: 34px;
-            justify-content: center; /* Pusatkan icon */
-            padding: 0; /* Hapus padding agar pas */
-        }
-        .text-size-btn i.fa-minus, .text-size-btn i.fa-plus {
-             font-size: 0.6em;
-             margin-left: -3px;
-         }
-
-        .text-size-display {
-            font-size: 0.9rem;
-            min-width: 40px;
-            text-align: center;
-            color: white;
-            padding: 5px 0; /* Vertikal padding */
-        }
-
-        .font-weight-btn.active {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .undo-btn:disabled, .redo-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none; /* Jangan transform saat disabled */
-        }
-
-        /* Upload button styling */
-        .btn input[type="file"] {
-            display: none; /* Sembunyikan input file asli */
-        }
-
-        /* Editor Styles */
-        .editor {
-            width: 100%;
-            min-height: 65vh; /* Sesuaikan tinggi minimal */
-            padding: 22px;
-            font-size: 16px;
-            font-weight: normal;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            resize: vertical;
-            line-height: 1.7;
-            flex: 1; /* Agar editor mengisi sisa ruang */
-            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease; /* Transisi warna */
-            font-family: 'Inter', sans-serif; /* Pastikan font konsisten */
-            margin-top: 10px; /* Jarak dari toolbar/search */
-        }
-
-        .editor:focus {
-            outline: 2px solid var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
-        }
-
-        .editor::placeholder {
-            color: var(--placeholder-color);
-            font-style: italic;
-            opacity: 0.7;
-        }
-
-        /* Footer Styles */
-        .footer {
-            text-align: center;
-            padding: 15px;
-            color: var(--text-color);
-            font-size: 0.9rem;
-            margin-top: auto; /* Dorong ke bawah */
-            border-top: 1px solid var(--border-color); /* Garis pemisah tipis */
-        }
-
-        /* Control Buttons Container (Floating) */
-        .control-buttons {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            display: flex;
-            flex-direction: column; /* Susun vertikal */
-            gap: 12px; /* Jarak antar tombol */
-            z-index: 100;
-        }
-
-        .control-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15); /* Shadow lebih jelas */
-            cursor: pointer;
-            border: none;
-            transition: all 0.3s ease;
-        }
-
-        .control-btn:hover {
-            transform: scale(1.08); /* Efek hover lebih besar */
-            background-color: #3a7bc8; /* Warna hover */
-        }
-
-        /* Toast and Save Status Styles (Existing) */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 14px 24px;
-            background-color: var(--toast-bg);
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transform: translateY(120px); /* Mulai lebih jauh */
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Transisi lebih smooth */
-            z-index: 1000;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .toast.error {
-            background-color: var(--error-bg);
-        }
-
-        .save-status {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 8px 12px;
-            background-color: rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            opacity: 0;
-            transform: translateY(-15px); /* Mulai sedikit di atas */
-            transition: all 0.3s ease;
-            color: var(--text-color); /* Agar teks terlihat di light/dark mode */
-            z-index: 999; /* Dibawah toast */
-        }
-        .dark-mode .save-status {
-             background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .save-status.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .save-status i {
-             margin-right: 5px;
-        }
-
-        /* --- Responsive Styles (Existing + Adjustments) --- */
-        @media (max-width: 992px) { /* Breakpoint baru untuk tablet */
-             .text-controls {
-                 margin-left: 0; /* Hapus margin auto agar tidak pindah baris terlalu cepat */
-             }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -100%; /* Mulai dari luar layar */
-                z-index: 1000;
-                height: 100vh;
-                transition: transform 0.3s ease; /* Ganti transisi ke transform */
-                width: 80%; /* Lebar sidebar mobile */
-                transform: translateX(-100%); /* State awal tersembunyi */
-                border-right: 1px solid var(--border-color); /* Tampilkan border lagi */
-            }
-
-            .sidebar.show-mobile {
-                transform: translateX(0); /* Munculkan sidebar */
-            }
-
-            .main-content {
-                margin-left: 0 !important; /* Pastikan tidak ada margin */
-                 transition: none; /* Hapus transisi margin */
-            }
-
-            .container {
-                padding: 15px;
-                min-height: calc(100vh - 70px); /* Recalculate height */
-            }
-
-            .note-title-input {
-                font-size: 1.2rem;
-                padding: 12px;
-            }
-
-             .toolbar {
-                 gap: 5px; /* Kurangi gap di mobile */
-             }
-
-            .btn, .font-weight-btn, .copy-btn {
-                padding: 8px 10px;
-                font-size: 0.85rem;
-            }
-             .text-controls {
-                 /* Biarkan default flow */
-                 gap: 5px;
-             }
-             .text-size-btn, .undo-btn, .redo-btn, .new-note-btn {
-                 width: 30px;
-                 height: 30px;
-             }
-             .text-size-display {
-                 min-width: 35px;
-                 font-size: 0.85rem;
-             }
-
-            .editor {
-                min-height: 55vh; /* Kurangi tinggi editor di mobile */
-                font-size: 1rem;
-                padding: 18px;
-            }
-
-            .save-status {
-                top: 10px;
-                right: 10px;
-            }
-
-            .control-buttons {
-                bottom: 15px; /* Naikkan sedikit */
-                right: 15px;
-            }
-
-            .control-btn {
-                width: 45px;
-                height: 45px;
-                font-size: 1.1rem;
-            }
-
-            .footer {
-                padding: 10px;
-                font-size: 0.8rem;
-            }
-             .editor-search-bar {
-                 flex-wrap: wrap; /* Agar bisa wrap jika tidak cukup */
-             }
-             .editor-search-bar input[type="text"] {
-                 font-size: 0.85rem;
-             }
-             .editor-search-bar button {
-                 font-size: 0.75rem;
-             }
-        }
-
-        @media (max-width: 480px) {
-            /* Sembunyikan teks pada tombol utama di layar sangat kecil */
-            .btn .btn-text, .font-weight-btn .btn-text, .copy-btn .btn-text {
-                display: none;
-            }
-
-            .btn i, .font-weight-btn i, .copy-btn i {
-                margin-right: 0; /* Hapus margin jika hanya icon */
-            }
-            .btn, .font-weight-btn, .copy-btn {
-                padding: 8px; /* Padding seragam untuk icon */
-                 gap: 0;
-            }
-
-             .text-size-display {
-                 min-width: 30px;
-                 font-size: 0.8rem;
-             }
-             .toast {
-                 left: 10px;
-                 right: 10px; /* Agar toast tidak terlalu lebar */
-                 bottom: 10px;
-                 padding: 12px 18px;
-             }
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <style type="text/tailwindcss">
+        @layer base {
+            html { font-family: 'Inter', sans-serif; }
+            h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; @apply leading-tight font-bold; }
+            body, .card { @apply transition-colors duration-300 ease-in-out; }
+            .btn { @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed; }
+            .btn-secondary { @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md shadow-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out; }
+            .btn-danger { @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out; }
+            .btn-danger-sm { @apply inline-flex items-center justify-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out; }
+            .input-field { @apply block w-full px-4 py-3 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500; @apply transition duration-150 ease-in-out; }
+            .input-error { @apply border-red-500 dark:border-red-500 focus:border-red-500 focus:ring-red-500; }
+            /* MODIFIKASI: Poin 9 - Sedikit penyesuaian warna error untuk potensi kontras lebih baik, tapi perlu dicek lagi */
+            .error-text { @apply text-red-600 dark:text-red-400 text-xs mt-1; }
+            .card { @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 md:p-8; }
+            .nav-link { @apply text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition; }
+            .nav-link-mobile { @apply block text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition; }
+            .tooltip { @apply absolute z-20 inline-block px-3 py-2 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-sm dark:bg-gray-700 whitespace-normal; }
+            /* MODIFIKASI: Poin 10 - Style untuk tombol copy kecil */
+            .btn-copy { @apply inline-flex items-center justify-center p-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md shadow-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out ml-2; }
         }
     </style>
-</head>
-<body>
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-title">Catatan Saya</div>
-            <button class="control-btn" id="closeSidebarBtn" style="display: none; width: 30px; height: 30px; font-size: 1rem; background: none; color: var(--sidebar-text); box-shadow: none;">
-                 <i class="fas fa-times"></i>
-             </button>
-        </div>
+    <script>
+        // Konfigurasi Tailwind
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], 'space': ['Space Grotesk', 'sans-serif'], }, } } }
 
-        <div class="search-container">
-            <input type="text" id="searchNotes" placeholder="Cari judul catatan...">
-            <i class="fas fa-search"></i>
-        </div>
+        // --- Helper Functions (Global Scope) ---
+        function gradeToValue(grade) { const g={'A':4.0,'A-':3.7,'B+':3.3,'B':3.0,'B-':2.7,'C+':2.3,'C':2.0,'D':1.0,'E':0.0}; return g[String(grade).toUpperCase()]??0.0; }
 
-        <div class="sidebar-content" id="notesList">
+        // MODIFIKASI: Poin 4 - Fungsi valueToGrade dimodifikasi untuk menerima parameter 'scale'
+        // Pengguna dapat menyediakan array of objects [{grade:'A', min:90}, {grade:'B', min:80}, ...]
+        // Jika scale tidak disediakan atau kosong, pakai default internal.
+        function valueToGrade(value, customScale = null) {
+            // Skala default internal
+            let defaultScale = [
+                {grade:'A',min:85},{grade:'A-',min:80},{grade:'B+',min:75},{grade:'B',min:70},
+                {grade:'B-',min:65},{grade:'C+',min:60},{grade:'C',min:55},{grade:'D',min:40},{grade:'E',min:0}
+            ];
+            let scaleToUse = defaultScale;
+
+            // Gunakan customScale jika valid dan tidak kosong
+            if(customScale && Array.isArray(customScale) && customScale.length > 0) {
+                // Validasi sederhana: pastikan ada grade dan min, lalu urutkan
+                let validCustomScale = customScale.filter(item => item && typeof item.grade === 'string' && typeof item.min === 'number');
+                if (validCustomScale.length > 0) {
+                    scaleToUse = [...validCustomScale].sort((a, b) => b.min - a.min); // Sort descending by min score
+                }
+                // Jika customScale tidak valid setelah filter, tetap gunakan defaultScale
+            }
+
+            const n = parseFloat(value);
+            if(isNaN(n) || n === null) return '-';
+            const r = Math.round(n); // Atau gunakan n tanpa pembulatan jika diinginkan: const r = n;
+
+            for(const level of scaleToUse) {
+                if(r >= parseFloat(level.min)) return level.grade;
+            }
+            // Jika tidak cocok dengan skala manapun (misal, nilai < min terendah di skala), return grade terendah
+            return scaleToUse.length > 0 ? scaleToUse[scaleToUse.length - 1].grade : 'E';
+        }
+
+        function formatNumber(num, dec=2) { const n=parseFloat(num); if(isNaN(n)||n===null)return'-'; return n.toFixed(dec); }
+        function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
+
+        // --- Dark Mode Logic (Global Scope) ---
+        function manageDarkMode() { const M=window.matchMedia('(prefers-color-scheme: dark)'); const p=localStorage.getItem('darkMode'); function a(d){const r=document.documentElement; const c=(d&&!r.classList.contains('dark'))||(!d&&r.classList.contains('dark')); if(d){r.classList.add('dark');localStorage.setItem('darkMode','true');}else{r.classList.remove('dark');localStorage.setItem('darkMode','false');} if(c)window.dispatchEvent(new CustomEvent('darkModeChanged',{detail:{isDark:d}}));} if(p!==null)a(p==='true');else a(M.matches); M.addEventListener('change',(e)=>{if(localStorage.getItem('darkMode')===null)a(e.matches);}); window.toggleDarkMode=()=>{a(!document.documentElement.classList.contains('dark'));}; }
+        manageDarkMode();
+
+        // --- Alpine Component Definitions ---
+        document.addEventListener('alpine:init', () => {
+
+            Alpine.data('appSetup', () => ({
+                isDark: document.documentElement.classList.contains('dark'),
+                mobileMenuOpen: false, showBackToTop: false,
+                toastVisible: false, toastMessage: '', toastTimeout: null,
+                // MODIFIKASI: Poin 4 - Placeholder untuk Skala Nilai Kustom (perlu UI editor terpisah)
+                // customGradeScale: JSON.parse(localStorage.getItem('customGradeScale')) || null,
+                init() {
+                    window.addEventListener('darkModeChanged',(e)=>{this.isDark=e.detail.isDark;});
+                    AOS.init({duration:800,once:true,offset:50});
+                    this.showBackToTop=(window.scrollY>200);
+                    // Inisialisasi listener clipboard (jika belum didukung secara native di semua browser)
+                    // Bisa menggunakan library clipboard.js jika diperlukan
+                },
+                showToast(message, duration = 3000) {
+                    clearTimeout(this.toastTimeout);
+                    this.toastMessage = message;
+                    this.toastVisible = true;
+                    this.toastTimeout = setTimeout(()=>{this.toastVisible=false;},duration);
+                },
+                // MODIFIKASI: Poin 10 - Fungsi untuk menyalin ke clipboard
+                copyToClipboard(value, successMessage = 'Hasil disalin!') {
+                    if (value === null || value === undefined || String(value).trim() === '' || String(value) === '-') {
+                        this.showToast('Tidak ada hasil untuk disalin.', 2000);
+                        return;
+                    }
+                    const textToCopy = String(value);
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(textToCopy)
+                            .then(() => {
+                                this.showToast(successMessage);
+                            })
+                            .catch(err => {
+                                console.error('Gagal menyalin:', err);
+                                this.showToast('Gagal menyalin hasil.', 2000);
+                                // Fallback manual jika diperlukan
+                                // this.fallbackCopyTextToClipboard(textToCopy);
+                            });
+                    } else {
+                        // Fallback untuk HTTP atau browser lama (mungkin memerlukan elemen textarea sementara)
+                        console.warn('Clipboard API tidak tersedia. Coba fallback.');
+                        this.fallbackCopyTextToClipboard(textToCopy);
+                    }
+                },
+                // Fallback copy (jika navigator.clipboard tidak ada)
+                fallbackCopyTextToClipboard(text) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed"; // Hindari scroll ke bawah
+                    textArea.style.top = "0";
+                    textArea.style.left = "0";
+                    textArea.style.width = "2em";
+                    textArea.style.height = "2em";
+                    textArea.style.padding = "0";
+                    textArea.style.border = "none";
+                    textArea.style.outline = "none";
+                    textArea.style.boxShadow = "none";
+                    textArea.style.background = "transparent";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        if (successful) {
+                            this.showToast('Hasil disalin (fallback).');
+                        } else {
+                            this.showToast('Gagal menyalin (fallback).', 2000);
+                        }
+                    } catch (err) {
+                        console.error('Fallback Gagal:', err);
+                        this.showToast('Gagal menyalin (fallback).', 2000);
+                    }
+                    document.body.removeChild(textArea);
+                },
+                // MODIFIKASI: Poin 4 - Fungsi untuk mendapatkan skala nilai aktif
+                // getActiveGradeScale() {
+                //     return this.customGradeScale || null; // Akan pakai default di valueToGrade jika null
+                // }
+            }));
+
+            Alpine.data('finalGradeCalculator', () => ({
+                nilaiTugas: null, bobotTugas: 20, nilaiUTS: null, bobotUTS: 30, nilaiUAS: null, bobotUAS: 50,
+                finalGrade: null, letterGrade: '-', neededUAS: null, loading: false, targetGrade: 80,
+                errors: { nilaiTugas: null, bobotTugas: null, nilaiUTS: null, bobotUTS: null, nilaiUAS: null, bobotUAS: null, bobotTotal: null, targetGrade: null },
+                // MODIFIKASI: Poin 4 - Ambil skala aktif saat init (jika appSetup sudah siap)
+                // activeScale: Alpine.store('appSetup').getActiveGradeScale(), // Contoh pengambilan, perlu disesuaikan
+                validateInput(k,v,min,max,req=true){const val=parseFloat(v); if(req&&(v===null||String(v).trim()==='')){this.errors[k]='Wajib.';return false;} if(v!==null&&String(v).trim()!==''&&(isNaN(val)||val<min||val>max)){this.errors[k]=`Nilai ${min}-${max}.`;return false;} this.errors[k]=null;return true;},
+                validateAll(){let ok=true;this.errors={nilaiTugas:null,bobotTugas:null,nilaiUTS:null,bobotUTS:null,nilaiUAS:null,bobotUAS:null,bobotTotal:null,targetGrade:null};ok=this.validateInput('nilaiTugas',this.nilaiTugas,0,100)&&ok;ok=this.validateInput('bobotTugas',this.bobotTugas,0,100)&&ok;ok=this.validateInput('nilaiUTS',this.nilaiUTS,0,100)&&ok;ok=this.validateInput('bobotUTS',this.bobotUTS,0,100)&&ok;ok=this.validateInput('nilaiUAS',this.nilaiUAS,0,100,false)&&ok; ok=this.validateInput('bobotUAS',this.bobotUAS,0,100)&&ok;const tb=(parseFloat(this.bobotTugas)||0)+(parseFloat(this.bobotUTS)||0)+(parseFloat(this.bobotUAS)||0);if(Math.abs(tb-100)>=0.01){this.errors.bobotTotal='Total bobot harus 100%.';ok=false;}return ok;},
+                calculateFinalGrade(){
+                    this.finalGrade=null;this.letterGrade='-';if(!this.validateAll())return;this.loading=true;
+                    // MODIFIKASI: Poin 4 - Ambil skala dari appSetup jika ada, atau null
+                    // const currentScale = Alpine.store('appSetup').getActiveGradeScale();
+                    setTimeout(()=>{
+                        const t=parseFloat(this.nilaiTugas)||0;const ut=parseFloat(this.nilaiUTS)||0;const ua=parseFloat(this.nilaiUAS)||0;
+                        const bt=parseFloat(this.bobotTugas)/100||0;const bu=parseFloat(this.bobotUTS)/100||0;const ba=parseFloat(this.bobotUAS)/100||0;
+                        this.finalGrade=(t*bt)+(ut*bu)+(ua*ba);
+                        // MODIFIKASI: Poin 4 - Gunakan skala saat memanggil valueToGrade
+                        // this.letterGrade=valueToGrade(this.finalGrade, currentScale);
+                        this.letterGrade=valueToGrade(this.finalGrade); // Tetap pakai default untuk sekarang
+                        this.loading=false;
+                    },300);
+                },
+                calculateNeededUAS(){this.neededUAS=null;let okT=this.validateInput('targetGrade',this.targetGrade,0,100);let okP=this.validateInput('nilaiTugas',this.nilaiTugas,0,100)&&this.validateInput('nilaiUTS',this.nilaiUTS,0,100)&&this.validateInput('bobotTugas',this.bobotTugas,0,100)&&this.validateInput('bobotUTS',this.bobotUTS,0,100)&&this.validateInput('bobotUAS',this.bobotUAS,0.01,100);if(!okT||!okP){if(parseFloat(this.bobotUAS)<=0&&this.errors.bobotUAS===null){this.errors.bobotUAS='Bobot UAS > 0.';}return;}const target=parseFloat(this.targetGrade);const t=parseFloat(this.nilaiTugas)||0;const ut=parseFloat(this.nilaiUTS)||0;const bt=parseFloat(this.bobotTugas)/100||0;const bu=parseFloat(this.bobotUTS)/100||0;const ba=parseFloat(this.bobotUAS)/100||0;const cs=(t*bt)+(ut*bu);const nfUAS=target-cs;this.neededUAS=nfUAS/ba;},
+                reset(){this.nilaiTugas=null;this.bobotTugas=20;this.nilaiUTS=null;this.bobotUTS=30;this.nilaiUAS=null;this.bobotUAS=50;this.finalGrade=null;this.letterGrade='-';this.neededUAS=null;this.targetGrade=80;this.loading=false;this.errors={nilaiTugas:null,bobotTugas:null,nilaiUTS:null,bobotUTS:null,nilaiUAS:null,bobotUAS:null,bobotTotal:null,targetGrade:null};}
+            }));
+
+            Alpine.data('gpaCalculator', () => ({
+                courses: [{ id: generateId(), name: '', sks: 3, grade: 'A' }], semesterIP: null, previousIPK: null, previousSKS: null,
+                cumulativeIPK: null, totalSKS: null, ipError: '', loading: false,
+                errors: { previousIPK: null, previousSKS: null, courses: [{id:'', sks:null}], tooltipIPKVisible: false, tooltipSKSVisible: false },
+                // MODIFIKASI: Poin 11 - Variabel untuk toggle rumus IPK
+                showFormulaIPK: false,
+                init() {
+                    this.loadFromLocalStorage();
+                    this.syncErrorsStructure();
+                    this.$watch('courses',()=> { this.saveGpaData(); this.syncErrorsStructure(); } ,{deep:true});
+                    this.$watch('previousIPK',()=>this.saveGpaData());
+                    this.$watch('previousSKS',()=>this.saveGpaData());
+                },
+                syncErrorsStructure() { this.errors.courses = this.courses.map(c => ({id: c.id, sks: null })); },
+                validateCourses(){let ok=true;/*this.errors.courses=[];*/if(this.courses.length===0){this.ipError='Tambah matkul.';return false;}this.courses.forEach((c,i)=>{if(!this.errors.courses[i]) this.errors.courses[i]={id:c.id, sks:null}; const s=parseInt(c.sks,10);if(isNaN(s)||s<=0){this.errors.courses[i].sks='SKS>0';ok=false;} else {this.errors.courses[i].sks=null;}});if(ok)this.ipError='';return ok;},
+                validatePrevious(){let ok=true;this.errors.previousIPK=null;this.errors.previousSKS=null;const pIPK=parseFloat(this.previousIPK);const pSKS=parseInt(this.previousSKS,10);if(this.previousIPK!==null&&String(this.previousIPK).trim()!==''&&(isNaN(pIPK)||pIPK<0||pIPK>4)){this.errors.previousIPK='IPK 0-4';ok=false;}if(this.previousSKS!==null&&String(this.previousSKS).trim()!==''&&(isNaN(pSKS)||pSKS<0)){this.errors.previousSKS='SKS>=0';ok=false;}return ok;},
+                addCourse() { const newId = generateId(); this.courses.push({ id: newId, name: '', sks: 3, grade: 'A' }); if(!this.errors.courses)this.errors.courses=[]; this.errors.courses.push({id: newId, sks:null}); },
+                removeCourse(index) { this.courses.splice(index, 1); this.errors.courses.splice(index,1); this.calculateIP(); if(this.previousIPK !== null && this.previousSKS !== null) this.calculateIPK(); },
+                calculateIP() { this.semesterIP=null;if(!this.validateCourses())return;this.loading=true;setTimeout(()=>{let score=0;let sksTotal=0;for(const c of this.courses){const s=parseInt(c.sks,10);if(isNaN(s) || s <= 0) continue; const gv=gradeToValue(c.grade);score+=gv*s;sksTotal+=s;}this.semesterIP=(sksTotal>0)?(score/sksTotal):null;if(this.previousIPK!==null&&this.previousSKS!==null&&String(this.previousIPK).trim()!==''&&String(this.previousSKS).trim()!=='')this.calculateIPK();this.loading=false;},300);},
+                calculateIPK() { this.cumulativeIPK=null;this.totalSKS=null;if(!this.validateCourses()||!this.validatePrevious()||this.semesterIP===null || this.previousIPK === null || this.previousSKS === null || String(this.previousIPK).trim()==='' || String(this.previousSKS).trim()==='') return; const pIPK=parseFloat(this.previousIPK);const pSKS=parseInt(this.previousSKS,10);const cIP=parseFloat(this.semesterIP);let cSKS=0;for(const c of this.courses){const sksVal = parseInt(c.sks, 10); if(!isNaN(sksVal) && sksVal > 0) cSKS+=sksVal;}if(cSKS<=0){this.cumulativeIPK=pIPK;this.totalSKS=pSKS;}else{const prevTotalScore = pIPK*pSKS; const currentTotalScore = cIP*cSKS; const totalScore = prevTotalScore + currentTotalScore; this.totalSKS=pSKS+cSKS;this.cumulativeIPK=this.totalSKS>0?totalScore/this.totalSKS:null;}},
+                reset() { this.courses=[{id: generateId(), name:'',sks:3,grade:'A'}];this.semesterIP=null;this.previousIPK=null;this.previousSKS=null;this.cumulativeIPK=null;this.totalSKS=null;this.ipError='';this.loading=false;this.errors={previousIPK:null,previousSKS:null,courses:[{id:'', sks:null}], tooltipIPKVisible: false, tooltipSKSVisible: false}; this.syncErrorsStructure(); localStorage.removeItem('gpaData'); /* MODIFIKASI: Hapus juga localStorage saat reset */ },
+                saveGpaData() { localStorage.setItem('gpaData', JSON.stringify({ courses: this.courses, previousIPK: this.previousIPK, previousSKS: this.previousSKS })); },
+                loadFromLocalStorage() { const s=localStorage.getItem('gpaData');if(s){try{const d=JSON.parse(s);this.courses=d.courses&&d.courses.length>0?d.courses:[{id: generateId(),name:'',sks:3,grade:'A'}];this.previousIPK=d.previousIPK||null;this.previousSKS=d.previousSKS||null;/*this.errors.courses=this.courses.map(()=>({sks:null}));*/}catch(e){this.courses=[{id:generateId(),name:'',sks:3,grade:'A'}];/*this.errors.courses=[{sks:null}];*/}}else{this.courses=[{id: generateId(),name:'',sks:3,grade:'A'}];/*this.errors.courses=[{sks:null}];*/} this.syncErrorsStructure(); /* Panggil sync setelah load */}
+            }));
+
+            Alpine.data('ppdbCalculator', () => ({
+                nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null,
+                nilaiGabungan: null, kontribusiRapor: null, kontribusiASPD: null, kontribusiAkreditasi: null,
+                loading: false,
+                errors: { nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null },
+                // MODIFIKASI: Poin 11 - Variabel untuk toggle rumus PPDB
+                showFormulaPPDB: false,
+                // MODIFIKASI: Poin 2 - Pengingat untuk cek Juknis
+                // !! PENTING: Pastikan rentang nilai (max) untuk Rapor (400?) dan ASPD (300?)
+                // !! sudah sesuai Juknis PPDB DIY terbaru sebelum digunakan secara publik.
+                validateInput(k, v, min, max, req = true) {
+                    const val = parseFloat(v);
+                    if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; }
+                    if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) {
+                        this.errors[k] = `Nilai harus antara ${min}-${max}.`; return false;
+                    }
+                    this.errors[k] = null; return true;
+                },
+                validateAll() {
+                    let ok = true;
+                    this.errors = { nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null };
+                    // Gunakan max sesuai asumsi saat ini, HARUS DIVERIFIKASI DENGAN JUKNIS
+                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok; // Max 400?
+                    ok = this.validateInput('nilaiASPD', this.nilaiASPD, 0, 300) && ok;   // Max 300?
+                    ok = this.validateInput('akreditasiSekolah', this.akreditasiSekolah, 0, 100) && ok; // Akreditasi 0-100
+                    return ok;
+                },
+                calculateNilaiGabungan() {
+                    this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null; this.kontribusiAkreditasi = null;
+                    if (!this.validateAll()) return;
+                    this.loading = true;
+                    setTimeout(() => {
+                        const rapor = parseFloat(this.nilaiRapor);
+                        const aspd = parseFloat(this.nilaiASPD);
+                        const akreditasi = parseFloat(this.akreditasiSekolah);
+                        // Rumus sesuai asumsi sebelumnya (PERLU VERIFIKASI JUKNIS!)
+                        this.kontribusiRapor = rapor * 0.40;
+                        this.kontribusiASPD = aspd * 0.55;
+                        this.kontribusiAkreditasi = (akreditasi * 4) * 0.05; // (Akreditasi * 4) * 5%
+                        this.nilaiGabungan = this.kontribusiRapor + this.kontribusiASPD + this.kontribusiAkreditasi;
+                        this.loading = false;
+                    }, 50);
+                },
+                reset() {
+                    this.nilaiRapor = null; this.nilaiASPD = null; this.akreditasiSekolah = null;
+                    this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null; this.kontribusiAkreditasi = null;
+                    this.loading = false; this.errors = { nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null };
+                    this.showFormulaPPDB = false; // Reset toggle rumus juga
+                }
+            }));
+
+            Alpine.data('gradeConverter', () => ({
+                numericGradeInput: null, letterGradeOutput: '-',
+                // MODIFIKASI: Poin 4 - Ambil skala aktif saat init
+                // activeScale: Alpine.store('appSetup').getActiveGradeScale(),
+                convertGrade() {
+                    // MODIFIKASI: Poin 4 - Gunakan skala saat memanggil valueToGrade
+                    // this.letterGradeOutput = valueToGrade(this.numericGradeInput, this.activeScale);
+                     this.letterGradeOutput = valueToGrade(this.numericGradeInput); // Tetap pakai default
+                },
+                reset() { this.numericGradeInput=null; this.letterGradeOutput='-'; }
+            }));
+
+            Alpine.data('raporCalculator', () => ({
+                // MODIFIKASI: Poin 7 - Tambah 'average' di semester
+                semesters: [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }],
+                averageGrade: null, loading: false,
+                // MODIFIKASI: Poin 7 - Tambah 'average' error (jika perlu)
+                errors: { semesters: [{ id: '', average: null, subjects: [{ id: '', grade: null }] }] },
+                init() {
+                    // MODIFIKASI: Poin 6 - Load data dari localStorage
+                    this.loadFromLocalStorage();
+                    this.syncErrorsStructure();
+                    // MODIFIKASI: Poin 6 - Watch perubahan untuk save ke localStorage
+                    this.$watch('semesters', () => {
+                        this.saveRaporData();
+                        this.syncErrorsStructure(); // Pastikan struktur error sinkron setelah perubahan
+                    }, { deep: true });
+                },
+                syncErrorsStructure() {
+                    // MODIFIKASI: Poin 7 - Sinkronkan struktur error semester
+                    this.errors.semesters = this.semesters.map(sem => ({
+                        id: sem.id,
+                        average: null, // Error untuk average semester (jika diperlukan nanti)
+                        subjects: sem.subjects.map(sub => ({ id: sub.id, grade: null }))
+                    }));
+                },
+                validateSubjectGrade(semIdx, subIdx) { const grade = this.semesters[semIdx].subjects[subIdx].grade; const val = parseFloat(grade); if (grade === null || String(grade).trim() === '') { this.errors.semesters[semIdx].subjects[subIdx].grade = null; return true; } if (isNaN(val) || val < 0 || val > 100) { this.errors.semesters[semIdx].subjects[subIdx].grade = '0-100'; return false; } this.errors.semesters[semIdx].subjects[subIdx].grade = null; return true; },
+                addSemester() { const newId = generateId(); this.semesters.push({ id: newId, name: `Semester ${this.semesters.length + 1}`, subjects: [{ id: generateId(), name: '', grade: null }], average: null }); this.errors.semesters.push({ id: newId, average: null, subjects: [{ id: '', grade: null }] }); },
+                removeSemester(index) { if (this.semesters.length > 1) { this.semesters.splice(index, 1); this.errors.semesters.splice(index, 1); this.calculateAverage(); } else { this.$dispatch('show-toast', { message: 'Minimal harus ada 1 semester.' }); } },
+                addSubject(semIdx) { const newId = generateId(); this.semesters[semIdx].subjects.push({ id: newId, name: '', grade: null }); this.errors.semesters[semIdx].subjects.push({ id: newId, grade: null }); },
+                removeSubject(semIdx, subIdx) { if (this.semesters[semIdx].subjects.length > 1) { this.semesters[semIdx].subjects.splice(subIdx, 1); this.errors.semesters[semIdx].subjects.splice(subIdx, 1); this.calculateAverage(); } else { this.$dispatch('show-toast', { message: 'Minimal harus ada 1 mapel per semester.' }); } },
+                calculateAverage() {
+                    this.averageGrade = null;
+                    let totalSum = 0; let totalCount = 0; let allValid = true;
+                    this.semesters.forEach((sem, semIdx) => {
+                        let semesterSum = 0; let semesterCount = 0; let semesterValid = true; // MODIFIKASI: Poin 7
+                        sem.subjects.forEach((sub, subIdx) => {
+                            if (!this.validateSubjectGrade(semIdx, subIdx)) {
+                                allValid = false; semesterValid = false; // MODIFIKASI: Poin 7
+                            } else {
+                                const grade = parseFloat(sub.grade);
+                                if (!isNaN(grade)) {
+                                    totalSum += grade; totalCount++;
+                                    semesterSum += grade; semesterCount++; // MODIFIKASI: Poin 7
+                                }
+                            }
+                        });
+                        // MODIFIKASI: Poin 7 - Hitung & simpan rata-rata semester
+                        if (semesterValid && semesterCount > 0) {
+                            this.semesters[semIdx].average = semesterSum / semesterCount;
+                        } else {
+                            this.semesters[semIdx].average = null;
+                        }
+                    });
+                    if (!allValid) return;
+                    if (totalCount > 0) { this.averageGrade = totalSum / totalCount; } else { this.averageGrade = null; }
+                },
+                reset() {
+                    this.semesters = [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }];
+                    this.averageGrade = null; this.loading = false;
+                    this.syncErrorsStructure();
+                    // MODIFIKASI: Poin 6 - Hapus data dari localStorage saat reset
+                    localStorage.removeItem('raporData');
+                    this.$dispatch('show-toast', { message: 'Data Rapor direset.' });
+                },
+                // MODIFIKASI: Poin 6 - Fungsi save ke localStorage
+                saveRaporData() {
+                    localStorage.setItem('raporData', JSON.stringify(this.semesters));
+                },
+                // MODIFIKASI: Poin 6 - Fungsi load dari localStorage
+                loadFromLocalStorage() {
+                    const savedData = localStorage.getItem('raporData');
+                    if (savedData) {
+                        try {
+                            const parsedData = JSON.parse(savedData);
+                            // Validasi sederhana: pastikan array dan ada isinya
+                            if (Array.isArray(parsedData) && parsedData.length > 0) {
+                                // Pastikan struktur data minimal ada (id, name, subjects)
+                                this.semesters = parsedData.map(sem => ({
+                                    id: sem.id || generateId(),
+                                    name: sem.name || 'Semester',
+                                    subjects: (Array.isArray(sem.subjects) ? sem.subjects.map(sub => ({
+                                        id: sub.id || generateId(),
+                                        name: sub.name || '',
+                                        grade: sub.grade !== undefined ? sub.grade : null
+                                    })) : [{ id: generateId(), name: '', grade: null }]),
+                                    average: null // Average dihitung ulang, tidak disimpan
+                                }));
+                            } else {
+                                this.setDefaultSemesters();
+                            }
+                        } catch (e) {
+                            console.error("Gagal parse data rapor:", e);
+                            this.setDefaultSemesters();
+                        }
+                    } else {
+                        this.setDefaultSemesters();
+                    }
+                    // Hitung ulang rata-rata setelah load
+                    this.calculateAverage();
+                },
+                // Fungsi untuk set default semester jika load gagal atau tidak ada data
+                setDefaultSemesters() {
+                    this.semesters = [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }];
+                },
+                 // MODIFIKASI: Poin 6 - Fungsi untuk hapus data tersimpan
+                clearStoredData() {
+                    localStorage.removeItem('raporData');
+                    this.reset(); // Panggil reset untuk mengembalikan ke state awal
+                    this.$dispatch('show-toast', { message: 'Data rapor tersimpan dihapus.' });
+                }
+            }));
+
+        }); // End of alpine:init listener
+    </script>
+    </head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased"
+      x-data="appSetup"
+      @scroll.window="showBackToTop = (window.scrollY > 200)"
+      @show-toast.window="showToast($event.detail.message, $event.detail.duration || 3000)"> <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors duration-300">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-indigo-600 dark:text-indigo-400"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /> </svg>
+                <h1 class="text-2xl font-space font-bold text-gray-800 dark:text-white">Pintar<span class="text-indigo-600">Hitung</span></h1>
             </div>
-
-        <button class="add-note-btn" id="addNoteBtn">
-            <i class="fas fa-plus"></i>
-            <span>Catatan Baru</span>
-        </button>
-    </div>
-
-    <div class="main-content">
-        <div class="container">
-            <div class="header">
-                <input type="text" class="note-title-input" id="noteTitle" placeholder="Beri judul catatan Anda..." aria-label="Judul catatan">
-                <div class="toolbar">
-                    <button class="btn" onclick="saveNote()" aria-label="Simpan catatan">
-                        <i class="fas fa-save"></i>
-                        <span class="btn-text">Simpan</span> </button>
-                     <button class="new-note-btn" id="newNoteBtn" aria-label="Catatan baru" title="Catatan Baru (Ctrl+N)">
-                         <i class="fas fa-plus"></i>
-                     </button>
-
-                    <div class="undo-redo-controls" style="display: inline-flex; gap: 5px;">
-                        <button class="undo-btn" id="undoBtn" aria-label="Undo" title="Undo (Ctrl+Z)" disabled>
-                             <i class="fas fa-undo"></i>
-                        </button>
-                        <button class="redo-btn" id="redoBtn" aria-label="Redo" title="Redo (Ctrl+Y/Shift+Z)" disabled>
-                             <i class="fas fa-redo"></i>
-                        </button>
-                    </div>
-
-                    <button class="btn" id="searchBtn" aria-label="Cari dalam teks" title="Cari dalam teks (Ctrl+F)">
-                        <i class="fas fa-search"></i>
-                        <span class="btn-text">Cari</span>
-                    </button>
-                    <button class="btn" id="formatTextBtn" aria-label="Format Teks" title="Rapikan Teks">
-                        <i class="fas fa-magic"></i> <span class="btn-text">Rapikan</span>
-                    </button>
-
-
-                    <div class="text-controls">
-                         <button class="font-weight-btn" id="fontWeightBtn" aria-label="Toggle Bold" title="Bold (Ctrl+B)">
-                             <i class="fas fa-bold"></i>
-                             <span class="btn-text">Bold</span>
-                         </button>
-                        <div class="text-size-controls" style="display: inline-flex; align-items: center; gap: 5px;">
-                            <button class="text-size-btn" id="decreaseFontBtn" aria-label="Perkecil teks">
-                                <i class="fas fa-font"></i><i class="fas fa-minus"></i>
-                            </button>
-                            <span class="text-size-display" id="fontSizeDisplay">16px</span>
-                            <button class="text-size-btn" id="increaseFontBtn" aria-label="Perbesar teks">
-                                <i class="fas fa-font"></i><i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                         <button class="copy-btn" id="copyBtn" aria-label="Salin semua teks" title="Salin Semua (Ctrl+Shift+C)">
-                            <i class="far fa-copy"></i>
-                            <span class="btn-text">Salin</span>
-                        </button>
-                        <button class="btn" onclick="downloadNote()" aria-label="Download catatan">
-                            <i class="fas fa-download"></i>
-                            <span class="btn-text">Unduh</span>
-                        </button>
-                        <label class="btn" aria-label="Upload file teks">
-                            <i class="fas fa-upload"></i>
-                             <span class="btn-text">Unggah</span>
-                            <input type="file" hidden accept=".txt" onchange="uploadNote(event)">
-                        </label>
-                    </div>
+            <div class="flex items-center space-x-4">
+                 <button @click="window.toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <svg x-show="!isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /> </svg>
+                     <svg x-show="isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-6.364-.386 1.591-1.591M3 12h2.25m.386-6.364 1.591 1.591M12 6.75A5.25 5.25 0 0 0 6.75 12a5.25 5.25 0 0 0 5.25 5.25a5.25 5.25 0 0 0 5.25-5.25A5.25 5.25 0 0 0 12 6.75Z" /> </svg>
+                </button>
+                <div class="hidden md:flex space-x-6">
+                     <a href="#kalkulator-nilai-akhir" class="nav-link">Nilai Akhir</a>
+                    <a href="#kalkulator-ipk" class="nav-link">IP/IPK</a>
+                    <a href="#kalkulator-ppdb" class="nav-link">PPDB DIY</a>
+                    <a href="#kalkulator-rapor" class="nav-link">Rata-rata Rapor</a>
+                     <a href="#konversi-nilai" class="nav-link">Konversi Nilai</a>
+                    <a href="#target-nilai" class="nav-link">Tips Target Nilai</a>
                 </div>
-                 <div class="editor-search-bar" id="editorSearchBar">
-                     <input type="text" id="editorSearchInput" placeholder="Cari teks dalam catatan...">
-                     <button id="searchPrevBtn"><i class="fas fa-chevron-up"></i> Prev</button>
-                     <button id="searchNextBtn">Next <i class="fas fa-chevron-down"></i></button>
-                     <span id="searchResultCount">0/0</span>
-                     <button id="closeSearchBtn"><i class="fas fa-times"></i></button>
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Toggle Menu">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /> </svg>
+                </button>
+           </div>
+        </nav>
+        <div :class="{ 'block': mobileMenuOpen, 'hidden': !mobileMenuOpen }" class="md:hidden bg-white dark:bg-gray-800 p-4 space-y-2 absolute top-full left-0 right-0 shadow-md z-40">
+            <a href="#kalkulator-nilai-akhir" @click="mobileMenuOpen = false" class="nav-link-mobile">Nilai Akhir</a>
+            <a href="#kalkulator-ipk" @click="mobileMenuOpen = false" class="nav-link-mobile">IP/IPK</a>
+            <a href="#kalkulator-ppdb" @click="mobileMenuOpen = false" class="nav-link-mobile">PPDB DIY</a>
+            <a href="#kalkulator-rapor" @click="mobileMenuOpen = false" class="nav-link-mobile">Rata-rata Rapor</a>
+            <a href="#konversi-nilai" @click="mobileMenuOpen = false" class="nav-link-mobile">Konversi Nilai</a>
+            <a href="#target-nilai" @click="mobileMenuOpen = false" class="nav-link-mobile">Tips Target Nilai</a>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-12">
+
+        <section id="kalkulator-nilai-akhir" x-data="finalGradeCalculator" data-aos="fade-up">
+            <div class="card">
+                <div class="flex items-center mb-6 space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-indigo-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /> </svg>
+                    <h2 class="text-3xl font-space">Kalkulator Nilai Akhir Mapel</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div class="space-y-4">
+                        <div>
+                            <label for="fn_nilai_tugas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Tugas</label>
+                            <input type="number" id="fn_nilai_tugas" x-model.number="nilaiTugas" @input="validateInput('nilaiTugas', nilaiTugas, 0, 100)" placeholder="0-100" class="input-field" :class="{ 'input-error': errors.nilaiTugas }">
+                            <p x-show="errors.nilaiTugas" x-text="errors.nilaiTugas" class="error-text"></p>
+                        </div>
+                        <div>
+                            <label for="fn_bobot_tugas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot Tugas (%)</label>
+                             <input type="number" id="fn_bobot_tugas" x-model.number="bobotTugas" @input="validateInput('bobotTugas', bobotTugas, 0, 100)" placeholder="mis: 20" class="input-field" :class="{ 'input-error': errors.bobotTugas || errors.bobotTotal }">
+                             <p x-show="errors.bobotTugas" x-text="errors.bobotTugas" class="error-text"></p>
+                        </div>
+                        <div>
+                             <label for="fn_nilai_uts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai UTS</label>
+                            <input type="number" id="fn_nilai_uts" x-model.number="nilaiUTS" @input="validateInput('nilaiUTS', nilaiUTS, 0, 100)" placeholder="0-100" class="input-field" :class="{ 'input-error': errors.nilaiUTS }">
+                            <p x-show="errors.nilaiUTS" x-text="errors.nilaiUTS" class="error-text"></p>
+                         </div>
+                        <div>
+                            <label for="fn_bobot_uts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot UTS (%)</label>
+                             <input type="number" id="fn_bobot_uts" x-model.number="bobotUTS" @input="validateInput('bobotUTS', bobotUTS, 0, 100)" placeholder="mis: 30" class="input-field" :class="{ 'input-error': errors.bobotUTS || errors.bobotTotal }">
+                            <p x-show="errors.bobotUTS" x-text="errors.bobotUTS" class="error-text"></p>
+                         </div>
+                         <div>
+                             <label for="fn_nilai_uas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai UAS</label>
+                            <input type="number" id="fn_nilai_uas" x-model.number="nilaiUAS" @input="validateInput('nilaiUAS', nilaiUAS, 0, 100, false)" placeholder="0-100" class="input-field" :class="{ 'input-error': errors.nilaiUAS }">
+                            <p x-show="errors.nilaiUAS" x-text="errors.nilaiUAS" class="error-text"></p>
+                         </div>
+                        <div>
+                            <label for="fn_bobot_uas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot UAS (%)</label>
+                             <input type="number" id="fn_bobot_uas" x-model.number="bobotUAS" @input="validateInput('bobotUAS', bobotUAS, 0, 100)" placeholder="mis: 50" class="input-field" :class="{ 'input-error': errors.bobotUAS || errors.bobotTotal }">
+                            <p x-show="errors.bobotUAS" x-text="errors.bobotUAS" class="error-text"></p>
+                        </div>
+                         <p x-show="errors.bobotTotal" x-text="errors.bobotTotal" class="error-text"></p>
+                         <div class="flex space-x-3 pt-2">
+                            <button @click="calculateFinalGrade()" class="btn flex-grow" :disabled="loading">
+                                <span x-show="!loading">Hitung Nilai Akhir</span>
+                                 <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                             </button>
+                             <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
+                                 Reset
+                            </button>
+                         </div>
+                    </div>
+                     <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg flex flex-col justify-center items-center text-center space-y-4">
+                        <h3 class="text-xl font-semibold text-indigo-800 dark:text-indigo-200">Hasil Perhitungan</h3>
+                        <div x-show="finalGrade !== null" class="relative"> <p class="text-gray-600 dark:text-gray-400">Nilai Akhir:</p>
+                            <p class="text-5xl font-bold text-indigo-600 dark:text-indigo-400" x-text="formatNumber(finalGrade, 2)"></p>
+                            <p class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-1" x-text="letterGrade"></p>
+                            <button @click="$store.appSetup.copyToClipboard(formatNumber(finalGrade, 2), 'Nilai akhir disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Nilai Akhir">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                            </button>
+                         </div>
+                        <div x-show="finalGrade === null" class="text-gray-500 dark:text-gray-400"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg> Masukkan nilai & bobot. </div>
+                        <div class="w-full pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                            <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Target Nilai UAS</h4>
+                            <div>
+                                 <label for="fn_target_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Nilai Akhir</label>
+                                <input type="number" id="fn_target_grade" x-model.number="targetGrade" @input="validateInput('targetGrade', targetGrade, 0, 100)" placeholder="mis: 85" class="input-field mb-2 !py-2 text-sm" :class="{ 'input-error': errors.targetGrade }">
+                                 <p x-show="errors.targetGrade" x-text="errors.targetGrade" class="error-text"></p>
+                            </div>
+                             <button @click="calculateNeededUAS()" class="btn-secondary w-full text-sm !py-2 mt-1"> Hitung Min. UAS </button>
+                             <div x-show="neededUAS !== null" class="mt-2 text-center">
+                                 <p class="text-sm text-gray-600 dark:text-gray-400">Nilai UAS minimum:</p>
+                                 <p class="text-xl font-bold" :class="neededUAS > 100 ? 'text-red-500' : 'text-green-600 dark:text-green-400'" x-text="neededUAS !== null ? formatNumber(neededUAS, 2) : '-'"></p>
+                                 <p x-show="neededUAS > 100" class="text-xs text-red-500">(Target tidak mungkin tercapai)</p>
+                            </div>
+                             <div x-show="neededUAS === null && errors.targetGrade === null && !errors.nilaiTugas && !errors.nilaiUTS && !errors.bobotUAS" class="mt-2 text-sm text-gray-500">Masukkan target & tekan tombol.</div>
+                        </div>
+                    </div>
                  </div>
             </div>
-            <textarea class="editor" id="editor" placeholder="Mulai mengetik di sini..."></textarea>
+        </section>
 
-            <div class="footer">
-                <span id="wordCount">0 kata</span> |
-                <span id="charCount">0 karakter</span>
-                &copy; 2025 Notepad Online | Fawwaz Dzaky
+        <section id="kalkulator-ipk" x-data="gpaCalculator" data-aos="fade-up">
+             <div class="card">
+                 <div class="flex items-center mb-6 space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-teal-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /> </svg>
+                    <h2 class="text-3xl font-space">Kalkulator IP & IPK</h2>
+                </div>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     <div class="lg:col-span-1 space-y-4">
+                         <h3 class="text-xl font-semibold">Daftar Mata Kuliah Semester Ini</h3>
+                          <template x-for="(course, index) in courses" :key="course.id"> <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start border dark:border-gray-700 p-3 rounded-md mb-2">
+                                <div class="sm:col-span-5">
+                                    <label :for="'course_name_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Matkul</label>
+                                    <input type="text" :id="'course_name_' + course.id" x-model="course.name" placeholder="Nama Mata Kuliah (Opsional)" class="input-field !py-2 text-sm">
+                                </div>
+                                 <div class="sm:col-span-2">
+                                    <label :for="'course_sks_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SKS</label>
+                                    <input type="number" :id="'course_sks_' + course.id" x-model.number="course.sks" @input="validateCourses(); calculateIP();" placeholder="SKS" min="1" class="input-field !py-2 text-sm" :class="{ 'input-error': errors.courses[index]?.sks }">
+                                    <p x-show="errors.courses[index]?.sks" x-text="errors.courses[index]?.sks" class="error-text !mb-0"></p>
+                                </div>
+                                <div class="sm:col-span-3">
+                                     <label :for="'course_grade_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai</label>
+                                     <select :id="'course_grade_' + course.id" x-model="course.grade" @change="calculateIP()" class="input-field !py-2 text-sm">
+                                        <option>A</option> <option>A-</option> <option>B+</option> <option>B</option>
+                                        <option>B-</option> <option>C+</option> <option>C</option> <option>D</option> <option>E</option>
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-2 flex justify-end items-center pt-5"> <button @click="removeCourse(index)" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 transition rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" aria-label="Hapus Mata Kuliah">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"> <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /> </svg>
+                                    </button>
+                                </div>
+                             </div>
+                         </template>
+                         <p x-show="ipError" x-text="ipError" class="error-text"></p>
+                         <div class="flex space-x-3 pt-2">
+                               <button @click="addCourse()" class="btn-secondary flex-grow flex items-center justify-center"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /> </svg> Tambah Matkul </button>
+                             <button @click="calculateIP()" class="btn flex-grow" :disabled="courses.length === 0 || loading">
+                                 <span x-show="!loading">Hitung IP Semester</span>
+                                 <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                             </button>
+                         </div>
+                         <div class="pt-4 border-t dark:border-gray-700">
+                            <h4 class="text-lg font-semibold mb-2">Hitung IPK Kumulatif</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="relative">
+                                     <label for="prev_ipk" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        IPK Sblm
+                                         <button type="button" @mouseenter="errors.tooltipIPKVisible = true" @mouseleave="errors.tooltipIPKVisible = false" @focus="errors.tooltipIPKVisible = true" @blur="errors.tooltipIPKVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
+                                        </button>
+                                     </label>
+                                    <div x-show="errors.tooltipIPKVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Masukkan IPK kumulatif terakhir Anda SEBELUM semester ini. Kosongkan jika semester pertama. </div>
+                                    <input type="number" step="0.01" id="prev_ipk" x-model.number="previousIPK" @input="validatePrevious(); calculateIPK();" placeholder="mis: 3.50" class="input-field" :class="{'input-error': errors.previousIPK}">
+                                    <p x-show="errors.previousIPK" x-text="errors.previousIPK" class="error-text"></p>
+                                 </div>
+                                <div class="relative">
+                                    <label for="prev_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                         Total SKS Sblm
+                                        <button type="button" @mouseenter="errors.tooltipSKSVisible = true" @mouseleave="errors.tooltipSKSVisible = false" @focus="errors.tooltipSKSVisible = true" @blur="errors.tooltipSKSVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
+                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
+                                         </button>
+                                    </label>
+                                     <div x-show="errors.tooltipSKSVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Total SKS yang sudah lulus SEBELUM semester ini. Kosongkan jika semester pertama. </div>
+                                    <input type="number" id="prev_sks" x-model.number="previousSKS" @input="validatePrevious(); calculateIPK();" placeholder="mis: 100" class="input-field" :class="{'input-error': errors.previousSKS}">
+                                    <p x-show="errors.previousSKS" x-text="errors.previousSKS" class="error-text"></p>
+                                 </div>
+                            </div>
+                             <div class="mt-2">
+                                <button @click="showFormulaIPK = !showFormulaIPK" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+                                    <span x-show="!showFormulaIPK">Lihat Rumus IPK</span>
+                                    <span x-show="showFormulaIPK">Sembunyikan Rumus IPK</span>
+                                </button>
+                                <div x-show="showFormulaIPK" x-transition class="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
+                                    <p><strong>Rumus IPK Kumulatif:</strong></p>
+                                    <p>((IPK Sblm × Total SKS Sblm) + (IP Semester Ini × SKS Semester Ini)) / (Total SKS Sblm + SKS Semester Ini)</p>
+                                </div>
+                            </div>
+                            <div class="flex space-x-3 mt-3">
+                                <button @click="calculateIPK()" class="btn flex-grow" :disabled="semesterIP === null || previousIPK === null || previousSKS === null || errors.previousIPK || errors.previousSKS || ipError || loading"> Hitung IPK </button>
+                                <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
+                                    Reset Data
+                                </button>
+                            </div>
+                         </div>
+                     </div>
+                      <div class="lg:col-span-1 space-y-6 flex flex-col">
+                        <div class="bg-teal-50 dark:bg-teal-900/30 p-6 rounded-lg text-center relative"> <h3 class="text-xl font-semibold text-teal-800 dark:text-teal-200 mb-2">Hasil Semester Ini</h3>
+                            <p class="text-gray-600 dark:text-gray-400">IP Semester (IPS):</p>
+                            <p class="text-5xl font-bold text-teal-600 dark:text-teal-400" x-text="formatNumber(semesterIP, 2) ?? '--'"></p>
+                             <button @click="$store.appSetup.copyToClipboard(formatNumber(semesterIP, 2), 'IP Semester disalin!')" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Semester">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                             </button>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-lg text-center relative"> <h3 class="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-2">Hasil Kumulatif</h3>
+                            <p class="text-gray-600 dark:text-gray-400">IP Kumulatif (IPK):</p>
+                            <p class="text-5xl font-bold text-purple-600 dark:text-purple-400" x-text="formatNumber(cumulativeIPK, 2) ?? '--'"></p>
+                             <button @click="$store.appSetup.copyToClipboard(formatNumber(cumulativeIPK, 2), 'IP Kumulatif disalin!')" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Kumulatif">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                             </button>
+                             <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total SKS: <span x-text="totalSKS ?? '--'"></span></p>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </section>
+
+        <section id="kalkulator-ppdb" x-data="ppdbCalculator" data-aos="fade-up">
+             <div class="card">
+                 <div class="flex items-center mb-6 space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-orange-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /> <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /> </svg>
+                    <h2 class="text-3xl font-space">Kalkulator Nilai Gabungan PPDB DIY (ASPD)</h2>
+                </div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-4">
+                    Kalkulator ini menggunakan rumus nilai gabungan ASPD sesuai Petunjuk Teknis (Juknis) PPDB SMA/SMK di Provinsi Daerah Istimewa Yogyakarta. Peraturan dan bobot nilai dapat berbeda di wilayah/tahun lain. <strong class="font-semibold">Selalu cek Juknis resmi terbaru.</strong>
+                </p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div class="space-y-4">
+                         <div>
+                            <label for="ppdb_nilai_rapor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rerata Nilai Rapor </label> <input type="number" step="any" id="ppdb_nilai_rapor" x-model.number="nilaiRapor" @input="validateInput('nilaiRapor', nilaiRapor, 0, 400); calculateNilaiGabungan();" placeholder="mis: 320" class="input-field" :class="{'input-error': errors.nilaiRapor}">
+                            <p x-show="errors.nilaiRapor" x-text="errors.nilaiRapor" class="error-text"></p>
+                        </div>
+                        <div>
+                            <label for="ppdb_nilai_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai ASPD </label> <input type="number" step="any" id="ppdb_nilai_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); calculateNilaiGabungan();" placeholder="mis: 280" class="input-field" :class="{'input-error': errors.nilaiASPD}">
+                            <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
+                        </div>
+                        <div>
+                            <label for="ppdb_akreditasi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Akreditasi Sekolah (0-100)</label>
+                            <input type="number" step="any" id="ppdb_akreditasi" x-model.number="akreditasiSekolah" @input="validateInput('akreditasiSekolah', akreditasiSekolah, 0, 100); calculateNilaiGabungan();" placeholder="mis: 91" class="input-field" :class="{'input-error': errors.akreditasiSekolah}">
+                            <p x-show="errors.akreditasiSekolah" x-text="errors.akreditasiSekolah" class="error-text"></p>
+                        </div>
+                        <div class="mt-2">
+                            <button @click="showFormulaPPDB = !showFormulaPPDB" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+                                <span x-show="!showFormulaPPDB">Lihat Rumus Nilai Gabungan</span>
+                                <span x-show="showFormulaPPDB">Sembunyikan Rumus</span>
+                            </button>
+                            <div x-show="showFormulaPPDB" x-transition class="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
+                                <p><strong>Rumus (Contoh Juknis DIY Sebelumnya):</strong></p>
+                                <p>Nilai Gabungan = (Nilai Rapor × 40%) + (Nilai ASPD × 55%) + ((Nilai Akreditasi × 4) × 5%)</p>
+                                <p class="mt-1"><em>*Bobot dapat berubah, cek Juknis terbaru!</em></p>
+                            </div>
+                        </div>
+                         <div class="flex space-x-3 pt-2">
+                            <button @click="calculateNilaiGabungan()" class="btn flex-grow" :disabled="loading">
+                                <span x-show="!loading">Hitung Nilai Gabungan</span>
+                                 <span x-show="loading" class="flex items-center justify-center"> Menghitung...</span>
+                            </button>
+                            <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                      <div class="bg-orange-50 dark:bg-orange-900/30 p-6 rounded-lg space-y-4">
+                         <h3 class="text-xl font-semibold text-orange-800 dark:text-orange-200 text-center">Hasil Nilai Gabungan</h3>
+                         <div class="text-center relative" x-show="nilaiGabungan !== null"> <p class="text-5xl font-bold text-orange-600 dark:text-orange-400" x-text="nilaiGabungan !== null ? formatNumber(nilaiGabungan, 3) : '-'"></p>
+                             <button @click="$store.appSetup.copyToClipboard(formatNumber(nilaiGabungan, 3), 'Nilai gabungan PPDB disalin!')" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                             </button>
+                             <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                                 <p>Kontribusi Rapor (40%): <span x-text="formatNumber(kontribusiRapor, 3) ?? '--'"></span></p>
+                                 <p>Kontribusi ASPD (55%): <span x-text="formatNumber(kontribusiASPD, 3) ?? '--'"></span></p>
+                                 <p>Kontribusi Akreditasi (5%): <span x-text="formatNumber(kontribusiAkreditasi, 3) ?? '--'"></span></p>
+                             </div>
+                         </div>
+                         <div x-show="nilaiGabungan === null" class="text-center text-gray-500 dark:text-gray-400 py-8"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M18 15.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-6 3.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z" /> </svg> Masukkan semua nilai yang diperlukan. </div>
+                         <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                             <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Simulasi Perubahan Nilai ASPD</h4>
+                             <label for="ppdb_sim_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ubah Nilai ASPD (Slider):</label>
+                             <input type="range" id="ppdb_sim_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); if(errors.nilaiRapor === null && errors.akreditasiSekolah === null) calculateNilaiGabungan();"
+                                    min="0" max="300" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-orange-500 mt-1">
+                             <span class="text-sm text-gray-600 dark:text-gray-400">Nilai ASPD: <strong x-text="nilaiASPD ?? '--'"></strong> / 300</span>
+                             <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
+                         </div>
+                    </div>
+                 </div>
             </div>
-        </div>
+        </section>
+
+        <section id="kalkulator-rapor" x-data="raporCalculator" data-aos="fade-up">
+            <div class="card">
+                <div class="flex items-center mb-6 space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-blue-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M18 15.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-6 3.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z" /> </svg>
+                    <h2 class="text-3xl font-space">Kalkulator Rata-rata Rapor</h2>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2 space-y-6">
+                        <template x-for="(semester, semesterIndex) in semesters" :key="semester.id">
+                            <div class="border dark:border-gray-700 rounded-lg p-4">
+                                 <div class="flex justify-between items-center mb-3">
+                                    <input type="text" x-model="semester.name" placeholder="Nama Semester (mis: Semester 1)" class="input-field !py-2 !px-3 text-lg font-semibold flex-grow mr-4 dark:bg-gray-700/50 border-0 focus:ring-indigo-500">
+                                     <button @click="removeSemester(semesterIndex)" type="button" class="text-red-500 hover:text-red-700" aria-label="Hapus Semester"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg> </button>
+                                 </div>
+                                <div class="space-y-2">
+                                    <template x-for="(subject, subjectIndex) in semester.subjects" :key="subject.id">
+                                         <div class="grid grid-cols-12 gap-2 items-start">
+                                            <div class="col-span-6">
+                                                 <label :for="'subject_name_' + subject.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Mapel</label>
+                                                <input type="text" :id="'subject_name_' + subject.id" x-model="subject.name" placeholder="Nama Mapel (Opsional)" class="input-field !py-2 text-sm">
+                                             </div>
+                                            <div class="col-span-4">
+                                                 <label :for="'subject_grade_' + subject.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai</label>
+                                                <input type="number" :id="'subject_grade_' + subject.id" x-model.number="subject.grade" @input="validateSubjectGrade(semesterIndex, subjectIndex); calculateAverage();" placeholder="Nilai (0-100)" class="input-field !py-2 text-sm" :class="{'input-error': errors.semesters[semesterIndex]?.subjects[subjectIndex]?.grade}">
+                                                <p x-show="errors.semesters[semesterIndex]?.subjects[subjectIndex]?.grade" x-text="errors.semesters[semesterIndex]?.subjects[subjectIndex]?.grade" class="error-text !mb-0"></p>
+                                            </div>
+                                             <div class="col-span-2 flex items-center pt-5"> <button @click="removeSubject(semesterIndex, subjectIndex)" type="button" class="text-red-500 hover:text-red-700 ml-auto" aria-label="Hapus Mapel"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg> </button>
+                                             </div>
+                                        </div>
+                                     </template>
+                                </div>
+                                <button @click="addSubject(semesterIndex)" type="button" class="btn-secondary !py-1 !px-3 text-xs mt-3"> + Tambah Mapel </button>
+                                <p class="text-sm mt-3 font-medium text-gray-700 dark:text-gray-300" x-show="semester.average !== null">
+                                    Rata-rata Semester Ini: <span class="font-bold text-blue-600 dark:text-blue-400" x-text="formatNumber(semester.average, 2)"></span>
+                                </p>
+                             </div>
+                        </template>
+                        <button @click="addSemester()" type="button" class="btn-secondary w-full mt-4"> + Tambah Semester </button>
+                    </div>
+                     <div class="md:col-span-1 space-y-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg text-center sticky top-24">
+                            <h3 class="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Hasil Rata-rata Keseluruhan</h3>
+                            <div class="relative mb-4"> <p class="text-5xl font-bold text-blue-600 dark:text-blue-400" x-text="averageGrade !== null ? formatNumber(averageGrade, 2) : '--'"></p>
+                                <button @click="$store.appSetup.copyToClipboard(formatNumber(averageGrade, 2), 'Rata-rata rapor disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Rata-rata Rapor" x-show="averageGrade !== null">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                                </button>
+                            </div>
+                             <div class="flex flex-col space-y-2">
+                                <button @click="calculateAverage()" class="btn w-full" :disabled="loading">
+                                     <span x-show="!loading">Hitung Ulang Rata-rata</span>
+                                    <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                                </button>
+                                <button @click="reset()" type="button" class="btn-secondary w-full flex items-center justify-center">
+                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg> Reset Semua
+                                </button>
+                                <button @click="clearStoredData()" type="button" class="btn-danger w-full flex items-center justify-center text-xs !py-1.5" title="Hapus data semester dan mapel yang tersimpan di browser ini">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
+                                     Hapus Data Tersimpan
+                                </button>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="konversi-nilai" x-data="gradeConverter" data-aos="fade-up">
+              <div class="card">
+                 <div class="flex items-center mb-6 space-x-3">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-cyan-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /> </svg>
+                     <h2 class="text-3xl font-space">Konversi Nilai Angka ke Huruf</h2>
+                 </div>
+                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                     Menggunakan skala nilai default. Fitur untuk mengatur skala nilai sendiri belum tersedia.
+                     </p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                     <div class="space-y-4">
+                        <div>
+                             <label for="conv_numeric_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Angka (0-100)</label>
+                            <input type="number" id="conv_numeric_grade" x-model.number="numericGradeInput" @input="convertGrade()" placeholder="mis: 88" class="input-field">
+                        </div>
+                         <div class="pt-2">
+                             <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
+                                Reset
+                            </button>
+                        </div>
+                     </div>
+                     <div class="bg-cyan-50 dark:bg-cyan-900/30 p-6 rounded-lg text-center">
+                        <h3 class="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-2">Hasil Konversi</h3>
+                        <p class="text-5xl font-bold text-cyan-600 dark:text-cyan-400" x-text="letterGradeOutput"></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">(Skala Default)</p>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="target-nilai" data-aos="fade-up">
+            <div class="card">
+                <div class="flex items-center mb-6 space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-lime-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" /> </svg>
+                    <h2 class="text-3xl font-space">Tips Mencapai Target Nilai</h2>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Ingin tahu nilai UAS minimal untuk mencapai target nilai akhir? Gunakan fitur <strong class="font-semibold text-gray-700 dark:text-gray-200">Target Nilai UAS</strong> yang ada di <a href="#kalkulator-nilai-akhir" class="text-indigo-600 hover:underline dark:text-indigo-400">Kalkulator Nilai Akhir Mapel</a> di bagian atas.
+                </p>
+                </div>
+       </section>
+
+        </main>
+    <footer class="bg-gray-200 dark:bg-gray-800 mt-16 transition-colors duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-600 dark:text-gray-400 text-sm">
+             <p>&copy; <span x-text="new Date().getFullYear()"></span> PintarHitung | Developed by FawwazDzaky.</p>
+             <p class="mt-1">Tools visual untuk perencanaan nilai akademik.</p>
+             </div>
+    </footer>
+    <button x-show="showBackToTop" @click="window.scrollTo({ top: 0, behavior: 'smooth' })" x-transition class="fixed bottom-5 right-5 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 z-50" aria-label="Kembali ke atas">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /> </svg>
+    </button>
+
+    <div x-show="toastVisible"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-full"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-full"
+         class="fixed bottom-5 left-1/2 -translate-x-1/2 max-w-sm w-full mx-auto z-[60] px-4 py-3 rounded-lg shadow-lg text-white bg-gray-800 dark:bg-gray-700 border border-gray-700 dark:border-gray-600"
+         role="alert" style="display: none;"
+         x-text="toastMessage">
     </div>
 
-    <div class="control-buttons">
-        <button class="control-btn" id="menuToggleBtn" aria-label="Toggle menu">
-            <i class="fas fa-bars"></i>
-        </button>
-        <button class="control-btn" id="themeToggle" aria-label="Toggle tema gelap/terang">
-            <i class="fas fa-moon"></i>
-        </button>
-    </div>
-
-    <div class="toast" id="toast"></div>
-    <div class="save-status" id="saveStatus">
-        <i class="fas fa-circle-notch fa-spin"></i>
-        <span>Menyimpan...</span>
-    </div>
-
-    <script>
-        // === DOM Elements ===
-        const sidebar = document.getElementById('sidebar');
-        const menuToggleBtn = document.getElementById('menuToggleBtn');
-        const closeSidebarBtn = document.getElementById('closeSidebarBtn'); // Tombol close baru
-        const notesList = document.getElementById('notesList');
-        const addNoteBtn = document.getElementById('addNoteBtn'); // Tombol di sidebar
-        const newNoteBtn = document.getElementById('newNoteBtn'); // Tombol di toolbar
-        const noteTitle = document.getElementById('noteTitle');
-        const editor = document.getElementById('editor');
-        const themeToggle = document.getElementById('themeToggle');
-        const toast = document.getElementById('toast');
-        const saveStatus = document.getElementById('saveStatus');
-        const decreaseFontBtn = document.getElementById('decreaseFontBtn');
-        const increaseFontBtn = document.getElementById('increaseFontBtn');
-        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
-        const fontWeightBtn = document.getElementById('fontWeightBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const undoBtn = document.getElementById('undoBtn');
-        const redoBtn = document.getElementById('redoBtn');
-        const searchNotesInput = document.getElementById('searchNotes'); // Search di sidebar
-        const wordCountEl = document.getElementById('wordCount');
-        const charCountEl = document.getElementById('charCount');
-
-        // --- Fitur Baru Elements ---
-        const searchBtn = document.getElementById('searchBtn'); // Tombol search di toolbar
-        const formatTextBtn = document.getElementById('formatTextBtn'); // Tombol format
-        const editorSearchBar = document.getElementById('editorSearchBar');
-        const editorSearchInput = document.getElementById('editorSearchInput');
-        const searchPrevBtn = document.getElementById('searchPrevBtn');
-        const searchNextBtn = document.getElementById('searchNextBtn');
-        const searchResultCount = document.getElementById('searchResultCount');
-        const closeSearchBtn = document.getElementById('closeSearchBtn');
-
-        // === State Variables ===
-        let notes = [];
-        let currentNoteId = null;
-        let typingTimer; // Untuk debounce/throttle word count & save history
-        let history = [];
-        let historyIndex = -1;
-        let isSaving = false;
-        let autoSaveInterval;
-        let editorSearchState = { // State untuk pencarian dalam editor
-            matches: [],
-            currentIndex: -1,
-            searchTerm: '',
-            regex: null // Store the regex for efficiency
-        };
-        let ignoreInputEvent = false; // Flag untuk mencegah trigger event input saat modifikasi programatik
-        let ignoreHistorySave = false; // Flag untuk mencegah penyimpanan history ganda dari auto-feature
-
-        // === Initialization ===
-        function init() {
-            loadNotes();
-            setupEventListeners();
-            updateDocumentTitle();
-            updateWordCount();
-            loadPreferences(); // Load theme, sidebar, font settings
-            startAutoSave();
-            checkMobileView(); // Cek tampilan mobile saat load
-            setupSidebarSearch(); // Setup listener search sidebar
-            // Initialize history for the first loaded note
-             if (currentNoteId) {
-                 const note = notes.find(n => n.id === currentNoteId);
-                 if (note) {
-                     history = [{ content: note.content, cursorPos: 0 }];
-                     historyIndex = 0;
-                     updateUndoRedoButtons();
-                 }
-             }
-        }
-
-        function loadPreferences() {
-            // Load theme preference
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark-mode') {
-                document.body.classList.add('dark-mode');
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                 document.body.classList.remove('dark-mode'); // Ensure light mode if not dark
-                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-
-            // Load sidebar state (only for desktop)
-            if (window.innerWidth > 768) {
-                 const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-                 if (isCollapsed) {
-                    sidebar.classList.add('collapsed');
-                    document.querySelector('.main-content').style.marginLeft = '0';
-                 } else {
-                     sidebar.classList.remove('collapsed');
-                     document.querySelector('.main-content').style.marginLeft = 'var(--sidebar-width)';
-                 }
-            } else {
-                sidebar.classList.remove('collapsed'); // Jangan collapsed di mobile
-                sidebar.classList.remove('show-mobile'); // Pastikan tertutup awal
-                document.querySelector('.main-content').style.marginLeft = '0'; // Selalu 0 di mobile
-            }
-
-
-            // Load font size preference
-            const savedFontSize = localStorage.getItem('editorFontSize') || '16px'; // Default ke 16px
-            editor.style.fontSize = savedFontSize;
-            fontSizeDisplay.textContent = savedFontSize;
-
-
-            // Load font weight preference
-            const savedFontWeight = localStorage.getItem('editorFontWeight') || 'normal'; // Default ke normal
-            editor.style.fontWeight = savedFontWeight;
-            fontWeightBtn.classList.toggle('active', savedFontWeight === 'bold');
-
-        }
-
-         function checkMobileView() {
-             const isMobile = window.innerWidth <= 768;
-             closeSidebarBtn.style.display = isMobile ? 'block' : 'none';
-             if (!isMobile && sidebar.classList.contains('show-mobile')) {
-                 // Jika layar membesar dan sidebar mobile terbuka, tutup dan terapkan state desktop
-                 sidebar.classList.remove('show-mobile');
-                 loadPreferences(); // Reload preferences untuk margin/collapse
-             } else if (isMobile) {
-                 sidebar.classList.remove('collapsed'); // Hapus state collapsed di mobile
-                 document.querySelector('.main-content').style.marginLeft = '0';
-             }
-         }
-
-        // === History Management (Undo/Redo) ===
-        function saveHistory(forceSave = false) {
-             if (ignoreHistorySave) return; // Skip if flagged
-
-             // Debounce saving history slightly
-             clearTimeout(typingTimer);
-             typingTimer = setTimeout(() => {
-                const currentState = { content: editor.value, cursorPos: editor.selectionStart };
-
-                // Jangan simpan state yang sama persis berturut-turut kecuali dipaksa
-                if (historyIndex >= 0 && currentState.content === history[historyIndex]?.content && !forceSave) {
-                    // Update cursor position in the last state if only cursor moved
-                     if (currentState.cursorPos !== history[historyIndex].cursorPos) {
-                         history[historyIndex].cursorPos = currentState.cursorPos;
-                     }
-                    return;
-                }
-
-                // Hapus history setelah index saat ini (jika ada undo sebelumnya)
-                if (historyIndex < history.length - 1) {
-                    history = history.slice(0, historyIndex + 1);
-                }
-
-                history.push(currentState);
-                historyIndex++;
-
-                // Batasi ukuran history
-                if (history.length > 100) { // Tingkatkan batas history
-                    history.shift();
-                    historyIndex--;
-                }
-                updateUndoRedoButtons();
-             }, 50); // Sedikit delay untuk grouping ketikan cepat
-        }
-
-        function undo() {
-            if (historyIndex > 0) {
-                historyIndex--;
-                applyHistoryState();
-            }
-        }
-
-        function redo() {
-            if (historyIndex < history.length - 1) {
-                historyIndex++;
-                applyHistoryState();
-            }
-        }
-
-        function applyHistoryState() {
-            if (!history[historyIndex]) return; // Guard clause
-
-            ignoreInputEvent = true; // Set flag sebelum mengubah value
-             ignoreHistorySave = true; // Prevent this change from being saved back immediately
-            const state = history[historyIndex];
-            editor.value = state.content;
-
-            // Restore cursor position (pakai setTimeout untuk memastikan DOM update)
-            setTimeout(() => {
-                try {
-                     editor.selectionStart = state.cursorPos;
-                     editor.selectionEnd = state.cursorPos;
-                     editor.focus(); // Kembalikan fokus ke editor
-                } catch (e) { console.error("Error setting selection:", e); }
-                updateUndoRedoButtons();
-                updateWordCount(); // Update count setelah undo/redo
-                 saveCurrentNoteData(); // Simpan state baru ke note setelah undo/redo
-                ignoreInputEvent = false; // Reset flag setelah selesai
-                 ignoreHistorySave = false;
-            }, 0);
-        }
-
-        function updateUndoRedoButtons() {
-            undoBtn.disabled = historyIndex <= 0;
-            redoBtn.disabled = historyIndex >= history.length - 1;
-        }
-
-        // === Note Management (CRUD) ===
-        function loadNotes() {
-            const savedNotes = localStorage.getItem('notes');
-            let loadedSuccessfully = false;
-            if (savedNotes) {
-                try {
-                    notes = JSON.parse(savedNotes);
-                    // Pastikan updatedAt ada, jika tidak tambahkan default
-                    notes.forEach(note => {
-                        if (!note.updatedAt) note.updatedAt = note.createdAt || new Date(0).toISOString();
-                        if (!note.createdAt) note.createdAt = new Date(0).toISOString(); // Ensure createdAt also exists
-                    });
-                     renderNotesList();
-                    // Coba load note terakhir yang dibuka, atau yang terbaru
-                     const lastOpenedId = localStorage.getItem('lastOpenedNoteId');
-                    if (lastOpenedId && notes.some(n => n.id === lastOpenedId)) {
-                         loadNote(lastOpenedId);
-                         loadedSuccessfully = true;
-                    } else if (notes.length > 0) {
-                        // Load note terbaru berdasarkan updatedAt
-                         const latestNote = [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
-                         loadNote(latestNote.id);
-                         loadedSuccessfully = true;
-                    }
-                } catch (e) {
-                    console.error("Error loading notes:", e);
-                    showToast('Gagal memuat catatan lama. Data mungkin korup.', true);
-                    notes = [];
-                }
-            }
-
-            if (!loadedSuccessfully) {
-                createNewNote(); // Buat note baru jika tidak ada atau gagal load
-            }
-        }
-
-        function renderNotesList() {
-            const searchTerm = searchNotesInput.value.toLowerCase(); // Dapatkan term pencarian sidebar
-            notesList.innerHTML = '';
-             // Sort notes by updatedAt (newest first)
-            const sortedNotes = [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-
-             let hasVisibleNotes = false;
-            sortedNotes.forEach(note => {
-                const noteTitleText = note.title.trim() || 'Untitled'; // Default title
-                // Filter berdasarkan pencarian sidebar
-                if (searchTerm && !noteTitleText.toLowerCase().includes(searchTerm)) {
-                    return; // Lewati note ini jika tidak cocok
-                }
-                 hasVisibleNotes = true; // Setidaknya satu note terlihat
-
-                const noteItem = document.createElement('div');
-                noteItem.className = `note-item ${note.id === currentNoteId ? 'active' : ''}`;
-                noteItem.dataset.noteId = note.id; // Tambahkan data-id
-                noteItem.innerHTML = `
-                    <div class="note-title" title="${noteTitleText}\nDiperbarui: ${new Date(note.updatedAt).toLocaleString('id-ID')}">${noteTitleText}</div>
-                    <div class="note-date">${formatDate(note.updatedAt)}</div>
-                    <button class="delete-btn" data-id="${note.id}" aria-label="Hapus catatan ${noteTitleText}" title="Hapus catatan">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                `;
-
-                // Klik pada item note (hindari klik tombol delete)
-                noteItem.addEventListener('click', (e) => {
-                     if (!e.target.closest('.delete-btn')) { // Pastikan bukan tombol delete yang diklik
-                         loadNote(note.id);
-                         if (window.innerWidth <= 768) { // Tutup sidebar di mobile setelah pilih note
-                             sidebar.classList.remove('show-mobile');
-                         }
-                     }
-                 });
-
-                // Klik tombol delete
-                const deleteBtn = noteItem.querySelector('.delete-btn');
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Hentikan event bubbling ke note item
-                    deleteNote(note.id);
-                });
-
-                notesList.appendChild(noteItem);
-            });
-             // Tampilkan pesan jika tidak ada note yang cocok dengan pencarian atau tidak ada note sama sekali
-             if (!hasVisibleNotes && searchTerm) {
-                 notesList.innerHTML = '<div style="padding: 15px; text-align: center; opacity: 0.7;">Tidak ada catatan ditemukan.</div>';
-             } else if (notes.length === 0) {
-                  notesList.innerHTML = '<div style="padding: 15px; text-align: center; opacity: 0.7;">Belum ada catatan. Klik "Catatan Baru".</div>';
-             }
-        }
-
-        function formatDate(dateString) {
-            try {
-                const date = new Date(dateString);
-                 const now = new Date();
-                 const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-
-                 if (diffDays < 1 && date.getDate() === now.getDate()) {
-                     // Today: show time
-                     return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                 } else if (diffDays < 7) {
-                     // This week: show day name
-                     return date.toLocaleDateString('id-ID', { weekday: 'short' });
-                 } else {
-                     // Older: show date
-                     return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' /*, year: 'numeric'*/ });
-                 }
-            } catch (e) {
-                return 'Invalid Date';
-            }
-        }
-
-        function createNewNote(content = '', title = '') { // Allow initial content/title
-            // Simpan note sebelumnya sebelum buat baru
-            saveCurrentNoteData();
-
-            const newNote = {
-                id: Date.now().toString(),
-                title: title,
-                content: content,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            notes.unshift(newNote); // Tambah ke awal array
-            saveNotesToStorage(); // Simpan ke storage
-            loadNote(newNote.id); // Langsung load note baru
-            renderNotesList(); // Update tampilan list
-
-            // Reset search & scroll ke atas di sidebar
-             searchNotesInput.value = '';
-             notesList.scrollTop = 0;
-
-            setTimeout(() => noteTitle.focus(), 50); // Fokus ke judul
-            showToast('Catatan baru dibuat');
-        }
-
-        function loadNote(noteId) {
-            const note = notes.find(n => n.id === noteId);
-            if (note) {
-                 // Selalu simpan note sebelumnya jika ID berubah
-                 if (currentNoteId && currentNoteId !== noteId) {
-                     saveCurrentNoteData();
-                 }
-
-                 currentNoteId = noteId;
-                 localStorage.setItem('lastOpenedNoteId', noteId); // Ingat note terakhir dibuka
-
-                 ignoreInputEvent = true; // Flag agar perubahan ini tidak trigger input event
-                 noteTitle.value = note.title;
-                 editor.value = note.content;
-                 setTimeout(() => ignoreInputEvent = false, 10); // Reset flag shortly after
-
-                 updateDocumentTitle();
-                 updateWordCount();
-                 loadPreferences(); // Reload font preferences (jika ada setting per note di masa depan)
-
-                 // Reset history untuk note yang baru dibuka
-                 history = [{ content: note.content, cursorPos: 0 }]; // State awal
-                 historyIndex = 0;
-                 updateUndoRedoButtons();
-
-                 renderNotesList(); // Update highlight 'active' di sidebar
-
-                 // Reset search in editor
-                 resetEditorSearch();
-                 editor.scrollTop = 0; // Scroll editor ke atas
-            } else {
-                 console.error("Note not found:", noteId);
-                 // Jika note tidak ditemukan (misal: korup), load note pertama atau buat baru
-                 currentNoteId = null; // Reset current ID
-                 localStorage.removeItem('lastOpenedNoteId');
-                 if (notes.length > 0) {
-                     // Load note terbaru jika ID yg diminta tidak ada
-                     const latestNote = [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
-                     loadNote(latestNote.id);
-                 } else {
-                     createNewNote();
-                 }
-                 showToast("Catatan yang diminta tidak ditemukan.", true);
-            }
-        }
-
-        // Fungsi untuk menyimpan data note saat ini ke array `notes` (tanpa UI save)
-        function saveCurrentNoteData(forceUpdateTimestamp = false) {
-             if (currentNoteId) {
-                const noteIndex = notes.findIndex(n => n.id === currentNoteId);
-                if (noteIndex !== -1) {
-                    const currentTitle = noteTitle.value;
-                    const currentContent = editor.value;
-                    const needsUpdate = notes[noteIndex].title !== currentTitle ||
-                                        notes[noteIndex].content !== currentContent ||
-                                        forceUpdateTimestamp; // Perlu update jika ada perubahan atau dipaksa
-
-                    if (needsUpdate) {
-                        notes[noteIndex].title = currentTitle;
-                        notes[noteIndex].content = currentContent;
-                        notes[noteIndex].updatedAt = new Date().toISOString();
-                        if (saveNotesToStorage()) { // Coba simpan
-                             // Update list hanya jika berhasil disimpan & ada perubahan
-                             renderNotesList();
-                        }
-                         updateDocumentTitle(); // Update judul window jika judul note berubah
-                    }
-                }
-             }
-        }
-
-
-        // Fungsi yang dipanggil oleh tombol Simpan atau Ctrl+S (dengan UI feedback)
-        function saveNote() {
-            if (!currentNoteId || isSaving) return;
-            isSaving = true;
-            showSavingStatus();
-
-            // Gunakan forceUpdateTimestamp = true untuk memastikan timestamp diperbarui
-            // dan perubahan terakhir (meski hanya cursor move) 'terasa' tersimpan
-            saveCurrentNoteData(true);
-
-            // Paksa simpan state terakhir ke history juga
-             saveHistory(true);
-
-            setTimeout(() => {
-                isSaving = false;
-                hideSavingStatus();
-                showToast('Catatan tersimpan!');
-            }, 300); // Delay singkat untuk UI
-        }
-
-        function startAutoSave() {
-            if (autoSaveInterval) clearInterval(autoSaveInterval);
-            // Simpan secara periodik jika ada perubahan (tanpa force timestamp update)
-            autoSaveInterval = setInterval(() => {
-                if (currentNoteId && !isSaving) {
-                    saveCurrentNoteData(false);
-                }
-            }, 5000); // Simpan setiap 5 detik jika ada perubahan potensial
-        }
-
-        function deleteNote(noteId) {
-            if (notes.length <= 1 && notes[0].id === noteId) {
-                showToast('Tidak dapat menghapus satu-satunya catatan.', true);
-                return;
-            }
-
-            const noteIndex = notes.findIndex(n => n.id === noteId);
-            if (noteIndex === -1) return; // Note sudah tidak ada
-
-            const noteToDelete = notes[noteIndex];
-             const noteTitleDisplay = noteToDelete.title.trim() || 'Untitled';
-
-            if (confirm(`Apakah Anda yakin ingin menghapus catatan "${noteTitleDisplay}"?`)) {
-                notes.splice(noteIndex, 1); // Hapus dari array
-
-                if (saveNotesToStorage()) { // Coba simpan perubahan
-                    showToast(`Catatan "${noteTitleDisplay}" dihapus`);
-
-                    if (currentNoteId === noteId) {
-                        // Load note terdekat (biasanya yang terbaru setelah dihapus)
-                         localStorage.removeItem('lastOpenedNoteId');
-                        currentNoteId = null; // Reset ID
-                        if (notes.length > 0) {
-                            const latestNote = [...notes].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
-                            loadNote(latestNote.id);
-                        } else {
-                             // Jika ini note terakhir & berhasil dihapus (seharusnya tidak terjadi karena cek di awal)
-                             createNewNote();
-                        }
-                    } else {
-                         renderNotesList(); // Update list jika note yg aktif tidak dihapus
-                    }
-                } else {
-                     // Jika gagal menyimpan (misal: storage penuh), kembalikan note yang dihapus
-                     notes.splice(noteIndex, 0, noteToDelete);
-                     showToast('Gagal menghapus catatan. Penyimpanan mungkin bermasalah.', true);
-                }
-            }
-        }
-
-        function saveNotesToStorage() {
-            try {
-                localStorage.setItem('notes', JSON.stringify(notes));
-                return true;
-            } catch (e) {
-                console.error("Error saving notes to localStorage:", e);
-                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                     showToast('Gagal menyimpan! Penyimpanan penuh. Hapus beberapa catatan atau bersihkan data situs.', true);
-                     // TODO: Implementasi strategi pembersihan otomatis yang lebih canggih jika diperlukan
-                } else {
-                     showToast('Gagal menyimpan catatan. Terjadi kesalahan.', true);
-                }
-                return false;
-            }
-        }
-
-        // === Download / Upload ===
-        function downloadNote() {
-            if (!currentNoteId) return showToast("Pilih catatan untuk diunduh.", true);
-            const note = notes.find(n => n.id === currentNoteId);
-            if (note) {
-                const text = note.content;
-                const title = (note.title.trim() || 'catatan-tanpa-judul').replace(/[/\\?%*:|"<>]/g, '-'); // Sanitasi nama file
-                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' }); // Tentukan charset
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${title}.txt`;
-                document.body.appendChild(a); // Diperlukan di beberapa browser
-                a.click();
-                document.body.removeChild(a); // Hapus elemen setelah klik
-                URL.revokeObjectURL(url);
-                showToast('Catatan berhasil diunduh');
-            } else {
-                 showToast("Catatan tidak ditemukan untuk diunduh.", true);
-            }
-        }
-
-        function uploadNote(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Reset input file agar bisa upload file yang sama lagi
-            event.target.value = '';
-
-            if (file.type !== 'text/plain') {
-                 showToast('Hanya file .txt yang didukung.', true);
-                 return;
-            }
-
-            // Batas ukuran file (misal 5MB)
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                showToast(`Ukuran file terlalu besar (maks ${maxSize / 1024 / 1024}MB)`, true);
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const content = e.target.result;
-                     // Batasi konten juga jika perlu (misal 2 Juta karakter)
-                     const maxContentLength = 2 * 1000 * 1000;
-                     if (content.length > maxContentLength) {
-                         showToast(`Konten file terlalu panjang (maks ${maxContentLength/1000000} Juta karakter)`, true);
-                         return;
-                     }
-
-                     const title = file.name.replace(/\.txt$/i, ''); // Hapus ekstensi .txt
-                     createNewNote(content, title); // Gunakan createNewNote untuk menambahkannya
-                     showToast(`File "${file.name}" berhasil diunggah sebagai catatan baru`);
-
-                } catch (readError) {
-                    console.error("Error processing file content:", readError);
-                    showToast('Gagal memproses isi file.', true);
-                }
-            };
-            reader.onerror = (e) => {
-                console.error("Error reading file:", e);
-                showToast('Gagal membaca file.', true);
-            };
-            reader.readAsText(file, 'UTF-8'); // Baca sebagai teks UTF-8
-        }
-
-
-        // === UI Interaction (Sidebar, Theme, Font) ===
-        function toggleSidebar() {
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                sidebar.classList.toggle('show-mobile');
-            } else {
-                sidebar.classList.toggle('collapsed');
-                const isCollapsed = sidebar.classList.contains('collapsed');
-                localStorage.setItem('sidebarCollapsed', isCollapsed);
-                // Sesuaikan margin main content
-                 document.querySelector('.main-content').style.marginLeft = isCollapsed ? '0' : 'var(--sidebar-width)';
-            }
-        }
-
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            themeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            localStorage.setItem('theme', isDarkMode ? 'dark-mode' : 'light-mode');
-
-            // Animasi kecil
-            themeToggle.style.transform = 'scale(1.1) rotate(15deg)';
-            setTimeout(() => themeToggle.style.transform = '', 300);
-        }
-
-        function increaseFontSize() {
-            const currentSize = parseInt(editor.style.fontSize || window.getComputedStyle(editor).fontSize);
-            const newSize = Math.min(currentSize + 2, 32); // Max 32px
-            setFontSize(newSize);
-        }
-
-        function decreaseFontSize() {
-            const currentSize = parseInt(editor.style.fontSize || window.getComputedStyle(editor).fontSize);
-            const newSize = Math.max(currentSize - 2, 10); // Min 10px
-            setFontSize(newSize);
-        }
-
-         function setFontSize(size) {
-             const sizePx = `${size}px`;
-             editor.style.fontSize = sizePx;
-             fontSizeDisplay.textContent = sizePx;
-             localStorage.setItem('editorFontSize', sizePx);
-             // Simpan juga ke note saat ini? Opsional
-             // saveCurrentNoteData();
-         }
-
-        function toggleFontWeight() {
-            const newWeight = editor.style.fontWeight === 'bold' ? 'normal' : 'bold';
-            editor.style.fontWeight = newWeight;
-            fontWeightBtn.classList.toggle('active', newWeight === 'bold');
-            localStorage.setItem('editorFontWeight', newWeight);
-             // Simpan juga ke note saat ini? Opsional
-             // saveCurrentNoteData();
-        }
-
-        function copyText() {
-             if (!editor.value) {
-                 showToast('Tidak ada teks untuk disalin.', true);
-                 return;
-             }
-             navigator.clipboard.writeText(editor.value)
-                .then(() => {
-                    showToast('Seluruh teks berhasil disalin!');
-                    // Optional: visual feedback like flashing the button
-                    copyBtn.style.transform = 'scale(1.1)';
-                    copyBtn.style.backgroundColor = 'var(--toast-bg)';
-                    setTimeout(() => {
-                         copyBtn.style.transform = '';
-                         copyBtn.style.backgroundColor = ''; // Kembali ke style normal
-                    }, 300);
-                })
-                .catch(err => {
-                    console.error('Failed to copy text: ', err);
-                    // Fallback attempt for older browsers/contexts without clipboard API access
-                    try {
-                         editor.select(); // Select the text
-                         const successful = document.execCommand('copy');
-                         if (successful) {
-                            showToast('Teks disalin (menggunakan metode lama).');
-                         } else {
-                            showToast('Gagal menyalin teks.', true);
-                         }
-                         window.getSelection().removeAllRanges(); // Deselect
-                    } catch (fallbackErr) {
-                         console.error('Fallback copy failed: ', fallbackErr);
-                         showToast('Gagal menyalin teks. Browser mungkin tidak mendukung.', true);
-                    }
-                });
-        }
-
-
-        // === Word Count ===
-        function updateWordCount() {
-             const text = editor.value;
-             // Hitung kata: split berdasarkan spasi/newline/punctuation, filter elemen kosong
-             // Regex yang lebih baik untuk kata
-             const wordMatch = text.match(/\b[\w']+\b/g);
-             const wordCount = wordMatch ? wordMatch.length : 0;
-             const charCount = text.length;
-             wordCountEl.textContent = `${wordCount} kata`;
-             charCountEl.textContent = `${charCount} karakter`;
-        }
-
-        // === Toast & Save Status UI ===
-        function showSavingStatus() {
-             saveStatus.style.display = 'flex'; // Pastikan terlihat
-            saveStatus.classList.add('show');
-        }
-        function hideSavingStatus() {
-            saveStatus.classList.remove('show');
-             // Sembunyikan lagi setelah transisi selesai jika perlu
-            // setTimeout(() => saveStatus.style.display = 'none', 300);
-        }
-        let toastTimeout;
-        function showToast(message, isError = false) {
-             clearTimeout(toastTimeout); // Hapus toast sebelumnya jika ada
-            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> <span>${message}</span>`;
-            toast.className = `toast ${isError ? 'error' : ''}`; // Hapus show dulu
-            // Trigger reflow sebelum menambah class show agar transisi jalan
-            void toast.offsetWidth;
-            toast.classList.add('show');
-
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // === Document Title ===
-        function updateDocumentTitle() {
-            let title = 'Notepad Online';
-            if (currentNoteId) {
-                const note = notes.find(n => n.id === currentNoteId);
-                 const noteTitleDisplay = note?.title?.trim();
-                if (noteTitleDisplay) {
-                    title = `${noteTitleDisplay} - Notepad Online`;
-                } else if (note) {
-                     title = `Untitled - Notepad Online`;
-                 }
-            }
-            document.title = title;
-        }
-
-        // === Search in Sidebar ===
-        function setupSidebarSearch() {
-             // Debounce search input
-             let searchDebounceTimer;
-            searchNotesInput.addEventListener('input', () => {
-                 clearTimeout(searchDebounceTimer);
-                 searchDebounceTimer = setTimeout(() => {
-                    renderNotesList(); // Render ulang list berdasarkan input search
-                 }, 200); // Delay 200ms
-            });
-        }
-
-        // === Fitur Baru: Auto Features & Editor Interactions ===
-
-        const PAIRS = { '(': ')', '[': ']', '{': '}', '"': '"', "'": "'" };
-        const CLOSING_CHARS = Object.values(PAIRS);
-
-        function handleEditorKeyDown(e) {
-             const cursorPos = editor.selectionStart;
-             const text = editor.value;
-             const charBefore = text[cursorPos - 1];
-             const charAfter = text[cursorPos];
-
-             // --- Auto Pairing ---
-             if (PAIRS[e.key]) {
-                 // Cek jika karakter setelahnya adalah penutup yang sama (untuk menimpa) atau whitespace/akhir baris
-                 if (e.key === charAfter && (e.key === '"' || e.key === "'")) {
-                    // Jika mengetik quote yang sama dengan setelah kursor, lewati saja
-                    e.preventDefault();
-                    editor.selectionStart = cursorPos + 1;
-                    editor.selectionEnd = cursorPos + 1;
-                    return; // Jangan proses lebih lanjut
-                 } else if (!charAfter || charAfter.match(/\s/) || CLOSING_CHARS.includes(charAfter)) {
-                     // Jika kosong, whitespace, atau karakter penutup lain setelahnya, lakukan pairing
-                    e.preventDefault();
-                    const closingChar = PAIRS[e.key];
-                    const newText = text.substring(0, cursorPos) + e.key + closingChar + text.substring(cursorPos);
-
-                    ignoreInputEvent = true;
-                    ignoreHistorySave = true;
-                    editor.value = newText;
-                    editor.selectionStart = cursorPos + 1;
-                    editor.selectionEnd = cursorPos + 1;
-                    setTimeout(() => {
-                        ignoreInputEvent = false;
-                        ignoreHistorySave = false;
-                        saveHistory(); // Simpan setelah auto pair
-                        updateWordCount();
-                    }, 10);
-                    return;
-                 }
-             }
-
-             // --- Auto Unpair (Backspace) ---
-             if (e.key === 'Backspace') {
-                const openChar = Object.keys(PAIRS).find(key => PAIRS[key] === charAfter);
-                // Jika karakter sebelum adalah pembuka dan karakter sesudah adalah penutup pasangannya
-                if (openChar && charBefore === openChar) {
-                    e.preventDefault();
-                     const newText = text.substring(0, cursorPos - 1) + text.substring(cursorPos + 1);
-                     ignoreInputEvent = true;
-                     ignoreHistorySave = true;
-                     editor.value = newText;
-                     editor.selectionStart = cursorPos - 1;
-                     editor.selectionEnd = cursorPos - 1;
-                     setTimeout(() => {
-                         ignoreInputEvent = false;
-                         ignoreHistorySave = false;
-                         saveHistory();
-                         updateWordCount();
-                     }, 10);
-                     return;
-                }
-             }
-
-
-             // --- Line Continuation & Auto List (Enter) ---
-             const currentLineStart = text.lastIndexOf('\n', cursorPos - 1) + 1;
-             const currentLineEnd = text.indexOf('\n', cursorPos);
-             const currentLine = text.substring(currentLineStart, currentLineEnd === -1 ? text.length : currentLineEnd);
-
-             // 1. Shift + Enter -> Normal Newline
-             if (e.key === 'Enter' && e.shiftKey) {
-                 // Biarkan default behavior (handled by browser)
-                 setTimeout(saveHistory, 50); // Simpan history setelah newline
-                 return; // Hentikan proses lebih lanjut di handler ini
-             }
-
-             // 2. Enter Key Logic
-             if (e.key === 'Enter' && !e.shiftKey) {
-                 const numberMatch = currentLine.match(/^(\s*)(\d+)\.\s*(.*)/);
-                 const bulletMatch = currentLine.match(/^(\s*)([-*])\s*(.*)/);
-                 const indentMatch = currentLine.match(/^(\s+)(.*)/); // Indentasi umum
-
-                 // Jika baris saat ini adalah list item (bernomor atau bullet)
-                 if (numberMatch || bulletMatch) {
-                     const prefix = numberMatch ? numberMatch[1] : bulletMatch[1]; // Indentasi
-                     const content = numberMatch ? numberMatch[3] : bulletMatch[3]; // Teks setelah list marker
-
-                     // Jika list item kosong, hapus list marker dan keluar dari list
-                     if (content.trim() === '') {
-                         e.preventDefault();
-                         const textBefore = text.substring(0, currentLineStart);
-                         const textAfter = text.substring(cursorPos); // Teks setelah kursor di baris itu
-                         const newText = textBefore + textAfter;
-
-                         ignoreInputEvent = true;
-                         ignoreHistorySave = true;
-                         editor.value = newText;
-                         editor.selectionStart = currentLineStart;
-                         editor.selectionEnd = currentLineStart;
-
-                         setTimeout(() => {
-                             ignoreInputEvent = false;
-                             ignoreHistorySave = false;
-                             saveHistory();
-                             updateWordCount();
-                         }, 10);
-                     } else {
-                         // Jika list item ada isinya, buat item baru di bawahnya
-                         e.preventDefault();
-                         let nextMarker;
-                         if (numberMatch) {
-                             const nextNum = parseInt(numberMatch[2]) + 1;
-                             nextMarker = `${prefix}${nextNum}. `;
-                         } else {
-                             nextMarker = `${prefix}${bulletMatch[2]} `;
-                         }
-                         const textBefore = text.substring(0, cursorPos);
-                         const textAfter = text.substring(cursorPos);
-                         const newText = `${textBefore}\n${nextMarker}${textAfter}`;
-
-                         ignoreInputEvent = true;
-                         ignoreHistorySave = true;
-                         editor.value = newText;
-                         editor.selectionStart = cursorPos + 1 + nextMarker.length; // Pindah kursor ke setelah marker baru
-                         editor.selectionEnd = cursorPos + 1 + nextMarker.length;
-
-                         setTimeout(() => {
-                             ignoreInputEvent = false;
-                             ignoreHistorySave = false;
-                             saveHistory();
-                             updateWordCount();
-                         }, 10);
-                     }
-                 } else if (indentMatch && indentMatch[2].trim() !== '') {
-                     // Jika bukan list tapi ada indentasi, teruskan indentasi ke baris baru
-                      e.preventDefault();
-                      const indent = indentMatch[1];
-                      const textBefore = text.substring(0, cursorPos);
-                      const textAfter = text.substring(cursorPos);
-                      const newText = `${textBefore}\n${indent}${textAfter}`;
-
-                      ignoreInputEvent = true;
-                      ignoreHistorySave = true;
-                      editor.value = newText;
-                      editor.selectionStart = cursorPos + 1 + indent.length;
-                      editor.selectionEnd = cursorPos + 1 + indent.length;
-
-                      setTimeout(() => {
-                         ignoreInputEvent = false;
-                         ignoreHistorySave = false;
-                         saveHistory();
-                         updateWordCount();
-                      }, 10);
-                 } else {
-                     // Jika bukan list dan tidak ada indentasi signifikan (atau baris kosong), Enter biasa
-                     setTimeout(saveHistory, 50); // Simpan history setelah newline
-                 }
-                 return; // Hentikan proses jika Enter sudah dihandle
-             }
-
-             // --- Tab Key for Indentation ---
-             if (e.key === 'Tab') {
-                 e.preventDefault();
-                 const indent = '    '; // 4 spasi untuk Tab
-                 const textBefore = text.substring(0, cursorPos);
-                 const textAfter = text.substring(cursorPos);
-                 const newText = textBefore + indent + textAfter;
-
-                 ignoreInputEvent = true;
-                 ignoreHistorySave = true;
-                 editor.value = newText;
-                 editor.selectionStart = cursorPos + indent.length;
-                 editor.selectionEnd = cursorPos + indent.length;
-                  setTimeout(() => {
-                     ignoreInputEvent = false;
-                     ignoreHistorySave = false;
-                     saveHistory();
-                     updateWordCount();
-                  }, 10);
-                 return;
-             }
-
-             // Jika tidak ada handler khusus, biarkan default dan simpan history
-             if (!e.ctrlKey && !e.metaKey && !e.altKey) { // Jangan simpan history untuk modifier keys saja
-                 setTimeout(saveHistory, 50);
-             }
-        }
-
-         // === Fitur Baru: Format Teks (Rapikan) ===
-         function formatText() {
-             if (!editor.value) return;
-
-             let originalText = editor.value;
-             let formattedText = originalText;
-
-             // 1. Trim whitespace dari setiap baris
-             formattedText = formattedText.split('\n').map(line => line.trim()).join('\n');
-
-             // 2. Ganti multiple spasi dengan satu spasi (kecuali di awal baris untuk indentasi)
-             formattedText = formattedText.split('\n').map(line => {
-                 const indentMatch = line.match(/^(\s*)/);
-                 const indent = indentMatch ? indentMatch[1] : '';
-                 const content = line.substring(indent.length);
-                 return indent + content.replace(/\s{2,}/g, ' ');
-             }).join('\n');
-
-             // 3. Hapus baris kosong berlebihan (maksimal satu baris kosong antar blok teks)
-             formattedText = formattedText.replace(/\n{3,}/g, '\n\n');
-
-             // 4. Hapus spasi/tab di akhir teks
-             formattedText = formattedText.trimEnd();
-
-             // 5. Pastikan ada satu newline di akhir jika teks tidak kosong
-             if (formattedText && !formattedText.endsWith('\n')) {
-                 formattedText += '\n';
-             }
-
-
-             if (formattedText !== originalText) {
-                 ignoreInputEvent = true;
-                 ignoreHistorySave = true;
-                 editor.value = formattedText;
-                 editor.scrollTop = 0; // Kembali ke atas setelah format
-                 editor.selectionStart = 0;
-                 editor.selectionEnd = 0;
-
-                 setTimeout(() => {
-                    ignoreInputEvent = false;
-                    ignoreHistorySave = false;
-                    saveHistory(true); // Paksa simpan history setelah format
-                    updateWordCount();
-                    saveCurrentNoteData(); // Simpan perubahan ke note
-                    showToast("Teks dirapikan!");
-                 }, 10);
-             } else {
-                 showToast("Teks sudah rapi.");
-             }
-         }
-
-        // === Fitur Baru: Search in Editor ===
-        function toggleEditorSearch() {
-            if (editorSearchBar.style.display === 'flex') {
-                hideEditorSearch();
-            } else {
-                showEditorSearch();
-            }
-        }
-
-        function showEditorSearch() {
-            editorSearchBar.style.display = 'flex';
-            editorSearchInput.focus();
-            editorSearchInput.select();
-             // Lakukan pencarian awal jika sudah ada teks di input
-             if (editorSearchInput.value) {
-                 findMatchesInEditor();
-             }
-        }
-
-        function hideEditorSearch() {
-            editorSearchBar.style.display = 'none';
-            resetEditorSearch(); // Hapus state dan highlight saat ditutup
-             editor.focus(); // Kembalikan fokus ke editor
-        }
-
-        function resetEditorSearch() {
-             editorSearchInput.value = '';
-             editorSearchState = { matches: [], currentIndex: -1, searchTerm: '', regex: null };
-             removeHighlights(); // Fungsi untuk menghapus highlight (jika ada)
-             updateSearchUI();
-             editor.focus(); // Kembalikan fokus ke editor
-        }
-
-        function findMatchesInEditor() {
-            const searchTerm = editorSearchInput.value;
-            if (!searchTerm) {
-                 resetEditorSearch(); // Reset jika search term kosong
-                 return;
-            }
-
-            if (searchTerm === editorSearchState.searchTerm) {
-                 // Jika term sama, tidak perlu cari ulang, cukup navigasi
-                 if (editorSearchState.matches.length > 0) {
-                     navigateToNextMatch();
-                 }
-                 return;
-            }
-
-            editorSearchState.searchTerm = searchTerm;
-             // 'gi' = global, case-insensitive
-             // Escape special regex characters in search term
-             const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-             editorSearchState.regex = new RegExp(escapedTerm, 'gi');
-             editorSearchState.matches = [];
-             editorSearchState.currentIndex = -1;
-
-             const text = editor.value;
-             let match;
-             while ((match = editorSearchState.regex.exec(text)) !== null) {
-                 editorSearchState.matches.push({
-                     index: match.index,
-                     length: match[0].length
-                 });
-             }
-
-             removeHighlights(); // Hapus highlight lama
-
-             if (editorSearchState.matches.length > 0) {
-                 editorSearchState.currentIndex = 0;
-                 highlightAndScrollToMatch(editorSearchState.currentIndex);
-             }
-             updateSearchUI();
-        }
-
-        function navigateToNextMatch() {
-            if (editorSearchState.matches.length === 0) return;
-            editorSearchState.currentIndex = (editorSearchState.currentIndex + 1) % editorSearchState.matches.length;
-            highlightAndScrollToMatch(editorSearchState.currentIndex);
-            updateSearchUI();
-        }
-
-        function navigateToPrevMatch() {
-            if (editorSearchState.matches.length === 0) return;
-            editorSearchState.currentIndex = (editorSearchState.currentIndex - 1 + editorSearchState.matches.length) % editorSearchState.matches.length;
-            highlightAndScrollToMatch(editorSearchState.currentIndex);
-            updateSearchUI();
-        }
-
-        // Highlight di textarea sulit dilakukan dengan `mark`. Kita akan gunakan selection.
-        function highlightAndScrollToMatch(index) {
-            if (index < 0 || index >= editorSearchState.matches.length) return;
-
-            const match = editorSearchState.matches[index];
-            const start = match.index;
-            const end = start + match.length;
-
-             editor.focus(); // Penting untuk selection
-             editor.scrollTop = editor.scrollHeight; // Scroll ke bawah dulu (hackish)
-             // Hitung posisi baris untuk scroll yang lebih baik
-            const textToMatch = editor.value.substring(0, start);
-            const lines = textToMatch.split('\n').length;
-             const avgLineHeight = editor.scrollHeight / (editor.value.split('\n').length || 1);
-             const scrollPosition = Math.max(0, (lines - 5) * avgLineHeight); // Scroll 5 baris sebelum match
-
-            editor.scrollTop = scrollPosition;
-
-            // Pakai timeout kecil agar scroll selesai sebelum selection
-            setTimeout(() => {
-                try {
-                    editor.setSelectionRange(start, end);
-                } catch (e) {
-                    console.error("Error setting selection range:", e);
-                }
-            }, 50);
-
-        }
-
-        function removeHighlights() {
-            // Karena kita pakai selection, cukup remove selection
-            try {
-                 if (document.activeElement === editor) { // Hanya jika editor fokus
-                    const currentPos = editor.selectionStart;
-                    editor.setSelectionRange(currentPos, currentPos); // Collapse selection
-                 }
-            } catch (e) { console.error("Error removing selection:", e); }
-        }
-
-        function updateSearchUI() {
-            const count = editorSearchState.matches.length;
-            if (count > 0) {
-                searchResultCount.textContent = `${editorSearchState.currentIndex + 1}/${count}`;
-                searchPrevBtn.disabled = false;
-                searchNextBtn.disabled = false;
-            } else {
-                searchResultCount.textContent = editorSearchState.searchTerm ? "0/0" : ""; // Tampilkan 0/0 jika ada search term tapi tidak ketemu
-                searchPrevBtn.disabled = true;
-                searchNextBtn.disabled = true;
-            }
-             // Highlight input jika tidak ada hasil
-            if (editorSearchState.searchTerm && count === 0) {
-                editorSearchInput.style.backgroundColor = 'rgba(255, 100, 100, 0.2)';
-            } else {
-                 editorSearchInput.style.backgroundColor = ''; // Kembali normal
-            }
-        }
-
-        // === Event Listeners Setup ===
-        function setupEventListeners() {
-            // Sidebar Toggle
-            menuToggleBtn.addEventListener('click', toggleSidebar);
-            closeSidebarBtn.addEventListener('click', () => sidebar.classList.remove('show-mobile'));
-
-            // Theme Toggle
-            themeToggle.addEventListener('click', toggleTheme);
-
-            // Note Management Buttons
-            addNoteBtn.addEventListener('click', () => createNewNote()); // Tombol di sidebar
-            newNoteBtn.addEventListener('click', () => createNewNote()); // Tombol di toolbar
-
-            // Editor Input & Title Input
-            editor.addEventListener('input', (e) => {
-                if (ignoreInputEvent) return; // Skip jika perubahan dari script
-                updateWordCount();
-                saveHistory(); // Simpan ke history saat mengetik (debounced)
-                 // Tandai perlu auto-save (akan dijalankan oleh interval)
-            });
-            noteTitle.addEventListener('input', () => {
-                updateDocumentTitle();
-                 // Langsung simpan judul saat berubah (debounced)
-                 clearTimeout(typingTimer);
-                 typingTimer = setTimeout(saveCurrentNoteData, 300);
-            });
-
-            // Toolbar Buttons
-            document.querySelector('.btn[onclick="saveNote()"]').addEventListener('click', saveNote); // Tombol simpan asli
-            undoBtn.addEventListener('click', undo);
-            redoBtn.addEventListener('click', redo);
-            searchBtn.addEventListener('click', toggleEditorSearch); // Tombol search di toolbar
-            formatTextBtn.addEventListener('click', formatText); // Tombol rapikan
-            fontWeightBtn.addEventListener('click', toggleFontWeight);
-            decreaseFontBtn.addEventListener('click', decreaseFontSize);
-            increaseFontBtn.addEventListener('click', increaseFontSize);
-            copyBtn.addEventListener('click', copyText);
-            document.querySelector('.btn[onclick="downloadNote()"]').addEventListener('click', downloadNote); // Tombol unduh asli
-            // Upload sudah dihandle onchange di HTML
-
-            // Editor Search Bar Buttons
-            editorSearchInput.addEventListener('input', findMatchesInEditor);
-            editorSearchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                        navigateToPrevMatch();
-                    } else {
-                        navigateToNextMatch();
-                    }
-                } else if (e.key === 'Escape') {
-                    hideEditorSearch();
-                }
-            });
-            searchPrevBtn.addEventListener('click', navigateToPrevMatch);
-            searchNextBtn.addEventListener('click', navigateToNextMatch);
-            closeSearchBtn.addEventListener('click', hideEditorSearch);
-
-            // Editor specific keydown
-            editor.addEventListener('keydown', handleEditorKeyDown);
-
-            // Keyboard Shortcuts
-            document.addEventListener('keydown', (e) => {
-                 // Prioritaskan input search jika aktif
-                if (editorSearchBar.style.display === 'flex' && document.activeElement === editorSearchInput) {
-                    return; // Biarkan handler input search bekerja
-                }
-
-                const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-                const ctrlKey = isMac ? e.metaKey : e.ctrlKey; // Cmd on Mac, Ctrl elsewhere
-
-                if (ctrlKey) {
-                    switch (e.key.toLowerCase()) {
-                        case 's': // Ctrl+S / Cmd+S -> Save
-                            e.preventDefault();
-                            saveNote();
-                            break;
-                        case 'n': // Ctrl+N / Cmd+N -> New Note
-                            e.preventDefault();
-                            createNewNote();
-                            break;
-                        case 'z': // Ctrl+Z / Cmd+Z -> Undo
-                             // Redo di Mac seringkali Cmd+Shift+Z
-                             if (!e.shiftKey) {
-                                e.preventDefault();
-                                undo();
-                             } else if (isMac) {
-                                 e.preventDefault();
-                                 redo();
-                             }
-                            break;
-                        case 'y': // Ctrl+Y -> Redo (Windows/Linux)
-                             if (!isMac) {
-                                e.preventDefault();
-                                redo();
-                             }
-                            break;
-                        case 'b': // Ctrl+B / Cmd+B -> Bold
-                             e.preventDefault();
-                             toggleFontWeight();
-                            break;
-                        case 'f': // Ctrl+F / Cmd+F -> Find in Editor
-                             e.preventDefault();
-                             showEditorSearch();
-                            break;
-                        case 'c': // Ctrl+Shift+C / Cmd+Shift+C -> Copy All
-                             if (e.shiftKey) {
-                                e.preventDefault();
-                                copyText();
-                             }
-                             break;
-                        // Tambahkan shortcut lain jika perlu
-                    }
-                } else if (e.key === 'Escape') {
-                     // Escape bisa untuk menutup search bar atau sidebar mobile
-                     if (editorSearchBar.style.display === 'flex') {
-                        hideEditorSearch();
-                     } else if (sidebar.classList.contains('show-mobile')) {
-                         sidebar.classList.remove('show-mobile');
-                     }
-                 }
-            });
-
-            // Window Resize Listener
-            window.addEventListener('resize', checkMobileView);
-
-             // Close sidebar on click outside (mobile)
-             document.addEventListener('click', (e) => {
-                 if (window.innerWidth <= 768 && sidebar.classList.contains('show-mobile')) {
-                     // Cek jika klik BUKAN di dalam sidebar ATAU pada tombol toggle
-                     if (!sidebar.contains(e.target) && !menuToggleBtn.contains(e.target)) {
-                         sidebar.classList.remove('show-mobile');
-                     }
-                 }
-             });
-        }
-
-        // === Run Initialization ===
-        init();
-
-    </script>
 </body>
 </html>
