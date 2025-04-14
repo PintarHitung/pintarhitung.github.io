@@ -43,7 +43,6 @@ Saat ini, PintarHitung menyediakan beberapa jenis kalkulator:
 ## 🖼️ Tampilan
 
 ![Screenshot PintarHitung](screenshot.png)  
-*Sangat disarankan untuk menambahkan screenshot website Anda di sini. Upload gambar ke repo atau hosting lain, lalu ganti `url_screenshot_anda.png` dengan link gambarnya.*
 
 ---
 
