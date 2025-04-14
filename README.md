@@ -1,7 +1,7 @@
 # PintarHitung - Kalkulator Nilai Akademik
 
-[![GitHub Pages Deploy](https://github.com/USERNAME/PintarHitung.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/USERNAME/PintarHitung.github.io/actions/workflows/pages/pages-build-deployment)
-*(Ganti USERNAME/PintarHitung.github.io dengan username dan nama repo Anda jika berbeda untuk mengaktifkan badge status deploy)*
+[![GitHub Pages Deploy](https://github.com/pintarhitung/PintarHitung.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/pintarhitung/PintarHitung.github.io/actions/workflows/pages/pages-build-deployment)
+
 
 Website ini dapat diakses langsung melalui:
 **[https://PintarHitung.github.io/](https://PintarHitung.github.io/)**
