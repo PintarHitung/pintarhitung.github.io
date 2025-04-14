@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://notepad-web.github.io/sitemap.xml
+Sitemap: https://pintarhitung.github.io/sitemap.xml
