@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Nilai Akademik - PintarHitung</title>
+    <title>Kalkulator Nilai Akademik Lengkap - PintarHitung</title>
 
-    <meta name="description" content="Kalkulator akademik untuk nilai akhir, IPK, PPDB, rata-rata rapor, dan lainnya. Gratis dan mudah digunakan.">
-    <meta name="keywords" content="kalkulator nilai, ipk, rapor, ppdb, akademik, sekolah, pintarhitung, hitung nilai">
-    <meta property="og:title" content="Kalkulator Nilai Akademik - PintarHitung">
-    <meta property="og:description" content="Alat bantu hitung nilai sekolah dan kuliah secara otomatis dan akurat.">
-    <meta property="og:image" content="https://cdn.xtermai.xyz/fOONh.jpg">
-    <meta property="og:type" content="website">
+    <meta name="description" content="Kalkulator akademik lengkap: nilai akhir, IPK, PPDB DIY (ASPD 60%), rata-rata rapor, konversi skala, bobot fleksibel, prediksi kelulusan. Gratis dan mudah digunakan.">
+    <meta name="keywords" content="kalkulator nilai, ipk, rapor, ppdb, aspd, akademik, sekolah, kuliah, konversi skala, bobot nilai, prediksi lulus, pintarhitung, hitung nilai">
+    <meta property="og:title" content="Kalkulator Nilai Akademik Lengkap - PintarHitung">
+    <meta property="og:description" content="Alat bantu hitung nilai sekolah dan kuliah: nilai akhir, IP/IPK, PPDB DIY (ASPD 60%), rata-rata rapor, konversi skala, bobot fleksibel, prediksi kelulusan.">
+    <meta property="og:image" content="https://cdn.xtermai.xyz/fOONh.jpg"> <meta property="og:type" content="website">
 
     <link rel="icon" type="image/png" href="favicon.png">
 
@@ -33,13 +32,11 @@
             .btn-danger-sm { @apply inline-flex items-center justify-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out; }
             .input-field { @apply block w-full px-4 py-3 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500; @apply transition duration-150 ease-in-out; }
             .input-error { @apply border-red-500 dark:border-red-500 focus:border-red-500 focus:ring-red-500; }
-            /* MODIFIKASI: Poin 9 - Sedikit penyesuaian warna error untuk potensi kontras lebih baik, tapi perlu dicek lagi */
             .error-text { @apply text-red-600 dark:text-red-400 text-xs mt-1; }
             .card { @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden p-6 md:p-8; }
             .nav-link { @apply text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition; }
             .nav-link-mobile { @apply block text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition; }
             .tooltip { @apply absolute z-20 inline-block px-3 py-2 text-xs font-medium text-white bg-gray-900 rounded-lg shadow-sm dark:bg-gray-700 whitespace-normal; }
-            /* MODIFIKASI: Poin 10 - Style untuk tombol copy kecil */
             .btn-copy { @apply inline-flex items-center justify-center p-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md shadow-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out ml-2; }
         }
     </style>
@@ -50,35 +47,14 @@
         // --- Helper Functions (Global Scope) ---
         function gradeToValue(grade) { const g={'A':4.0,'A-':3.7,'B+':3.3,'B':3.0,'B-':2.7,'C+':2.3,'C':2.0,'D':1.0,'E':0.0}; return g[String(grade).toUpperCase()]??0.0; }
 
-        // MODIFIKASI: Poin 4 - Fungsi valueToGrade dimodifikasi untuk menerima parameter 'scale'
-        // Pengguna dapat menyediakan array of objects [{grade:'A', min:90}, {grade:'B', min:80}, ...]
-        // Jika scale tidak disediakan atau kosong, pakai default internal.
+        // Fungsi valueToGrade (bisa dimodifikasi untuk customScale jika diimplementasikan)
         function valueToGrade(value, customScale = null) {
-            // Skala default internal
-            let defaultScale = [
-                {grade:'A',min:85},{grade:'A-',min:80},{grade:'B+',min:75},{grade:'B',min:70},
-                {grade:'B-',min:65},{grade:'C+',min:60},{grade:'C',min:55},{grade:'D',min:40},{grade:'E',min:0}
-            ];
+            let defaultScale = [ {grade:'A',min:85},{grade:'A-',min:80},{grade:'B+',min:75},{grade:'B',min:70}, {grade:'B-',min:65},{grade:'C+',min:60},{grade:'C',min:55},{grade:'D',min:40},{grade:'E',min:0} ];
             let scaleToUse = defaultScale;
-
-            // Gunakan customScale jika valid dan tidak kosong
-            if(customScale && Array.isArray(customScale) && customScale.length > 0) {
-                // Validasi sederhana: pastikan ada grade dan min, lalu urutkan
-                let validCustomScale = customScale.filter(item => item && typeof item.grade === 'string' && typeof item.min === 'number');
-                if (validCustomScale.length > 0) {
-                    scaleToUse = [...validCustomScale].sort((a, b) => b.min - a.min); // Sort descending by min score
-                }
-                // Jika customScale tidak valid setelah filter, tetap gunakan defaultScale
-            }
-
-            const n = parseFloat(value);
-            if(isNaN(n) || n === null) return '-';
-            const r = Math.round(n); // Atau gunakan n tanpa pembulatan jika diinginkan: const r = n;
-
-            for(const level of scaleToUse) {
-                if(r >= parseFloat(level.min)) return level.grade;
-            }
-            // Jika tidak cocok dengan skala manapun (misal, nilai < min terendah di skala), return grade terendah
+            // Logika penggunaan customScale (jika ada) bisa ditambahkan di sini
+            const n = parseFloat(value); if(isNaN(n) || n === null) return '-';
+            const r = Math.round(n);
+            for(const level of scaleToUse) { if(r >= parseFloat(level.min)) return level.grade; }
             return scaleToUse.length > 0 ? scaleToUse[scaleToUse.length - 1].grade : 'E';
         }
 
@@ -96,100 +72,58 @@
                 isDark: document.documentElement.classList.contains('dark'),
                 mobileMenuOpen: false, showBackToTop: false,
                 toastVisible: false, toastMessage: '', toastTimeout: null,
-                // MODIFIKASI: Poin 4 - Placeholder untuk Skala Nilai Kustom (perlu UI editor terpisah)
-                // customGradeScale: JSON.parse(localStorage.getItem('customGradeScale')) || null,
                 init() {
                     window.addEventListener('darkModeChanged',(e)=>{this.isDark=e.detail.isDark;});
                     AOS.init({duration:800,once:true,offset:50});
                     this.showBackToTop=(window.scrollY>200);
-                    // Inisialisasi listener clipboard (jika belum didukung secara native di semua browser)
-                    // Bisa menggunakan library clipboard.js jika diperlukan
                 },
                 showToast(message, duration = 3000) {
                     clearTimeout(this.toastTimeout);
-                    this.toastMessage = message;
-                    this.toastVisible = true;
+                    this.toastMessage = message; this.toastVisible = true;
                     this.toastTimeout = setTimeout(()=>{this.toastVisible=false;},duration);
                 },
-                // MODIFIKASI: Poin 10 - Fungsi untuk menyalin ke clipboard
                 copyToClipboard(value, successMessage = 'Hasil disalin!') {
+                    // Handle null/undefined/empty/'-' cases gracefully
                     if (value === null || value === undefined || String(value).trim() === '' || String(value) === '-') {
-                        this.showToast('Tidak ada hasil untuk disalin.', 2000);
-                        return;
+                       this.showToast('Tidak ada hasil valid untuk disalin.', 2000); return;
                     }
                     const textToCopy = String(value);
                     if (navigator.clipboard && window.isSecureContext) {
                         navigator.clipboard.writeText(textToCopy)
-                            .then(() => {
-                                this.showToast(successMessage);
-                            })
-                            .catch(err => {
-                                console.error('Gagal menyalin:', err);
-                                this.showToast('Gagal menyalin hasil.', 2000);
-                                // Fallback manual jika diperlukan
-                                // this.fallbackCopyTextToClipboard(textToCopy);
-                            });
+                            .then(() => { this.showToast(successMessage); })
+                            .catch(err => { console.error('Gagal menyalin:', err); this.showToast('Gagal menyalin hasil.', 2000); this.fallbackCopyTextToClipboard(textToCopy); });
                     } else {
-                        // Fallback untuk HTTP atau browser lama (mungkin memerlukan elemen textarea sementara)
-                        console.warn('Clipboard API tidak tersedia. Coba fallback.');
-                        this.fallbackCopyTextToClipboard(textToCopy);
+                        console.warn('Clipboard API tidak tersedia. Coba fallback.'); this.fallbackCopyTextToClipboard(textToCopy);
                     }
                 },
-                // Fallback copy (jika navigator.clipboard tidak ada)
                 fallbackCopyTextToClipboard(text) {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = text;
-                    textArea.style.position = "fixed"; // Hindari scroll ke bawah
-                    textArea.style.top = "0";
-                    textArea.style.left = "0";
-                    textArea.style.width = "2em";
-                    textArea.style.height = "2em";
-                    textArea.style.padding = "0";
-                    textArea.style.border = "none";
-                    textArea.style.outline = "none";
-                    textArea.style.boxShadow = "none";
-                    textArea.style.background = "transparent";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
+                    const textArea = document.createElement("textarea"); textArea.value = text;
+                    textArea.style.position = "fixed"; textArea.style.top = "0"; textArea.style.left = "0";
+                    textArea.style.width = "2em"; textArea.style.height = "2em"; textArea.style.padding = "0";
+                    textArea.style.border = "none"; textArea.style.outline = "none"; textArea.style.boxShadow = "none"; textArea.style.background = "transparent";
+                    document.body.appendChild(textArea); textArea.focus(); textArea.select();
                     try {
                         const successful = document.execCommand('copy');
-                        if (successful) {
-                            this.showToast('Hasil disalin (fallback).');
-                        } else {
-                            this.showToast('Gagal menyalin (fallback).', 2000);
-                        }
-                    } catch (err) {
-                        console.error('Fallback Gagal:', err);
-                        this.showToast('Gagal menyalin (fallback).', 2000);
-                    }
+                        if (successful) { this.showToast('Hasil disalin (fallback).'); } else { this.showToast('Gagal menyalin (fallback).', 2000); }
+                    } catch (err) { console.error('Fallback Gagal:', err); this.showToast('Gagal menyalin (fallback).', 2000); }
                     document.body.removeChild(textArea);
                 },
-                // MODIFIKASI: Poin 4 - Fungsi untuk mendapatkan skala nilai aktif
-                // getActiveGradeScale() {
-                //     return this.customGradeScale || null; // Akan pakai default di valueToGrade jika null
-                // }
             }));
 
+            // --- Kalkulator Nilai Akhir Mapel ---
             Alpine.data('finalGradeCalculator', () => ({
                 nilaiTugas: null, bobotTugas: 20, nilaiUTS: null, bobotUTS: 30, nilaiUAS: null, bobotUAS: 50,
                 finalGrade: null, letterGrade: '-', neededUAS: null, loading: false, targetGrade: 80,
                 errors: { nilaiTugas: null, bobotTugas: null, nilaiUTS: null, bobotUTS: null, nilaiUAS: null, bobotUAS: null, bobotTotal: null, targetGrade: null },
-                // MODIFIKASI: Poin 4 - Ambil skala aktif saat init (jika appSetup sudah siap)
-                // activeScale: Alpine.store('appSetup').getActiveGradeScale(), // Contoh pengambilan, perlu disesuaikan
-                validateInput(k,v,min,max,req=true){const val=parseFloat(v); if(req&&(v===null||String(v).trim()==='')){this.errors[k]='Wajib.';return false;} if(v!==null&&String(v).trim()!==''&&(isNaN(val)||val<min||val>max)){this.errors[k]=`Nilai ${min}-${max}.`;return false;} this.errors[k]=null;return true;},
+                validateInput(k,v,min,max,req=true){const val=parseFloat(v); if(req&&(v===null||String(v).trim()==='')){this.errors[k]='Wajib.';return false;} if(v!==null&&String(v).trim()!==''&&(isNaN(val)||val<min||val>max)){this.errors[k]=`Nilai <span class="math-inline">\{min\}\-</span>{max}.`;return false;} this.errors[k]=null;return true;},
                 validateAll(){let ok=true;this.errors={nilaiTugas:null,bobotTugas:null,nilaiUTS:null,bobotUTS:null,nilaiUAS:null,bobotUAS:null,bobotTotal:null,targetGrade:null};ok=this.validateInput('nilaiTugas',this.nilaiTugas,0,100)&&ok;ok=this.validateInput('bobotTugas',this.bobotTugas,0,100)&&ok;ok=this.validateInput('nilaiUTS',this.nilaiUTS,0,100)&&ok;ok=this.validateInput('bobotUTS',this.bobotUTS,0,100)&&ok;ok=this.validateInput('nilaiUAS',this.nilaiUAS,0,100,false)&&ok; ok=this.validateInput('bobotUAS',this.bobotUAS,0,100)&&ok;const tb=(parseFloat(this.bobotTugas)||0)+(parseFloat(this.bobotUTS)||0)+(parseFloat(this.bobotUAS)||0);if(Math.abs(tb-100)>=0.01){this.errors.bobotTotal='Total bobot harus 100%.';ok=false;}return ok;},
                 calculateFinalGrade(){
                     this.finalGrade=null;this.letterGrade='-';if(!this.validateAll())return;this.loading=true;
-                    // MODIFIKASI: Poin 4 - Ambil skala dari appSetup jika ada, atau null
-                    // const currentScale = Alpine.store('appSetup').getActiveGradeScale();
                     setTimeout(()=>{
                         const t=parseFloat(this.nilaiTugas)||0;const ut=parseFloat(this.nilaiUTS)||0;const ua=parseFloat(this.nilaiUAS)||0;
                         const bt=parseFloat(this.bobotTugas)/100||0;const bu=parseFloat(this.bobotUTS)/100||0;const ba=parseFloat(this.bobotUAS)/100||0;
                         this.finalGrade=(t*bt)+(ut*bu)+(ua*ba);
-                        // MODIFIKASI: Poin 4 - Gunakan skala saat memanggil valueToGrade
-                        // this.letterGrade=valueToGrade(this.finalGrade, currentScale);
-                        this.letterGrade=valueToGrade(this.finalGrade); // Tetap pakai default untuk sekarang
+                        this.letterGrade=valueToGrade(this.finalGrade); // Tetap pakai default
                         this.loading=false;
                     },300);
                 },
@@ -197,203 +131,187 @@
                 reset(){this.nilaiTugas=null;this.bobotTugas=20;this.nilaiUTS=null;this.bobotUTS=30;this.nilaiUAS=null;this.bobotUAS=50;this.finalGrade=null;this.letterGrade='-';this.neededUAS=null;this.targetGrade=80;this.loading=false;this.errors={nilaiTugas:null,bobotTugas:null,nilaiUTS:null,bobotUTS:null,nilaiUAS:null,bobotUAS:null,bobotTotal:null,targetGrade:null};}
             }));
 
+            // --- Kalkulator IP & IPK ---
             Alpine.data('gpaCalculator', () => ({
                 courses: [{ id: generateId(), name: '', sks: 3, grade: 'A' }], semesterIP: null, previousIPK: null, previousSKS: null,
                 cumulativeIPK: null, totalSKS: null, ipError: '', loading: false,
                 errors: { previousIPK: null, previousSKS: null, courses: [{id:'', sks:null}], tooltipIPKVisible: false, tooltipSKSVisible: false },
-                // MODIFIKASI: Poin 11 - Variabel untuk toggle rumus IPK
                 showFormulaIPK: false,
-                init() {
-                    this.loadFromLocalStorage();
-                    this.syncErrorsStructure();
-                    this.$watch('courses',()=> { this.saveGpaData(); this.syncErrorsStructure(); } ,{deep:true});
-                    this.$watch('previousIPK',()=>this.saveGpaData());
-                    this.$watch('previousSKS',()=>this.saveGpaData());
-                },
+                init() { this.loadFromLocalStorage(); this.syncErrorsStructure(); this.$watch('courses',()=> { this.saveGpaData(); this.syncErrorsStructure(); } ,{deep:true}); this.$watch('previousIPK',()=>this.saveGpaData()); this.$watch('previousSKS',()=>this.saveGpaData()); },
                 syncErrorsStructure() { this.errors.courses = this.courses.map(c => ({id: c.id, sks: null })); },
-                validateCourses(){let ok=true;/*this.errors.courses=[];*/if(this.courses.length===0){this.ipError='Tambah matkul.';return false;}this.courses.forEach((c,i)=>{if(!this.errors.courses[i]) this.errors.courses[i]={id:c.id, sks:null}; const s=parseInt(c.sks,10);if(isNaN(s)||s<=0){this.errors.courses[i].sks='SKS>0';ok=false;} else {this.errors.courses[i].sks=null;}});if(ok)this.ipError='';return ok;},
+                validateCourses(){let ok=true;if(this.courses.length===0){this.ipError='Tambah matkul.';return false;}this.courses.forEach((c,i)=>{if(!this.errors.courses[i]) this.errors.courses[i]={id:c.id, sks:null}; const s=parseInt(c.sks,10);if(isNaN(s)||s<=0){this.errors.courses[i].sks='SKS>0';ok=false;} else {this.errors.courses[i].sks=null;}});if(ok)this.ipError='';return ok;},
                 validatePrevious(){let ok=true;this.errors.previousIPK=null;this.errors.previousSKS=null;const pIPK=parseFloat(this.previousIPK);const pSKS=parseInt(this.previousSKS,10);if(this.previousIPK!==null&&String(this.previousIPK).trim()!==''&&(isNaN(pIPK)||pIPK<0||pIPK>4)){this.errors.previousIPK='IPK 0-4';ok=false;}if(this.previousSKS!==null&&String(this.previousSKS).trim()!==''&&(isNaN(pSKS)||pSKS<0)){this.errors.previousSKS='SKS>=0';ok=false;}return ok;},
                 addCourse() { const newId = generateId(); this.courses.push({ id: newId, name: '', sks: 3, grade: 'A' }); if(!this.errors.courses)this.errors.courses=[]; this.errors.courses.push({id: newId, sks:null}); },
                 removeCourse(index) { this.courses.splice(index, 1); this.errors.courses.splice(index,1); this.calculateIP(); if(this.previousIPK !== null && this.previousSKS !== null) this.calculateIPK(); },
                 calculateIP() { this.semesterIP=null;if(!this.validateCourses())return;this.loading=true;setTimeout(()=>{let score=0;let sksTotal=0;for(const c of this.courses){const s=parseInt(c.sks,10);if(isNaN(s) || s <= 0) continue; const gv=gradeToValue(c.grade);score+=gv*s;sksTotal+=s;}this.semesterIP=(sksTotal>0)?(score/sksTotal):null;if(this.previousIPK!==null&&this.previousSKS!==null&&String(this.previousIPK).trim()!==''&&String(this.previousSKS).trim()!=='')this.calculateIPK();this.loading=false;},300);},
                 calculateIPK() { this.cumulativeIPK=null;this.totalSKS=null;if(!this.validateCourses()||!this.validatePrevious()||this.semesterIP===null || this.previousIPK === null || this.previousSKS === null || String(this.previousIPK).trim()==='' || String(this.previousSKS).trim()==='') return; const pIPK=parseFloat(this.previousIPK);const pSKS=parseInt(this.previousSKS,10);const cIP=parseFloat(this.semesterIP);let cSKS=0;for(const c of this.courses){const sksVal = parseInt(c.sks, 10); if(!isNaN(sksVal) && sksVal > 0) cSKS+=sksVal;}if(cSKS<=0){this.cumulativeIPK=pIPK;this.totalSKS=pSKS;}else{const prevTotalScore = pIPK*pSKS; const currentTotalScore = cIP*cSKS; const totalScore = prevTotalScore + currentTotalScore; this.totalSKS=pSKS+cSKS;this.cumulativeIPK=this.totalSKS>0?totalScore/this.totalSKS:null;}},
-                reset() { this.courses=[{id: generateId(), name:'',sks:3,grade:'A'}];this.semesterIP=null;this.previousIPK=null;this.previousSKS=null;this.cumulativeIPK=null;this.totalSKS=null;this.ipError='';this.loading=false;this.errors={previousIPK:null,previousSKS:null,courses:[{id:'', sks:null}], tooltipIPKVisible: false, tooltipSKSVisible: false}; this.syncErrorsStructure(); localStorage.removeItem('gpaData'); /* MODIFIKASI: Hapus juga localStorage saat reset */ },
+                reset() { this.courses=[{id: generateId(), name:'',sks:3,grade:'A'}];this.semesterIP=null;this.previousIPK=null;this.previousSKS=null;this.cumulativeIPK=null;this.totalSKS=null;this.ipError='';this.loading=false;this.errors={previousIPK:null,previousSKS:null,courses:[{id:'', sks:null}], tooltipIPKVisible: false, tooltipSKSVisible: false}; this.syncErrorsStructure(); localStorage.removeItem('gpaData'); },
                 saveGpaData() { localStorage.setItem('gpaData', JSON.stringify({ courses: this.courses, previousIPK: this.previousIPK, previousSKS: this.previousSKS })); },
-                loadFromLocalStorage() { const s=localStorage.getItem('gpaData');if(s){try{const d=JSON.parse(s);this.courses=d.courses&&d.courses.length>0?d.courses:[{id: generateId(),name:'',sks:3,grade:'A'}];this.previousIPK=d.previousIPK||null;this.previousSKS=d.previousSKS||null;/*this.errors.courses=this.courses.map(()=>({sks:null}));*/}catch(e){this.courses=[{id:generateId(),name:'',sks:3,grade:'A'}];/*this.errors.courses=[{sks:null}];*/}}else{this.courses=[{id: generateId(),name:'',sks:3,grade:'A'}];/*this.errors.courses=[{sks:null}];*/} this.syncErrorsStructure(); /* Panggil sync setelah load */}
+                loadFromLocalStorage() { const s=localStorage.getItem('gpaData');if(s){try{const d=JSON.parse(s);this.courses=d.courses&&d.courses.length>0?d.courses:[{id: generateId(),name:'',sks:3,grade:'A'}];this.previousIPK=d.previousIPK||null;this.previousSKS=d.previousSKS||null;}catch(e){this.courses=[{id:generateId(),name:'',sks:3,grade:'A'}];}}else{this.courses=[{id: generateId(),name:'',sks:3,grade:'A'}];} this.syncErrorsStructure(); }
             }));
 
+            // --- Kalkulator PPDB DIY (ASPD) - VERSI UPDATE ---
             Alpine.data('ppdbCalculator', () => ({
-                nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null,
-                nilaiGabungan: null, kontribusiRapor: null, kontribusiASPD: null, kontribusiAkreditasi: null,
-                loading: false,
-                errors: { nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null },
-                // MODIFIKASI: Poin 11 - Variabel untuk toggle rumus PPDB
+                nilaiRapor: null, nilaiASPD: null, nilaiGabungan: null,
+                kontribusiRapor: null, kontribusiASPD: null, loading: false,
+                errors: { nilaiRapor: null, nilaiASPD: null }, // Hapus akreditasiSekolah dari errors
                 showFormulaPPDB: false,
-                // MODIFIKASI: Poin 2 - Pengingat untuk cek Juknis
-                // !! PENTING: Pastikan rentang nilai (max) untuk Rapor (400?) dan ASPD (300?)
-                // !! sudah sesuai Juknis PPDB DIY terbaru sebelum digunakan secara publik.
-                validateInput(k, v, min, max, req = true) {
-                    const val = parseFloat(v);
-                    if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; }
-                    if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) {
-                        this.errors[k] = `Nilai harus antara ${min}-${max}.`; return false;
-                    }
-                    this.errors[k] = null; return true;
-                },
+                // !! PENTING: Pastikan rentang nilai (max) untuk Rapor (400?) dan ASPD (300?) sesuai Juknis PPDB DIY terbaru.
+                validateInput(k, v, min, max, req = true) { const val = parseFloat(v); if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; } if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) { this.errors[k] = `Nilai harus <span class="math-inline">\{min\}\-</span>{max}.`; return false; } this.errors[k] = null; return true; },
                 validateAll() {
                     let ok = true;
-                    this.errors = { nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null };
-                    // Gunakan max sesuai asumsi saat ini, HARUS DIVERIFIKASI DENGAN JUKNIS
-                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok; // Max 400?
-                    ok = this.validateInput('nilaiASPD', this.nilaiASPD, 0, 300) && ok;   // Max 300?
-                    ok = this.validateInput('akreditasiSekolah', this.akreditasiSekolah, 0, 100) && ok; // Akreditasi 0-100
+                    this.errors = { nilaiRapor: null, nilaiASPD: null }; // Reset errors tanpa akreditasi
+                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok; // Asumsi max 400, cek Juknis
+                    ok = this.validateInput('nilaiASPD', this.nilaiASPD, 0, 300) && ok;   // Asumsi max 300, cek Juknis
+                    // Hapus validasi akreditasi
                     return ok;
                 },
                 calculateNilaiGabungan() {
-                    this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null; this.kontribusiAkreditasi = null;
+                    this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null;
+                    // Hapus reset kontribusiAkreditasi
                     if (!this.validateAll()) return;
                     this.loading = true;
                     setTimeout(() => {
                         const rapor = parseFloat(this.nilaiRapor);
                         const aspd = parseFloat(this.nilaiASPD);
-                        const akreditasi = parseFloat(this.akreditasiSekolah);
-                        // Rumus sesuai asumsi sebelumnya (PERLU VERIFIKASI JUKNIS!)
-                        this.kontribusiRapor = rapor * 0.40;
-                        this.kontribusiASPD = aspd * 0.55;
-                        this.kontribusiAkreditasi = (akreditasi * 4) * 0.05; // (Akreditasi * 4) * 5%
-                        this.nilaiGabungan = this.kontribusiRapor + this.kontribusiASPD + this.kontribusiAkreditasi;
+                        // Hapus const akreditasi
+                        this.kontribusiRapor = rapor * 0.40; // Bobot rapor 40%
+                        this.kontribusiASPD = aspd * 0.60;   // Bobot ASPD 60%
+                        // Hapus perhitungan kontribusiAkreditasi
+                        this.nilaiGabungan = this.kontribusiRapor + this.kontribusiASPD; // Update formula
                         this.loading = false;
                     }, 50);
                 },
                 reset() {
-                    this.nilaiRapor = null; this.nilaiASPD = null; this.akreditasiSekolah = null;
-                    this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null; this.kontribusiAkreditasi = null;
-                    this.loading = false; this.errors = { nilaiRapor: null, nilaiASPD: null, akreditasiSekolah: null };
-                    this.showFormulaPPDB = false; // Reset toggle rumus juga
+                    this.nilaiRapor = null; this.nilaiASPD = null; this.nilaiGabungan = null;
+                    this.kontribusiRapor = null; this.kontribusiASPD = null;
+                    // Hapus reset akreditasi & kontribusinya
+                    this.loading = false;
+                    this.errors = { nilaiRapor: null, nilaiASPD: null }; // Update reset errors
+                    this.showFormulaPPDB = false;
                 }
             }));
 
-            Alpine.data('gradeConverter', () => ({
-                numericGradeInput: null, letterGradeOutput: '-',
-                // MODIFIKASI: Poin 4 - Ambil skala aktif saat init
-                // activeScale: Alpine.store('appSetup').getActiveGradeScale(),
-                convertGrade() {
-                    // MODIFIKASI: Poin 4 - Gunakan skala saat memanggil valueToGrade
-                    // this.letterGradeOutput = valueToGrade(this.numericGradeInput, this.activeScale);
-                     this.letterGradeOutput = valueToGrade(this.numericGradeInput); // Tetap pakai default
-                },
-                reset() { this.numericGradeInput=null; this.letterGradeOutput='-'; }
-            }));
-
+             // --- Kalkulator Rata-rata Rapor ---
             Alpine.data('raporCalculator', () => ({
-                // MODIFIKASI: Poin 7 - Tambah 'average' di semester
                 semesters: [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }],
-                averageGrade: null, loading: false,
-                // MODIFIKASI: Poin 7 - Tambah 'average' error (jika perlu)
-                errors: { semesters: [{ id: '', average: null, subjects: [{ id: '', grade: null }] }] },
-                init() {
-                    // MODIFIKASI: Poin 6 - Load data dari localStorage
-                    this.loadFromLocalStorage();
-                    this.syncErrorsStructure();
-                    // MODIFIKASI: Poin 6 - Watch perubahan untuk save ke localStorage
-                    this.$watch('semesters', () => {
-                        this.saveRaporData();
-                        this.syncErrorsStructure(); // Pastikan struktur error sinkron setelah perubahan
-                    }, { deep: true });
-                },
-                syncErrorsStructure() {
-                    // MODIFIKASI: Poin 7 - Sinkronkan struktur error semester
-                    this.errors.semesters = this.semesters.map(sem => ({
-                        id: sem.id,
-                        average: null, // Error untuk average semester (jika diperlukan nanti)
-                        subjects: sem.subjects.map(sub => ({ id: sub.id, grade: null }))
-                    }));
-                },
+                averageGrade: null, loading: false, errors: { semesters: [{ id: '', average: null, subjects: [{ id: '', grade: null }] }] },
+                init() { this.loadFromLocalStorage(); this.syncErrorsStructure(); this.$watch('semesters', () => { this.saveRaporData(); this.syncErrorsStructure(); }, { deep: true }); },
+                syncErrorsStructure() { this.errors.semesters = this.semesters.map(sem => ({ id: sem.id, average: null, subjects: sem.subjects.map(sub => ({ id: sub.id, grade: null })) })); },
                 validateSubjectGrade(semIdx, subIdx) { const grade = this.semesters[semIdx].subjects[subIdx].grade; const val = parseFloat(grade); if (grade === null || String(grade).trim() === '') { this.errors.semesters[semIdx].subjects[subIdx].grade = null; return true; } if (isNaN(val) || val < 0 || val > 100) { this.errors.semesters[semIdx].subjects[subIdx].grade = '0-100'; return false; } this.errors.semesters[semIdx].subjects[subIdx].grade = null; return true; },
                 addSemester() { const newId = generateId(); this.semesters.push({ id: newId, name: `Semester ${this.semesters.length + 1}`, subjects: [{ id: generateId(), name: '', grade: null }], average: null }); this.errors.semesters.push({ id: newId, average: null, subjects: [{ id: '', grade: null }] }); },
                 removeSemester(index) { if (this.semesters.length > 1) { this.semesters.splice(index, 1); this.errors.semesters.splice(index, 1); this.calculateAverage(); } else { this.$dispatch('show-toast', { message: 'Minimal harus ada 1 semester.' }); } },
                 addSubject(semIdx) { const newId = generateId(); this.semesters[semIdx].subjects.push({ id: newId, name: '', grade: null }); this.errors.semesters[semIdx].subjects.push({ id: newId, grade: null }); },
                 removeSubject(semIdx, subIdx) { if (this.semesters[semIdx].subjects.length > 1) { this.semesters[semIdx].subjects.splice(subIdx, 1); this.errors.semesters[semIdx].subjects.splice(subIdx, 1); this.calculateAverage(); } else { this.$dispatch('show-toast', { message: 'Minimal harus ada 1 mapel per semester.' }); } },
-                calculateAverage() {
-                    this.averageGrade = null;
-                    let totalSum = 0; let totalCount = 0; let allValid = true;
-                    this.semesters.forEach((sem, semIdx) => {
-                        let semesterSum = 0; let semesterCount = 0; let semesterValid = true; // MODIFIKASI: Poin 7
-                        sem.subjects.forEach((sub, subIdx) => {
-                            if (!this.validateSubjectGrade(semIdx, subIdx)) {
-                                allValid = false; semesterValid = false; // MODIFIKASI: Poin 7
-                            } else {
-                                const grade = parseFloat(sub.grade);
-                                if (!isNaN(grade)) {
-                                    totalSum += grade; totalCount++;
-                                    semesterSum += grade; semesterCount++; // MODIFIKASI: Poin 7
-                                }
-                            }
-                        });
-                        // MODIFIKASI: Poin 7 - Hitung & simpan rata-rata semester
-                        if (semesterValid && semesterCount > 0) {
-                            this.semesters[semIdx].average = semesterSum / semesterCount;
-                        } else {
-                            this.semesters[semIdx].average = null;
-                        }
-                    });
-                    if (!allValid) return;
-                    if (totalCount > 0) { this.averageGrade = totalSum / totalCount; } else { this.averageGrade = null; }
-                },
-                reset() {
-                    this.semesters = [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }];
-                    this.averageGrade = null; this.loading = false;
-                    this.syncErrorsStructure();
-                    // MODIFIKASI: Poin 6 - Hapus data dari localStorage saat reset
-                    localStorage.removeItem('raporData');
-                    this.$dispatch('show-toast', { message: 'Data Rapor direset.' });
-                },
-                // MODIFIKASI: Poin 6 - Fungsi save ke localStorage
-                saveRaporData() {
-                    localStorage.setItem('raporData', JSON.stringify(this.semesters));
-                },
-                // MODIFIKASI: Poin 6 - Fungsi load dari localStorage
-                loadFromLocalStorage() {
-                    const savedData = localStorage.getItem('raporData');
-                    if (savedData) {
-                        try {
-                            const parsedData = JSON.parse(savedData);
-                            // Validasi sederhana: pastikan array dan ada isinya
-                            if (Array.isArray(parsedData) && parsedData.length > 0) {
-                                // Pastikan struktur data minimal ada (id, name, subjects)
-                                this.semesters = parsedData.map(sem => ({
-                                    id: sem.id || generateId(),
-                                    name: sem.name || 'Semester',
-                                    subjects: (Array.isArray(sem.subjects) ? sem.subjects.map(sub => ({
-                                        id: sub.id || generateId(),
-                                        name: sub.name || '',
-                                        grade: sub.grade !== undefined ? sub.grade : null
-                                    })) : [{ id: generateId(), name: '', grade: null }]),
-                                    average: null // Average dihitung ulang, tidak disimpan
-                                }));
-                            } else {
-                                this.setDefaultSemesters();
-                            }
-                        } catch (e) {
-                            console.error("Gagal parse data rapor:", e);
-                            this.setDefaultSemesters();
-                        }
-                    } else {
-                        this.setDefaultSemesters();
+                calculateAverage() { this.averageGrade = null; let totalSum = 0; let totalCount = 0; let allValid = true; this.semesters.forEach((sem, semIdx) => { let semesterSum = 0; let semesterCount = 0; let semesterValid = true; sem.subjects.forEach((sub, subIdx) => { if (!this.validateSubjectGrade(semIdx, subIdx)) { allValid = false; semesterValid = false; } else { const grade = parseFloat(sub.grade); if (!isNaN(grade)) { totalSum += grade; totalCount++; semesterSum += grade; semesterCount++; } } }); if (semesterValid && semesterCount > 0) { this.semesters[semIdx].average = semesterSum / semesterCount; } else { this.semesters[semIdx].average = null; } }); if (!allValid) return; if (totalCount > 0) { this.averageGrade = totalSum / totalCount; } else { this.averageGrade = null; } },
+                reset() { this.semesters = [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }]; this.averageGrade = null; this.loading = false; this.syncErrorsStructure(); localStorage.removeItem('raporData'); this.$dispatch('show-toast', { message: 'Data Rapor direset.' }); },
+                saveRaporData() { localStorage.setItem('raporData', JSON.stringify(this.semesters)); },
+                loadFromLocalStorage() { const savedData = localStorage.getItem('raporData'); if (savedData) { try { const parsedData = JSON.parse(savedData); if (Array.isArray(parsedData) && parsedData.length > 0) { this.semesters = parsedData.map(sem => ({ id: sem.id || generateId(), name: sem.name || 'Semester', subjects: (Array.isArray(sem.subjects) ? sem.subjects.map(sub => ({ id: sub.id || generateId(), name: sub.name || '', grade: sub.grade !== undefined ? sub.grade : null })) : [{ id: generateId(), name: '', grade: null }]), average: null })); } else { this.setDefaultSemesters(); } } catch (e) { console.error("Gagal parse data rapor:", e); this.setDefaultSemesters(); } } else { this.setDefaultSemesters(); } this.calculateAverage(); },
+                setDefaultSemesters() { this.semesters = [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }]; },
+                clearStoredData() { localStorage.removeItem('raporData'); this.reset(); this.$dispatch('show-toast', { message: 'Data rapor tersimpan dihapus.' }); }
+            }));
+
+            // --- Konversi Nilai Angka ke Huruf ---
+            Alpine.data('gradeConverter', () => ({
+                numericGradeInput: null, letterGradeOutput: '-',
+                convertGrade() { this.letterGradeOutput = valueToGrade(this.numericGradeInput); }, // Tetap pakai default
+                reset() { this.numericGradeInput=null; this.letterGradeOutput='-'; }
+            }));
+
+            // --- Kalkulator Konversi Skala Nilai (Angka) ---
+            Alpine.data('scaleValueConverter', () => ({
+                inputValue: null, inputScale: '100', outputScale: '4', outputValue: null, error: null,
+                calculateConversion() {
+                    this.outputValue = null; this.error = null; const val = parseFloat(this.inputValue);
+                    if (this.inputValue === null || String(this.inputValue).trim() === '' || isNaN(val)) { this.error = 'Masukkan nilai angka yang valid.'; return; }
+                    if (this.inputScale === this.outputScale) { this.error = 'Skala input dan output tidak boleh sama.'; return; }
+                    let converted = null;
+                    if (this.inputScale === '100') {
+                        if (val < 0 || val > 100) { this.error = 'Nilai skala 100 harus antara 0-100.'; return; }
+                        if (this.outputScale === '4') { converted = (val / 100.0) * 4.0; }
+                    } else if (this.inputScale === '4') {
+                        if (val < 0 || val > 4) { this.error = 'Nilai skala 4 harus antara 0-4.'; return; }
+                        if (this.outputScale === '100') { converted = (val / 4.0) * 100.0; }
                     }
-                    // Hitung ulang rata-rata setelah load
-                    this.calculateAverage();
+                    if (converted !== null) { this.outputValue = formatNumber(converted, this.outputScale === '4' ? 2 : 1); }
+                    else { this.error = 'Konversi tidak didukung untuk skala yang dipilih.'; }
                 },
-                // Fungsi untuk set default semester jika load gagal atau tidak ada data
-                setDefaultSemesters() {
-                    this.semesters = [{ id: generateId(), name: 'Semester 1', subjects: [{ id: generateId(), name: '', grade: null }], average: null }];
+                reset() { this.inputValue = null; this.inputScale = '100'; this.outputScale = '4'; this.outputValue = null; this.error = null; },
+                swapScales() { const tempScale = this.inputScale; this.inputScale = this.outputScale; this.outputScale = tempScale; if (this.inputValue !== null) { this.calculateConversion(); } }
+            }));
+
+            // --- Kalkulator Bobot Nilai Fleksibel ---
+            Alpine.data('flexibleWeightedAverageCalculator', () => ({
+                components: [{ id: generateId(), name: '', score: null, weight: null }], finalScore: null, letterGrade: '-', totalWeight: 0,
+                errors: { components: [{ id: '', score: null, weight: null }], totalWeight: null }, loading: false,
+                init() { this.syncErrorsStructure(); this.$watch('components', () => { this.syncErrorsStructure(); this.validateAll(); }, { deep: true }); },
+                syncErrorsStructure() { this.errors.components = this.components.map(c => ({ id: c.id, score: null, weight: null })); },
+                validateComponent(index) {
+                    let compOk = true; const comp = this.components[index]; const score = parseFloat(comp.score); const weight = parseFloat(comp.weight);
+                    if (comp.score !== null && String(comp.score).trim() !== '' && (isNaN(score) || score < 0 || score > 100)) { this.errors.components[index].score = '0-100'; compOk = false; } else { this.errors.components[index].score = null; }
+                    if (comp.weight === null || String(comp.weight).trim() === '') { this.errors.components[index].weight = 'Wajib'; compOk = false; } else if (isNaN(weight) || weight < 0 || weight > 100) { this.errors.components[index].weight = '0-100'; compOk = false; } else { this.errors.components[index].weight = null; }
+                    return compOk;
                 },
-                 // MODIFIKASI: Poin 6 - Fungsi untuk hapus data tersimpan
-                clearStoredData() {
-                    localStorage.removeItem('raporData');
-                    this.reset(); // Panggil reset untuk mengembalikan ke state awal
-                    this.$dispatch('show-toast', { message: 'Data rapor tersimpan dihapus.' });
-                }
+                validateAll() {
+                    let allValid = true; let currentTotalWeight = 0;
+                    this.components.forEach((comp, index) => { if (!this.validateComponent(index)) { allValid = false; } const weight = parseFloat(comp.weight); if (!isNaN(weight) && weight >= 0 && weight <= 100) { currentTotalWeight += weight; } });
+                    this.totalWeight = currentTotalWeight;
+                    if (Math.abs(currentTotalWeight - 100) >= 0.01 && this.components.length > 0) { this.errors.totalWeight = `Total bobot harus 100% (Saat ini: ${formatNumber(currentTotalWeight, 1)}%)`; allValid = false; } else { this.errors.totalWeight = null; }
+                    return allValid;
+                },
+                addComponent() { const newId = generateId(); this.components.push({ id: newId, name: '', score: null, weight: null }); },
+                removeComponent(index) { this.components.splice(index, 1); this.calculateFinalScore(); },
+                calculateFinalScore() {
+                    this.finalScore = null; this.letterGrade = '-'; this.loading = true;
+                    if (!this.validateAll()) { this.loading = false; return; }
+                    setTimeout(() => {
+                        let weightedSum = 0; let weightSum = 0;
+                        this.components.forEach(comp => { const score = parseFloat(comp.score) || 0; const weight = parseFloat(comp.weight); if (!isNaN(weight) && weight > 0) { weightedSum += score * (weight / 100.0); weightSum += weight; } });
+                        this.finalScore = weightedSum; // Langsung karena validasi total 100%
+                        if (this.finalScore !== null) { this.letterGrade = valueToGrade(this.finalScore); }
+                        this.loading = false;
+                    }, 300);
+                },
+                reset() { this.components = [{ id: generateId(), name: '', score: null, weight: null }]; this.finalScore = null; this.letterGrade = '-'; this.totalWeight = 0; this.errors = { components: [{ id: '', score: null, weight: null }], totalWeight: null }; this.loading = false; this.syncErrorsStructure(); }
+            }));
+
+            // --- Kalkulator Prediksi Kelulusan Sederhana ---
+            Alpine.data('graduationPredictor', () => ({
+                currentGPA: null, currentSKS: null, targetGPA: null, totalRequiredSKS: null, requiredRemainingGPA: null,
+                resultMessage: '', resultClass: 'text-gray-500 dark:text-gray-400',
+                errors: { currentGPA: null, currentSKS: null, targetGPA: null, totalRequiredSKS: null, calculation: null }, loading: false,
+                validateInput(field, value, min, max, isInt = false, required = true) {
+                    this.errors[field] = null; const val = isInt ? parseInt(value) : parseFloat(value);
+                    if (required && (value === null || String(value).trim() === '')) { this.errors[field] = 'Wajib diisi.'; return false; }
+                    if (value !== null && String(value).trim() !== '') { if (isNaN(val)) { this.errors[field] = 'Harus berupa angka.'; return false; } if (val < min || val > max) { this.errors[field] = `Nilai harus <span class="math-inline">\{min\}\-</span>{max}.`; return false; } }
+                    return true;
+                },
+                calculatePrediction() {
+                    this.requiredRemainingGPA = null; this.resultMessage = ''; this.errors.calculation = null; this.loading = true;
+                    let isValid = true;
+                    isValid = this.validateInput('currentGPA', this.currentGPA, 0, 4) && isValid;
+                    isValid = this.validateInput('currentSKS', this.currentSKS, 0, 500, true) && isValid;
+                    isValid = this.validateInput('targetGPA', this.targetGPA, 0, 4) && isValid;
+                    isValid = this.validateInput('totalRequiredSKS', this.totalRequiredSKS, 1, 500, true) && isValid;
+                    if (!isValid) { this.loading = false; this.resultMessage = 'Periksa kembali input Anda.'; this.resultClass = 'text-red-600 dark:text-red-400'; return; }
+                    const cGPA = parseFloat(this.currentGPA); const cSKS = parseInt(this.currentSKS); const tGPA = parseFloat(this.targetGPA); const reqSKS = parseInt(this.totalRequiredSKS);
+                    setTimeout(() => {
+                        const remainingSKS = reqSKS - cSKS;
+                        if (remainingSKS <= 0) {
+                            this.errors.calculation = 'Total SKS yang dibutuhkan sudah atau kurang dari SKS saat ini.'; this.resultMessage = 'Anda sudah memenuhi syarat SKS.'; this.resultClass = (cGPA >= tGPA) ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400';
+                            if (cGPA < tGPA) { this.resultMessage += ` Namun IPK saat ini (<span class="math-inline">\{formatNumber\(cGPA,2\)\}\) belum mencapai target \(</span>{formatNumber(tGPA,2)}).`; } else { this.resultMessage += ` IPK saat ini (<span class="math-inline">\{formatNumber\(cGPA,2\)\}\) memenuhi target \(</span>{formatNumber(tGPA,2)}). Selamat!`; }
+                            this.loading = false; return;
+                        }
+                        const totalRequiredScore = tGPA * reqSKS; const currentScore = cGPA * cSKS; const requiredRemainingScore = totalRequiredScore - currentScore; const reqGPA = requiredRemainingScore / remainingSKS;
+                        this.requiredRemainingGPA = reqGPA;
+                        if (reqGPA > 4.0) { this.resultMessage = `Tidak mungkin tercapai. Anda memerlukan IPK ${formatNumber(reqGPA, 2)} untuk sisa ${remainingSKS} SKS.`; this.resultClass = 'text-red-600 dark:text-red-400 font-semibold'; }
+                        else if (reqGPA < 0) { this.resultMessage = `Sangat mungkin tercapai. Anda hanya perlu IPK minimal 0.00 untuk sisa ${remainingSKS} SKS.`; this.resultClass = 'text-green-600 dark:text-green-400 font-semibold'; }
+                        else if (reqGPA > 3.5) { this.resultMessage = `Mungkin, tapi butuh usaha keras. Anda memerlukan IPK ${formatNumber(reqGPA, 2)} untuk sisa ${remainingSKS} SKS.`; this.resultClass = 'text-orange-600 dark:text-orange-400 font-semibold'; }
+                        else { this.resultMessage = `Sangat mungkin tercapai. Anda memerlukan IPK ${formatNumber(reqGPA, 2)} untuk sisa ${remainingSKS} SKS.`; this.resultClass = 'text-green-600 dark:text-green-400 font-semibold'; }
+                        this.loading = false;
+                    }, 300);
+                },
+                reset() { this.currentGPA = null; this.currentSKS = null; this.targetGPA = null; this.totalRequiredSKS = null; this.requiredRemainingGPA = null; this.resultMessage = ''; this.resultClass = 'text-gray-500 dark:text-gray-400'; this.errors = { currentGPA: null, currentSKS: null, targetGPA: null, totalRequiredSKS: null, calculation: null }; this.loading = false; }
             }));
 
         }); // End of alpine:init listener
@@ -403,23 +321,28 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased"
       x-data="appSetup"
       @scroll.window="showBackToTop = (window.scrollY > 200)"
-      @show-toast.window="showToast($event.detail.message, $event.detail.duration || 3000)"> <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors duration-300">
+      @show-toast.window="showToast($event.detail.message, $event.detail.duration || 3000)">
+
+    <header class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 transition-colors duration-300">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-2">
                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-indigo-600 dark:text-indigo-400"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /> </svg>
                 <h1 class="text-2xl font-space font-bold text-gray-800 dark:text-white">Pintar<span class="text-indigo-600">Hitung</span></h1>
             </div>
             <div class="flex items-center space-x-4">
-                 <button @click="window.toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <button @click="window.toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                     <svg x-show="!isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" /> </svg>
-                     <svg x-show="isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-6.364-.386 1.591-1.591M3 12h2.25m.386-6.364 1.591 1.591M12 6.75A5.25 5.25 0 0 0 6.75 12a5.25 5.25 0 0 0 5.25 5.25a5.25 5.25 0 0 0 5.25-5.25A5.25 5.25 0 0 0 12 6.75Z" /> </svg>
+                      <svg x-show="isDark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-6.364-.386 1.591-1.591M3 12h2.25m.386-6.364 1.591 1.591M12 6.75A5.25 5.25 0 0 0 6.75 12a5.25 5.25 0 0 0 5.25 5.25a5.25 5.25 0 0 0 5.25-5.25A5.25 5.25 0 0 0 12 6.75Z" /> </svg>
                 </button>
                 <div class="hidden md:flex space-x-6">
-                     <a href="#kalkulator-nilai-akhir" class="nav-link">Nilai Akhir</a>
+                    <a href="#kalkulator-nilai-akhir" class="nav-link">Nilai Akhir</a>
                     <a href="#kalkulator-ipk" class="nav-link">IP/IPK</a>
                     <a href="#kalkulator-ppdb" class="nav-link">PPDB DIY</a>
                     <a href="#kalkulator-rapor" class="nav-link">Rata-rata Rapor</a>
-                     <a href="#konversi-nilai" class="nav-link">Konversi Nilai</a>
+                    <a href="#konversi-nilai" class="nav-link">Konversi Nilai</a>
+                    <a href="#kalkulator-konversi-skala" class="nav-link">Konversi Skala</a>
+                    <a href="#kalkulator-bobot-fleksibel" class="nav-link">Nilai Fleksibel</a>
+                    <a href="#kalkulator-prediksi-lulus" class="nav-link">Prediksi Lulus</a>
                     <a href="#target-nilai" class="nav-link">Tips Target Nilai</a>
                 </div>
                 <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700" aria-label="Toggle Menu">
@@ -433,9 +356,13 @@
             <a href="#kalkulator-ppdb" @click="mobileMenuOpen = false" class="nav-link-mobile">PPDB DIY</a>
             <a href="#kalkulator-rapor" @click="mobileMenuOpen = false" class="nav-link-mobile">Rata-rata Rapor</a>
             <a href="#konversi-nilai" @click="mobileMenuOpen = false" class="nav-link-mobile">Konversi Nilai</a>
+            <a href="#kalkulator-konversi-skala" @click="mobileMenuOpen = false" class="nav-link-mobile">Konversi Skala</a>
+            <a href="#kalkulator-bobot-fleksibel" @click="mobileMenuOpen = false" class="nav-link-mobile">Nilai Fleksibel</a>
+            <a href="#kalkulator-prediksi-lulus" @click="mobileMenuOpen = false" class="nav-link-mobile">Prediksi Lulus</a>
             <a href="#target-nilai" @click="mobileMenuOpen = false" class="nav-link-mobile">Tips Target Nilai</a>
         </div>
     </header>
+
     <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-12">
 
         <section id="kalkulator-nilai-akhir" x-data="finalGradeCalculator" data-aos="fade-up">
@@ -445,7 +372,7 @@
                     <h2 class="text-3xl font-space">Kalkulator Nilai Akhir Mapel</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div class="space-y-4">
+                    <div class="space-y-4">
                         <div>
                             <label for="fn_nilai_tugas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Tugas</label>
                             <input type="number" id="fn_nilai_tugas" x-model.number="nilaiTugas" @input="validateInput('nilaiTugas', nilaiTugas, 0, 100)" placeholder="0-100" class="input-field" :class="{ 'input-error': errors.nilaiTugas }">
@@ -457,53 +384,54 @@
                              <p x-show="errors.bobotTugas" x-text="errors.bobotTugas" class="error-text"></p>
                         </div>
                         <div>
-                             <label for="fn_nilai_uts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai UTS</label>
+                            <label for="fn_nilai_uts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai UTS</label>
                             <input type="number" id="fn_nilai_uts" x-model.number="nilaiUTS" @input="validateInput('nilaiUTS', nilaiUTS, 0, 100)" placeholder="0-100" class="input-field" :class="{ 'input-error': errors.nilaiUTS }">
                             <p x-show="errors.nilaiUTS" x-text="errors.nilaiUTS" class="error-text"></p>
-                         </div>
+                        </div>
                         <div>
                             <label for="fn_bobot_uts" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot UTS (%)</label>
-                             <input type="number" id="fn_bobot_uts" x-model.number="bobotUTS" @input="validateInput('bobotUTS', bobotUTS, 0, 100)" placeholder="mis: 30" class="input-field" :class="{ 'input-error': errors.bobotUTS || errors.bobotTotal }">
+                            <input type="number" id="fn_bobot_uts" x-model.number="bobotUTS" @input="validateInput('bobotUTS', bobotUTS, 0, 100)" placeholder="mis: 30" class="input-field" :class="{ 'input-error': errors.bobotUTS || errors.bobotTotal }">
                             <p x-show="errors.bobotUTS" x-text="errors.bobotUTS" class="error-text"></p>
                          </div>
                          <div>
-                             <label for="fn_nilai_uas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai UAS</label>
+                            <label for="fn_nilai_uas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai UAS</label>
                             <input type="number" id="fn_nilai_uas" x-model.number="nilaiUAS" @input="validateInput('nilaiUAS', nilaiUAS, 0, 100, false)" placeholder="0-100" class="input-field" :class="{ 'input-error': errors.nilaiUAS }">
                             <p x-show="errors.nilaiUAS" x-text="errors.nilaiUAS" class="error-text"></p>
-                         </div>
+                        </div>
                         <div>
                             <label for="fn_bobot_uas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot UAS (%)</label>
-                             <input type="number" id="fn_bobot_uas" x-model.number="bobotUAS" @input="validateInput('bobotUAS', bobotUAS, 0, 100)" placeholder="mis: 50" class="input-field" :class="{ 'input-error': errors.bobotUAS || errors.bobotTotal }">
+                            <input type="number" id="fn_bobot_uas" x-model.number="bobotUAS" @input="validateInput('bobotUAS', bobotUAS, 0, 100)" placeholder="mis: 50" class="input-field" :class="{ 'input-error': errors.bobotUAS || errors.bobotTotal }">
                             <p x-show="errors.bobotUAS" x-text="errors.bobotUAS" class="error-text"></p>
                         </div>
                          <p x-show="errors.bobotTotal" x-text="errors.bobotTotal" class="error-text"></p>
                          <div class="flex space-x-3 pt-2">
                             <button @click="calculateFinalGrade()" class="btn flex-grow" :disabled="loading">
                                 <span x-show="!loading">Hitung Nilai Akhir</span>
-                                 <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                                <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
                              </button>
-                             <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                            <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
-                                 Reset
+                                Reset
                             </button>
                          </div>
                     </div>
-                     <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg flex flex-col justify-center items-center text-center space-y-4">
+                    <div class="bg-indigo-50 dark:bg-indigo-900/30 p-6 rounded-lg flex flex-col justify-center items-center text-center space-y-4">
                         <h3 class="text-xl font-semibold text-indigo-800 dark:text-indigo-200">Hasil Perhitungan</h3>
-                        <div x-show="finalGrade !== null" class="relative"> <p class="text-gray-600 dark:text-gray-400">Nilai Akhir:</p>
+                        <div x-show="finalGrade !== null" class="relative">
+                            <p class="text-gray-600 dark:text-gray-400">Nilai Akhir:</p>
                             <p class="text-5xl font-bold text-indigo-600 dark:text-indigo-400" x-text="formatNumber(finalGrade, 2)"></p>
                             <p class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-1" x-text="letterGrade"></p>
                             <button @click="$store.appSetup.copyToClipboard(formatNumber(finalGrade, 2), 'Nilai akhir disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Nilai Akhir">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
-                            </button>
+                             </button>
                          </div>
                         <div x-show="finalGrade === null" class="text-gray-500 dark:text-gray-400"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg> Masukkan nilai & bobot. </div>
                         <div class="w-full pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
                             <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Target Nilai UAS</h4>
                             <div>
-                                 <label for="fn_target_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Nilai Akhir</label>
+                               <label for="fn_target_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Nilai Akhir</label>
                                 <input type="number" id="fn_target_grade" x-model.number="targetGrade" @input="validateInput('targetGrade', targetGrade, 0, 100)" placeholder="mis: 85" class="input-field mb-2 !py-2 text-sm" :class="{ 'input-error': errors.targetGrade }">
-                                 <p x-show="errors.targetGrade" x-text="errors.targetGrade" class="error-text"></p>
+                                <p x-show="errors.targetGrade" x-text="errors.targetGrade" class="error-text"></p>
                             </div>
                              <button @click="calculateNeededUAS()" class="btn-secondary w-full text-sm !py-2 mt-1"> Hitung Min. UAS </button>
                              <div x-show="neededUAS !== null" class="mt-2 text-center">
@@ -511,10 +439,10 @@
                                  <p class="text-xl font-bold" :class="neededUAS > 100 ? 'text-red-500' : 'text-green-600 dark:text-green-400'" x-text="neededUAS !== null ? formatNumber(neededUAS, 2) : '-'"></p>
                                  <p x-show="neededUAS > 100" class="text-xs text-red-500">(Target tidak mungkin tercapai)</p>
                             </div>
-                             <div x-show="neededUAS === null && errors.targetGrade === null && !errors.nilaiTugas && !errors.nilaiUTS && !errors.bobotUAS" class="mt-2 text-sm text-gray-500">Masukkan target & tekan tombol.</div>
+                            <div x-show="neededUAS === null && errors.targetGrade === null && !errors.nilaiTugas && !errors.nilaiUTS && !errors.bobotUAS" class="mt-2 text-sm text-gray-500">Masukkan target & tekan tombol.</div>
                         </div>
                     </div>
-                 </div>
+                </div>
             </div>
         </section>
 
@@ -522,12 +450,12 @@
              <div class="card">
                  <div class="flex items-center mb-6 space-x-3">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-teal-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /> </svg>
-                    <h2 class="text-3xl font-space">Kalkulator IP & IPK</h2>
+                     <h2 class="text-3xl font-space">Kalkulator IP & IPK</h2>
                 </div>
                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                      <div class="lg:col-span-1 space-y-4">
                          <h3 class="text-xl font-semibold">Daftar Mata Kuliah Semester Ini</h3>
-                          <template x-for="(course, index) in courses" :key="course.id"> <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start border dark:border-gray-700 p-3 rounded-md mb-2">
+                           <template x-for="(course, index) in courses" :key="course.id"> <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start border dark:border-gray-700 p-3 rounded-md mb-2">
                                 <div class="sm:col-span-5">
                                     <label :for="'course_name_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Matkul</label>
                                     <input type="text" :id="'course_name_' + course.id" x-model="course.name" placeholder="Nama Mata Kuliah (Opsional)" class="input-field !py-2 text-sm">
@@ -537,7 +465,7 @@
                                     <input type="number" :id="'course_sks_' + course.id" x-model.number="course.sks" @input="validateCourses(); calculateIP();" placeholder="SKS" min="1" class="input-field !py-2 text-sm" :class="{ 'input-error': errors.courses[index]?.sks }">
                                     <p x-show="errors.courses[index]?.sks" x-text="errors.courses[index]?.sks" class="error-text !mb-0"></p>
                                 </div>
-                                <div class="sm:col-span-3">
+                                 <div class="sm:col-span-3">
                                      <label :for="'course_grade_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai</label>
                                      <select :id="'course_grade_' + course.id" x-model="course.grade" @change="calculateIP()" class="input-field !py-2 text-sm">
                                         <option>A</option> <option>A-</option> <option>B+</option> <option>B</option>
@@ -548,11 +476,11 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"> <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /> </svg>
                                     </button>
                                 </div>
-                             </div>
+                           </div>
                          </template>
                          <p x-show="ipError" x-text="ipError" class="error-text"></p>
                          <div class="flex space-x-3 pt-2">
-                               <button @click="addCourse()" class="btn-secondary flex-grow flex items-center justify-center"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /> </svg> Tambah Matkul </button>
+                             <button @click="addCourse()" class="btn-secondary flex-grow flex items-center justify-center"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /> </svg> Tambah Matkul </button>
                              <button @click="calculateIP()" class="btn flex-grow" :disabled="courses.length === 0 || loading">
                                  <span x-show="!loading">Hitung IP Semester</span>
                                  <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
@@ -562,20 +490,18 @@
                             <h4 class="text-lg font-semibold mb-2">Hitung IPK Kumulatif</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="relative">
-                                     <label for="prev_ipk" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        IPK Sblm
+                                    <label for="prev_ipk" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> IPK Sblm
                                          <button type="button" @mouseenter="errors.tooltipIPKVisible = true" @mouseleave="errors.tooltipIPKVisible = false" @focus="errors.tooltipIPKVisible = true" @blur="errors.tooltipIPKVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
                                         </button>
-                                     </label>
+                                    </label>
                                     <div x-show="errors.tooltipIPKVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Masukkan IPK kumulatif terakhir Anda SEBELUM semester ini. Kosongkan jika semester pertama. </div>
                                     <input type="number" step="0.01" id="prev_ipk" x-model.number="previousIPK" @input="validatePrevious(); calculateIPK();" placeholder="mis: 3.50" class="input-field" :class="{'input-error': errors.previousIPK}">
                                     <p x-show="errors.previousIPK" x-text="errors.previousIPK" class="error-text"></p>
                                  </div>
                                 <div class="relative">
-                                    <label for="prev_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                         Total SKS Sblm
-                                        <button type="button" @mouseenter="errors.tooltipSKSVisible = true" @mouseleave="errors.tooltipSKSVisible = false" @focus="errors.tooltipSKSVisible = true" @blur="errors.tooltipSKSVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
+                                    <label for="prev_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Total SKS Sblm
+                                         <button type="button" @mouseenter="errors.tooltipSKSVisible = true" @mouseleave="errors.tooltipSKSVisible = false" @focus="errors.tooltipSKSVisible = true" @blur="errors.tooltipSKSVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
                                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
                                          </button>
                                     </label>
@@ -586,32 +512,33 @@
                             </div>
                              <div class="mt-2">
                                 <button @click="showFormulaIPK = !showFormulaIPK" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    <span x-show="!showFormulaIPK">Lihat Rumus IPK</span>
-                                    <span x-show="showFormulaIPK">Sembunyikan Rumus IPK</span>
+                                     <span x-show="!showFormulaIPK">Lihat Rumus IPK</span> <span x-show="showFormulaIPK">Sembunyikan Rumus IPK</span>
                                 </button>
-                                <div x-show="showFormulaIPK" x-transition class="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
+                                 <div x-show="showFormulaIPK" x-transition class="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
                                     <p><strong>Rumus IPK Kumulatif:</strong></p>
                                     <p>((IPK Sblm × Total SKS Sblm) + (IP Semester Ini × SKS Semester Ini)) / (Total SKS Sblm + SKS Semester Ini)</p>
                                 </div>
                             </div>
-                            <div class="flex space-x-3 mt-3">
+                             <div class="flex space-x-3 mt-3">
                                 <button @click="calculateIPK()" class="btn flex-grow" :disabled="semesterIP === null || previousIPK === null || previousSKS === null || errors.previousIPK || errors.previousSKS || ipError || loading"> Hitung IPK </button>
                                 <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
                                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
                                     Reset Data
                                 </button>
-                            </div>
+                           </div>
                          </div>
                      </div>
                       <div class="lg:col-span-1 space-y-6 flex flex-col">
-                        <div class="bg-teal-50 dark:bg-teal-900/30 p-6 rounded-lg text-center relative"> <h3 class="text-xl font-semibold text-teal-800 dark:text-teal-200 mb-2">Hasil Semester Ini</h3>
+                         <div class="bg-teal-50 dark:bg-teal-900/30 p-6 rounded-lg text-center relative">
+                             <h3 class="text-xl font-semibold text-teal-800 dark:text-teal-200 mb-2">Hasil Semester Ini</h3>
                             <p class="text-gray-600 dark:text-gray-400">IP Semester (IPS):</p>
                             <p class="text-5xl font-bold text-teal-600 dark:text-teal-400" x-text="formatNumber(semesterIP, 2) ?? '--'"></p>
                              <button @click="$store.appSetup.copyToClipboard(formatNumber(semesterIP, 2), 'IP Semester disalin!')" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Semester">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                              </button>
                         </div>
-                        <div class="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-lg text-center relative"> <h3 class="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-2">Hasil Kumulatif</h3>
+                         <div class="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-lg text-center relative">
+                             <h3 class="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-2">Hasil Kumulatif</h3>
                             <p class="text-gray-600 dark:text-gray-400">IP Kumulatif (IPK):</p>
                             <p class="text-5xl font-bold text-purple-600 dark:text-purple-400" x-text="formatNumber(cumulativeIPK, 2) ?? '--'"></p>
                              <button @click="$store.appSetup.copyToClipboard(formatNumber(cumulativeIPK, 2), 'IP Kumulatif disalin!')" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Kumulatif">
@@ -625,68 +552,59 @@
         </section>
 
         <section id="kalkulator-ppdb" x-data="ppdbCalculator" data-aos="fade-up">
-             <div class="card">
+            <div class="card">
                  <div class="flex items-center mb-6 space-x-3">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-orange-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /> <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /> </svg>
-                    <h2 class="text-3xl font-space">Kalkulator Nilai Gabungan PPDB DIY (ASPD)</h2>
+                     <h2 class="text-3xl font-space">Kalkulator Nilai Gabungan PPDB DIY (Rapor & ASPD)</h2>
                 </div>
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-4">
-                    Kalkulator ini menggunakan rumus nilai gabungan ASPD sesuai Petunjuk Teknis (Juknis) PPDB SMA/SMK di Provinsi Daerah Istimewa Yogyakarta. Peraturan dan bobot nilai dapat berbeda di wilayah/tahun lain. <strong class="font-semibold">Selalu cek Juknis resmi terbaru.</strong>
+                    Kalkulator ini menggunakan contoh rumus nilai gabungan PPDB SMA/SMK di DIY berdasarkan Rapor (40%) dan ASPD (60%). <strong class="font-semibold">Selalu cek Juknis resmi terbaru untuk aturan, bobot, dan rentang nilai yang berlaku.</strong>
                 </p>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                     <div class="space-y-4">
                          <div>
-                            <label for="ppdb_nilai_rapor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rerata Nilai Rapor </label> <input type="number" step="any" id="ppdb_nilai_rapor" x-model.number="nilaiRapor" @input="validateInput('nilaiRapor', nilaiRapor, 0, 400); calculateNilaiGabungan();" placeholder="mis: 320" class="input-field" :class="{'input-error': errors.nilaiRapor}">
+                             <label for="ppdb_nilai_rapor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rerata Nilai Rapor (Misal: 4 Mapel x 5 Sem)</label>
+                             <input type="number" step="any" id="ppdb_nilai_rapor" x-model.number="nilaiRapor" @input="validateInput('nilaiRapor', nilaiRapor, 0, 400); calculateNilaiGabungan();" placeholder="Total nilai / jumlah mapel (maks 400?)" class="input-field" :class="{'input-error': errors.nilaiRapor}">
                             <p x-show="errors.nilaiRapor" x-text="errors.nilaiRapor" class="error-text"></p>
                         </div>
                         <div>
-                            <label for="ppdb_nilai_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai ASPD </label> <input type="number" step="any" id="ppdb_nilai_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); calculateNilaiGabungan();" placeholder="mis: 280" class="input-field" :class="{'input-error': errors.nilaiASPD}">
+                             <label for="ppdb_nilai_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai ASPD (Gabungan 3 Mapel)</label>
+                             <input type="number" step="any" id="ppdb_nilai_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); calculateNilaiGabungan();" placeholder="Total nilai ASPD (maks 300?)" class="input-field" :class="{'input-error': errors.nilaiASPD}">
                             <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
-                        </div>
-                        <div>
-                            <label for="ppdb_akreditasi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Akreditasi Sekolah (0-100)</label>
-                            <input type="number" step="any" id="ppdb_akreditasi" x-model.number="akreditasiSekolah" @input="validateInput('akreditasiSekolah', akreditasiSekolah, 0, 100); calculateNilaiGabungan();" placeholder="mis: 91" class="input-field" :class="{'input-error': errors.akreditasiSekolah}">
-                            <p x-show="errors.akreditasiSekolah" x-text="errors.akreditasiSekolah" class="error-text"></p>
                         </div>
                         <div class="mt-2">
                             <button @click="showFormulaPPDB = !showFormulaPPDB" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
-                                <span x-show="!showFormulaPPDB">Lihat Rumus Nilai Gabungan</span>
-                                <span x-show="showFormulaPPDB">Sembunyikan Rumus</span>
-                            </button>
+                                <span x-show="!showFormulaPPDB">Lihat Rumus (Contoh)</span> <span x-show="showFormulaPPDB">Sembunyikan Rumus</span>
+                           </button>
                             <div x-show="showFormulaPPDB" x-transition class="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
-                                <p><strong>Rumus (Contoh Juknis DIY Sebelumnya):</strong></p>
-                                <p>Nilai Gabungan = (Nilai Rapor × 40%) + (Nilai ASPD × 55%) + ((Nilai Akreditasi × 4) × 5%)</p>
-                                <p class="mt-1"><em>*Bobot dapat berubah, cek Juknis terbaru!</em></p>
+                                <p><strong>Rumus (Contoh):</strong></p>
+                                <p>Nilai Gabungan = (Nilai Rapor × 40%) + (Nilai ASPD × 60%)</p> <p class="mt-1"><em>*Bobot dan rentang nilai maks dapat berubah, cek Juknis terbaru!</em></p>
                             </div>
                         </div>
                          <div class="flex space-x-3 pt-2">
                             <button @click="calculateNilaiGabungan()" class="btn flex-grow" :disabled="loading">
-                                <span x-show="!loading">Hitung Nilai Gabungan</span>
-                                 <span x-show="loading" class="flex items-center justify-center"> Menghitung...</span>
+                                <span x-show="!loading">Hitung Nilai Gabungan</span> <span x-show="loading" class="flex items-center justify-center"> Menghitung...</span>
                             </button>
-                            <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
-                                Reset
-                            </button>
-                        </div>
+                             <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center"> Reset </button>
+                         </div>
                     </div>
                       <div class="bg-orange-50 dark:bg-orange-900/30 p-6 rounded-lg space-y-4">
                          <h3 class="text-xl font-semibold text-orange-800 dark:text-orange-200 text-center">Hasil Nilai Gabungan</h3>
-                         <div class="text-center relative" x-show="nilaiGabungan !== null"> <p class="text-5xl font-bold text-orange-600 dark:text-orange-400" x-text="nilaiGabungan !== null ? formatNumber(nilaiGabungan, 3) : '-'"></p>
-                             <button @click="$store.appSetup.copyToClipboard(formatNumber(nilaiGabungan, 3), 'Nilai gabungan PPDB disalin!')" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                         <div class="text-center relative" x-show="nilaiGabungan !== null">
+                             <p class="text-5xl font-bold text-orange-600 dark:text-orange-400" x-text="nilaiGabungan !== null ? formatNumber(nilaiGabungan, 3) : '-'"></p>
+                              <button @click="$store.appSetup.copyToClipboard(formatNumber(nilaiGabungan, 3), 'Nilai gabungan PPDB disalin!')" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                              </button>
                              <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
                                  <p>Kontribusi Rapor (40%): <span x-text="formatNumber(kontribusiRapor, 3) ?? '--'"></span></p>
-                                 <p>Kontribusi ASPD (55%): <span x-text="formatNumber(kontribusiASPD, 3) ?? '--'"></span></p>
-                                 <p>Kontribusi Akreditasi (5%): <span x-text="formatNumber(kontribusiAkreditasi, 3) ?? '--'"></span></p>
-                             </div>
+                                 <p>Kontribusi ASPD (60%): <span x-text="formatNumber(kontribusiASPD, 3) ?? '--'"></span></p>
+                                 </div>
                          </div>
                          <div x-show="nilaiGabungan === null" class="text-center text-gray-500 dark:text-gray-400 py-8"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M18 15.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-6 3.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z" /> </svg> Masukkan semua nilai yang diperlukan. </div>
                          <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
                              <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Simulasi Perubahan Nilai ASPD</h4>
                              <label for="ppdb_sim_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ubah Nilai ASPD (Slider):</label>
-                             <input type="range" id="ppdb_sim_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); if(errors.nilaiRapor === null && errors.akreditasiSekolah === null) calculateNilaiGabungan();"
-                                    min="0" max="300" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-orange-500 mt-1">
+                             <input type="range" id="ppdb_sim_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); if(errors.nilaiRapor === null) calculateNilaiGabungan();" min="0" max="300" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-orange-500 mt-1">
                              <span class="text-sm text-gray-600 dark:text-gray-400">Nilai ASPD: <strong x-text="nilaiASPD ?? '--'"></strong> / 300</span>
                              <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
                          </div>
@@ -702,13 +620,13 @@
                     <h2 class="text-3xl font-space">Kalkulator Rata-rata Rapor</h2>
                 </div>
                  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="md:col-span-2 space-y-6">
+                     <div class="md:col-span-2 space-y-6">
                         <template x-for="(semester, semesterIndex) in semesters" :key="semester.id">
                             <div class="border dark:border-gray-700 rounded-lg p-4">
-                                 <div class="flex justify-between items-center mb-3">
+                                <div class="flex justify-between items-center mb-3">
                                     <input type="text" x-model="semester.name" placeholder="Nama Semester (mis: Semester 1)" class="input-field !py-2 !px-3 text-lg font-semibold flex-grow mr-4 dark:bg-gray-700/50 border-0 focus:ring-indigo-500">
-                                     <button @click="removeSemester(semesterIndex)" type="button" class="text-red-500 hover:text-red-700" aria-label="Hapus Semester"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg> </button>
-                                 </div>
+                                    <button @click="removeSemester(semesterIndex)" type="button" class="text-red-500 hover:text-red-700" aria-label="Hapus Semester"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg> </button>
+                                </div>
                                 <div class="space-y-2">
                                     <template x-for="(subject, subjectIndex) in semester.subjects" :key="subject.id">
                                          <div class="grid grid-cols-12 gap-2 items-start">
@@ -721,8 +639,7 @@
                                                 <input type="number" :id="'subject_grade_' + subject.id" x-model.number="subject.grade" @input="validateSubjectGrade(semesterIndex, subjectIndex); calculateAverage();" placeholder="Nilai (0-100)" class="input-field !py-2 text-sm" :class="{'input-error': errors.semesters[semesterIndex]?.subjects[subjectIndex]?.grade}">
                                                 <p x-show="errors.semesters[semesterIndex]?.subjects[subjectIndex]?.grade" x-text="errors.semesters[semesterIndex]?.subjects[subjectIndex]?.grade" class="error-text !mb-0"></p>
                                             </div>
-                                             <div class="col-span-2 flex items-center pt-5"> <button @click="removeSubject(semesterIndex, subjectIndex)" type="button" class="text-red-500 hover:text-red-700 ml-auto" aria-label="Hapus Mapel"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg> </button>
-                                             </div>
+                                             <div class="col-span-2 flex items-center pt-5"> <button @click="removeSubject(semesterIndex, subjectIndex)" type="button" class="text-red-500 hover:text-red-700 ml-auto" aria-label="Hapus Mapel"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg> </button> </div>
                                         </div>
                                      </template>
                                 </div>
@@ -733,11 +650,12 @@
                              </div>
                         </template>
                         <button @click="addSemester()" type="button" class="btn-secondary w-full mt-4"> + Tambah Semester </button>
-                    </div>
+                     </div>
                      <div class="md:col-span-1 space-y-4">
                         <div class="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg text-center sticky top-24">
                             <h3 class="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Hasil Rata-rata Keseluruhan</h3>
-                            <div class="relative mb-4"> <p class="text-5xl font-bold text-blue-600 dark:text-blue-400" x-text="averageGrade !== null ? formatNumber(averageGrade, 2) : '--'"></p>
+                             <div class="relative mb-4">
+                                 <p class="text-5xl font-bold text-blue-600 dark:text-blue-400" x-text="averageGrade !== null ? formatNumber(averageGrade, 2) : '--'"></p>
                                 <button @click="$store.appSetup.copyToClipboard(formatNumber(averageGrade, 2), 'Rata-rata rapor disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Rata-rata Rapor" x-show="averageGrade !== null">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                                 </button>
@@ -748,7 +666,7 @@
                                     <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
                                 </button>
                                 <button @click="reset()" type="button" class="btn-secondary w-full flex items-center justify-center">
-                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg> Reset Semua
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg> Reset Semua
                                 </button>
                                 <button @click="clearStoredData()" type="button" class="btn-danger w-full flex items-center justify-center text-xs !py-1.5" title="Hapus data semester dan mapel yang tersimpan di browser ini">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
@@ -765,15 +683,15 @@
               <div class="card">
                  <div class="flex items-center mb-6 space-x-3">
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-cyan-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /> </svg>
-                     <h2 class="text-3xl font-space">Konversi Nilai Angka ke Huruf</h2>
+                    <h2 class="text-3xl font-space">Konversi Nilai Angka ke Huruf</h2>
                  </div>
                  <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                     Menggunakan skala nilai default. Fitur untuk mengatur skala nilai sendiri belum tersedia.
-                     </p>
+                     Menggunakan skala nilai default (contoh: A ≥ 85, A- ≥ 80, dst.). Fitur skala kustom belum tersedia.
+                 </p>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                      <div class="space-y-4">
                         <div>
-                             <label for="conv_numeric_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Angka (0-100)</label>
+                            <label for="conv_numeric_grade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Angka (0-100)</label>
                             <input type="number" id="conv_numeric_grade" x-model.number="numericGradeInput" @input="convertGrade()" placeholder="mis: 88" class="input-field">
                         </div>
                          <div class="pt-2">
@@ -783,34 +701,233 @@
                             </button>
                         </div>
                      </div>
-                     <div class="bg-cyan-50 dark:bg-cyan-900/30 p-6 rounded-lg text-center">
-                        <h3 class="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-2">Hasil Konversi</h3>
+                     <div class="bg-cyan-50 dark:bg-cyan-900/30 p-6 rounded-lg text-center relative">
+                        <h3 class="text-xl font-semibold text-cyan-800 dark:text-cyan-200 mb-2">Hasil Konversi Huruf</h3>
                         <p class="text-5xl font-bold text-cyan-600 dark:text-cyan-400" x-text="letterGradeOutput"></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">(Skala Default)</p>
+                        <button @click="$store.appSetup.copyToClipboard(letterGradeOutput, 'Hasil konversi huruf disalin!')" type="button" class="btn-copy absolute top-2 right-2" title="Salin Hasil Huruf" x-show="letterGradeOutput !== '-'">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                        </button>
+                         <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">(Skala Default)</p>
                     </div>
                  </div>
             </div>
         </section>
 
+        <section id="kalkulator-konversi-skala" x-data="scaleValueConverter" data-aos="fade-up">
+            <div class="card">
+                <div class="flex items-center mb-6 space-x-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-purple-500">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6h.008v.008H15.75V6z M15.75 18h.008v.008H15.75V18z"/>
+                    </svg>
+                    <h2 class="text-3xl font-space">Konversi Skala Nilai (Angka)</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                    <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                        <div>
+                            <label for="conv_input_scale" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Dari Skala</label>
+                            <select id="conv_input_scale" x-model="inputScale" @change="calculateConversion()" class="input-field">
+                                <option value="100">Skala 100</option>
+                                <option value="4">Skala 4</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-1">
+                             <label for="conv_input_value" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai Input</label>
+                             <input type="number" step="any" id="conv_input_value" x-model.number="inputValue" @input.debounce.300ms="calculateConversion()"
+                                    :placeholder="inputScale === '100' ? '0-100' : '0-4'"
+                                    :min="0" :max="inputScale === '100' ? 100 : 4"
+                                    class="input-field" :class="{'input-error': error}">
+                        </div>
+                        <div>
+                            <label for="conv_output_scale" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ke Skala</label>
+                            <select id="conv_output_scale" x-model="outputScale" @change="calculateConversion()" class="input-field">
+                                <option value="4">Skala 4</option>
+                                <option value="100">Skala 100</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-3">
+                            <p x-show="error" x-text="error" class="error-text"></p>
+                        </div>
+                         <div class="sm:col-span-3 flex space-x-3 items-center">
+                             <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                                 Reset
+                             </button>
+                              <button @click="swapScales()" type="button" title="Tukar Skala Input & Output" class="btn-secondary !px-3 !py-2">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"> <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /> </svg>
+                             </button>
+                         </div>
+                    </div>
+                    <div class="md:col-span-1 bg-purple-50 dark:bg-purple-900/30 p-6 rounded-lg text-center flex flex-col justify-center items-center">
+                        <h3 class="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-2">Hasil Konversi</h3>
+                        <div x-show="outputValue !== null" class="relative">
+                             <p class="text-5xl font-bold text-purple-600 dark:text-purple-400" x-text="outputValue"></p>
+                             <button @click="$store.appSetup.copyToClipboard(outputValue, 'Hasil konversi disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Hasil">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                             </button>
+                         </div>
+                         <div x-show="outputValue === null && !error" class="text-gray-500 dark:text-gray-400 py-5">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /> </svg>
+                             Masukkan nilai untuk dikonversi.
+                         </div>
+                         <div x-show="outputValue === null && error" class="text-red-500 dark:text-red-400 py-5">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.008v.008H12v-.008Z" /></svg>
+                             Periksa input atau skala.
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="kalkulator-bobot-fleksibel" x-data="flexibleWeightedAverageCalculator" data-aos="fade-up">
+            <div class="card">
+                 <div class="flex items-center mb-6 space-x-3">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-yellow-500">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /> <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 16.5a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /> </svg>
+                     <h2 class="text-3xl font-space">Kalkulator Nilai Akhir Fleksibel</h2>
+                 </div>
+                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Hitung nilai akhir berdasarkan beberapa komponen penilaian dengan bobot masing-masing. Total bobot harus 100%.</p>
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                     <div class="lg:col-span-2 space-y-3">
+                         <h3 class="text-lg font-semibold">Komponen Penilaian</h3>
+                         <template x-for="(component, index) in components" :key="component.id">
+                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start border dark:border-gray-700 p-3 rounded-md relative">
+                                 <div class="sm:col-span-5">
+                                     <label :for="'comp_name_' + component.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Komponen</label>
+                                     <input type="text" :id="'comp_name_' + component.id" x-model="component.name" placeholder="mis: Kuis 1 (Opsional)" class="input-field !py-2 text-sm">
+                                 </div>
+                                 <div class="sm:col-span-3">
+                                     <label :for="'comp_score_' + component.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai</label>
+                                     <input type="number" :id="'comp_score_' + component.id" x-model.number="component.score" @input="validateComponent(index); calculateFinalScore();" placeholder="0-100" class="input-field !py-2 text-sm" :class="{'input-error': errors.components[index]?.score}">
+                                      <p x-show="errors.components[index]?.score" x-text="errors.components[index]?.score" class="error-text !text-[11px]"></p>
+                                 </div>
+                                  <div class="sm:col-span-2">
+                                     <label :for="'comp_weight_' + component.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot (%)</label>
+                                     <input type="number" :id="'comp_weight_' + component.id" x-model.number="component.weight" @input="validateComponent(index); calculateFinalScore();" placeholder="mis: 15" class="input-field !py-2 text-sm" :class="{'input-error': errors.components[index]?.weight || errors.totalWeight}">
+                                     <p x-show="errors.components[index]?.weight" x-text="errors.components[index]?.weight" class="error-text !text-[11px]"></p>
+                                 </div>
+                                 <div class="sm:col-span-2 flex justify-end items-center pt-5">
+                                     <button @click="removeComponent(index)" type="button" class="p-1.5 text-red-500 hover:text-red-700 dark:hover:text-red-400 transition rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" aria-label="Hapus Komponen">
+                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"> <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /> </svg>
+                                     </button>
+                                 </div>
+                             </div>
+                         </template>
+                         <p x-show="errors.totalWeight" x-text="errors.totalWeight" class="error-text"></p>
+                         <div class="flex space-x-3 pt-2">
+                              <button @click="addComponent()" class="btn-secondary flex-grow flex items-center justify-center"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /> </svg> Tambah Komponen </button>
+                              <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                                 Reset
+                             </button>
+                         </div>
+                     </div>
+                     <div class="lg:col-span-1 bg-yellow-50 dark:bg-yellow-900/30 p-6 rounded-lg flex flex-col justify-center items-center text-center space-y-4 sticky top-24">
+                         <h3 class="text-xl font-semibold text-yellow-800 dark:text-yellow-200">Hasil Nilai Akhir</h3>
+                         <div x-show="finalScore !== null" class="relative">
+                             <p class="text-gray-600 dark:text-gray-400">Nilai Akhir:</p>
+                             <p class="text-5xl font-bold text-yellow-600 dark:text-yellow-400" x-text="formatNumber(finalScore, 2)"></p>
+                             <p class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-1" x-text="letterGrade"></p>
+                             <button @click="$store.appSetup.copyToClipboard(formatNumber(finalScore, 2), 'Nilai akhir disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Nilai Akhir">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                             </button>
+                         </div>
+                         <div x-show="finalScore === null" class="text-gray-500 dark:text-gray-400 py-5">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
+                             Masukkan nilai & bobot komponen.
+                         </div>
+                         <button @click="calculateFinalScore()" class="btn w-full mt-auto" :disabled="loading || components.length === 0">
+                             <span x-show="!loading">Hitung Nilai Akhir</span>
+                             <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                         </button>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="kalkulator-prediksi-lulus" x-data="graduationPredictor" data-aos="fade-up">
+            <div class="card">
+                 <div class="flex items-center mb-6 space-x-3">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-emerald-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M19.5 13.5 12 19.5m0 0L4.5 13.5M12 19.5v-15" /> </svg>
+                     <h2 class="text-3xl font-space">Kalkulator Prediksi Kelulusan (IPK)</h2>
+                 </div>
+                 <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Perkirakan IPK yang harus Anda capai di sisa masa studi untuk lulus dengan target IPK tertentu.</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                     <div class="space-y-4">
+                         <div>
+                             <label for="grad_current_gpa" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">IPK Kumulatif Saat Ini</label>
+                             <input type="number" step="0.01" id="grad_current_gpa" x-model.number="currentGPA" @input="validateInput('currentGPA', currentGPA, 0, 4); calculatePrediction();" placeholder="mis: 3.25" class="input-field" :class="{'input-error': errors.currentGPA}">
+                             <p x-show="errors.currentGPA" x-text="errors.currentGPA" class="error-text"></p>
+                         </div>
+                          <div>
+                             <label for="grad_current_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total SKS Lulus Saat Ini</label>
+                             <input type="number" id="grad_current_sks" x-model.number="currentSKS" @input="validateInput('currentSKS', currentSKS, 0, 500, true); calculatePrediction();" placeholder="mis: 90" class="input-field" :class="{'input-error': errors.currentSKS}">
+                             <p x-show="errors.currentSKS" x-text="errors.currentSKS" class="error-text"></p>
+                         </div>
+                         <div>
+                             <label for="grad_target_gpa" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target IPK Kelulusan</label>
+                             <input type="number" step="0.01" id="grad_target_gpa" x-model.number="targetGPA" @input="validateInput('targetGPA', targetGPA, 0, 4); calculatePrediction();" placeholder="mis: 3.50" class="input-field" :class="{'input-error': errors.targetGPA}">
+                             <p x-show="errors.targetGPA" x-text="errors.targetGPA" class="error-text"></p>
+                         </div>
+                         <div>
+                             <label for="grad_total_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Total SKS untuk Lulus</label>
+                             <input type="number" id="grad_total_sks" x-model.number="totalRequiredSKS" @input="validateInput('totalRequiredSKS', totalRequiredSKS, 1, 500, true); calculatePrediction();" placeholder="mis: 144" class="input-field" :class="{'input-error': errors.totalRequiredSKS}">
+                             <p x-show="errors.totalRequiredSKS" x-text="errors.totalRequiredSKS" class="error-text"></p>
+                         </div>
+                          <p x-show="errors.calculation" x-text="errors.calculation" class="error-text"></p>
+                         <div class="flex space-x-3 pt-2">
+                              <button @click="calculatePrediction()" class="btn flex-grow" :disabled="loading">
+                                  <span x-show="!loading">Hitung Prediksi</span>
+                                  <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                              </button>
+                              <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                                 Reset
+                             </button>
+                         </div>
+                     </div>
+                     <div class="bg-emerald-50 dark:bg-emerald-900/30 p-6 rounded-lg text-center flex flex-col justify-center items-center">
+                         <h3 class="text-xl font-semibold text-emerald-800 dark:text-emerald-200 mb-2">Hasil Prediksi</h3>
+                         <div x-show="requiredRemainingGPA !== null">
+                            <p class="text-gray-600 dark:text-gray-400">IPK yang Dibutuhkan (Sisa SKS):</p>
+                            <p class="text-5xl font-bold text-emerald-600 dark:text-emerald-400" x-text="requiredRemainingGPA >= 0 && requiredRemainingGPA <= 4 ? formatNumber(requiredRemainingGPA, 2) : (requiredRemainingGPA > 4 ? '> 4.00' : '< 0.00')"></p>
+                            <p class="mt-3 text-sm" :class="resultClass" x-text="resultMessage"></p>
+                         </div>
+                         <div x-show="requiredRemainingGPA === null && resultMessage && !loading" class="mt-3 text-sm" :class="resultClass" x-text="resultMessage">
+                            </div>
+                         <div x-show="requiredRemainingGPA === null && !resultMessage && !loading" class="text-gray-500 dark:text-gray-400 py-5">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mx-auto mb-2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                             Masukkan data IPK & SKS Anda.
+                         </div>
+                     </div>
+                 </div>
+            </div>
+        </section>
+
+
         <section id="target-nilai" data-aos="fade-up">
             <div class="card">
                 <div class="flex items-center mb-6 space-x-3">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-lime-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" /> </svg>
-                    <h2 class="text-3xl font-space">Tips Mencapai Target Nilai</h2>
+                     <h2 class="text-3xl font-space">Tips Mencapai Target Nilai</h2>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400">
-                    Ingin tahu nilai UAS minimal untuk mencapai target nilai akhir? Gunakan fitur <strong class="font-semibold text-gray-700 dark:text-gray-200">Target Nilai UAS</strong> yang ada di <a href="#kalkulator-nilai-akhir" class="text-indigo-600 hover:underline dark:text-indigo-400">Kalkulator Nilai Akhir Mapel</a> di bagian atas.
+                    Ingin tahu nilai UAS minimal untuk mencapai target nilai akhir mapel? Gunakan fitur <strong class="font-semibold text-gray-700 dark:text-gray-200">Target Nilai UAS</strong> yang ada di <a href="#kalkulator-nilai-akhir" class="text-indigo-600 hover:underline dark:text-indigo-400">Kalkulator Nilai Akhir Mapel</a> di bagian atas.
+                    <br>
+                    Ingin tahu target IPK di sisa SKS? Gunakan <a href="#kalkulator-prediksi-lulus" class="text-emerald-600 hover:underline dark:text-emerald-400">Kalkulator Prediksi Kelulusan</a>.
                 </p>
-                </div>
+            </div>
        </section>
 
-        </main>
+    </main>
+
     <footer class="bg-gray-200 dark:bg-gray-800 mt-16 transition-colors duration-300">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-600 dark:text-gray-400 text-sm">
              <p>&copy; <span x-text="new Date().getFullYear()"></span> PintarHitung | Developed by FawwazDzaky.</p>
-             <p class="mt-1">Tools visual untuk perencanaan nilai akademik.</p>
+             <p class="mt-1">Tools kalkulator visual untuk perencanaan nilai akademik Anda.</p>
              </div>
     </footer>
+
     <button x-show="showBackToTop" @click="window.scrollTo({ top: 0, behavior: 'smooth' })" x-transition class="fixed bottom-5 right-5 p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 z-50" aria-label="Kembali ke atas">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /> </svg>
     </button>
