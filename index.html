@@ -137,6 +137,7 @@
                 cumulativeIPK: null, totalSKS: null, ipError: '', loading: false,
                 errors: { previousIPK: null, previousSKS: null, courses: [{id:'', sks:null}], tooltipIPKVisible: false, tooltipSKSVisible: false },
                 showFormulaIPK: false,
+                showTipsModal: false, // <-- State untuk modal sudah ditambahkan
                 init() { this.loadFromLocalStorage(); this.syncErrorsStructure(); this.$watch('courses',()=> { this.saveGpaData(); this.syncErrorsStructure(); } ,{deep:true}); this.$watch('previousIPK',()=>this.saveGpaData()); this.$watch('previousSKS',()=>this.saveGpaData()); },
                 syncErrorsStructure() { this.errors.courses = this.courses.map(c => ({id: c.id, sks: null })); },
                 validateCourses(){let ok=true;if(this.courses.length===0){this.ipError='Tambah matkul.';return false;}this.courses.forEach((c,i)=>{if(!this.errors.courses[i]) this.errors.courses[i]={id:c.id, sks:null}; const s=parseInt(c.sks,10);if(isNaN(s)||s<=0){this.errors.courses[i].sks='SKS>0';ok=false;} else {this.errors.courses[i].sks=null;}});if(ok)this.ipError='';return ok;},
@@ -150,43 +151,34 @@
                 loadFromLocalStorage() { const s=localStorage.getItem('gpaData');if(s){try{const d=JSON.parse(s);this.courses=d.courses&&d.courses.length>0?d.courses:[{id: generateId(),name:'',sks:3,grade:'A'}];this.previousIPK=d.previousIPK||null;this.previousSKS=d.previousSKS||null;}catch(e){this.courses=[{id:generateId(),name:'',sks:3,grade:'A'}];}}else{this.courses=[{id: generateId(),name:'',sks:3,grade:'A'}];} this.syncErrorsStructure(); }
             }));
 
-// --- Kalkulator PPDB DIY (ASPD) - VERSI UPDATE ---
-Alpine.data('ppdbCalculator', () => ({
+            // --- Kalkulator PPDB DIY (ASPD) ---
+            Alpine.data('ppdbCalculator', () => ({
                 nilaiRapor: null, nilaiASPD: null, nilaiGabungan: null,
                 kontribusiRapor: null, kontribusiASPD: null, loading: false,
                 errors: { nilaiRapor: null, nilaiASPD: null },
                 showFormulaPPDB: false,
-                // Fungsi validateInput tidak perlu diubah, hanya panggilannya saja
-                validateInput(k, v, min, max, req = true) { const val = parseFloat(v); if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; } if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) { this.errors[k] = `Nilai harus ${min}-${max}.`; return false; } this.errors[k] = null; return true; }, // Sedikit ubah pesan error agar lebih jelas
+                validateInput(k, v, min, max, req = true) { const val = parseFloat(v); if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; } if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) { this.errors[k] = `Nilai harus <span class="math-inline">\{min\}\-</span>{max}.`; return false; } this.errors[k] = null; return true; },
                 validateAll() {
-                    let ok = true;
-                    this.errors = { nilaiRapor: null, nilaiASPD: null };
-                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok; // Rapor tetap maks 400
-                    // Perubahan di sini: validasi nilaiASPD menjadi 0-400
+                    let ok = true; this.errors = { nilaiRapor: null, nilaiASPD: null };
+                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok;
                     ok = this.validateInput('nilaiASPD', this.nilaiASPD, 0, 400) && ok;
                     return ok;
                 },
                 calculateNilaiGabungan() {
-                    // Fungsi ini tidak perlu diubah karena hanya menggunakan nilai yg sudah divalidasi
                     this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null;
                     if (!this.validateAll()) return;
                     this.loading = true;
                     setTimeout(() => {
-                        const rapor = parseFloat(this.nilaiRapor);
-                        const aspd = parseFloat(this.nilaiASPD);
-                        this.kontribusiRapor = rapor * 0.40; // Bobot rapor 40%
-                        this.kontribusiASPD = aspd * 0.60;   // Bobot ASPD 60%
+                        const rapor = parseFloat(this.nilaiRapor); const aspd = parseFloat(this.nilaiASPD);
+                        this.kontribusiRapor = rapor * 0.40; this.kontribusiASPD = aspd * 0.60;
                         this.nilaiGabungan = this.kontribusiRapor + this.kontribusiASPD;
                         this.loading = false;
                     }, 50);
                 },
                 reset() {
-                    // Fungsi reset tidak perlu diubah
                     this.nilaiRapor = null; this.nilaiASPD = null; this.nilaiGabungan = null;
-                    this.kontribusiRapor = null; this.kontribusiASPD = null;
-                    this.loading = false;
-                    this.errors = { nilaiRapor: null, nilaiASPD: null };
-                    this.showFormulaPPDB = false;
+                    this.kontribusiRapor = null; this.kontribusiASPD = null; this.loading = false;
+                    this.errors = { nilaiRapor: null, nilaiASPD: null }; this.showFormulaPPDB = false;
                 }
             }));
 
@@ -419,7 +411,7 @@ Alpine.data('ppdbCalculator', () => ({
                             <p class="text-gray-600 dark:text-gray-400">Nilai Akhir:</p>
                             <p class="text-5xl font-bold text-indigo-600 dark:text-indigo-400" x-text="formatNumber(finalGrade, 2)"></p>
                             <p class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mt-1" x-text="letterGrade"></p>
-                            <button @click="$store.appSetup.copyToClipboard(formatNumber(finalGrade, 2), 'Nilai akhir disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Nilai Akhir">
+                            <button @click="$dispatch('copyToClipboard', { value: formatNumber(finalGrade, 2), message: 'Nilai akhir disalin!' })" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Nilai Akhir">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                              </button>
                          </div>
@@ -447,91 +439,120 @@ Alpine.data('ppdbCalculator', () => ({
         <section id="kalkulator-ipk" x-data="gpaCalculator" data-aos="fade-up">
              <div class="card">
                  <div class="flex items-center mb-6 space-x-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-teal-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /> </svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-teal-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.627 48.627 0 0 1 12 20.904a48.627 48.627 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" /> </svg>
                      <h2 class="text-3xl font-space">Kalkulator IP & IPK</h2>
-                </div>
+                     <button @click="showTipsModal = true" type="button" class="ml-2 p-1.5 text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/50 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Lihat Tips IPK">
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                         </svg>
+                     </button>
+                     </div>
                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                      <div class="lg:col-span-1 space-y-4">
                          <h3 class="text-xl font-semibold">Daftar Mata Kuliah Semester Ini</h3>
-                           <template x-for="(course, index) in courses" :key="course.id"> <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start border dark:border-gray-700 p-3 rounded-md mb-2">
-                                <div class="sm:col-span-5">
-                                    <label :for="'course_name_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Matkul</label>
-                                    <input type="text" :id="'course_name_' + course.id" x-model="course.name" placeholder="Nama Mata Kuliah (Opsional)" class="input-field !py-2 text-sm">
-                                </div>
-                                 <div class="sm:col-span-2">
-                                    <label :for="'course_sks_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SKS</label>
-                                    <input type="number" :id="'course_sks_' + course.id" x-model.number="course.sks" @input="validateCourses(); calculateIP();" placeholder="SKS" min="1" class="input-field !py-2 text-sm" :class="{ 'input-error': errors.courses[index]?.sks }">
-                                    <p x-show="errors.courses[index]?.sks" x-text="errors.courses[index]?.sks" class="error-text !mb-0"></p>
-                                </div>
-                                 <div class="sm:col-span-3">
-                                     <label :for="'course_grade_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai</label>
-                                     <select :id="'course_grade_' + course.id" x-model="course.grade" @change="calculateIP()" class="input-field !py-2 text-sm">
-                                        <option>A</option> <option>A-</option> <option>B+</option> <option>B</option>
-                                        <option>B-</option> <option>C+</option> <option>C</option> <option>D</option> <option>E</option>
-                                    </select>
-                                </div>
-                                <div class="sm:col-span-2 flex justify-end items-center pt-5"> <button @click="removeCourse(index)" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 transition rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" aria-label="Hapus Mata Kuliah">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"> <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /> </svg>
-                                    </button>
-                                </div>
+                           <template x-for="(course, index) in courses" :key="course.id">
+                               <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-start border dark:border-gray-700 p-3 rounded-md mb-2">
+                                   <div class="sm:col-span-5">
+                                       <label :for="'course_name_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Matkul</label>
+                                       <input type="text" :id="'course_name_' + course.id" x-model="course.name" placeholder="Nama Mata Kuliah (Opsional)" class="input-field !py-2 text-sm">
+                                   </div>
+                                   <div class="sm:col-span-2">
+                                       <label :for="'course_sks_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">SKS</label>
+                                       <input type="number" :id="'course_sks_' + course.id" x-model.number="course.sks" @input="validateCourses(); calculateIP();" placeholder="SKS" min="1" class="input-field !py-2 text-sm" :class="{ 'input-error': errors.courses[index]?.sks }">
+                                       <p x-show="errors.courses[index]?.sks" x-text="errors.courses[index]?.sks" class="error-text !mb-0"></p>
+                                   </div>
+                                   <div class="sm:col-span-3">
+                                       <label :for="'course_grade_' + course.id" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai</label>
+                                       <select :id="'course_grade_' + course.id" x-model="course.grade" @change="calculateIP()" class="input-field !py-2 text-sm">
+                                           <option>A</option> <option>A-</option> <option>B+</option> <option>B</option>
+                                           <option>B-</option> <option>C+</option> <option>C</option> <option>D</option> <option>E</option>
+                                       </select>
+                                   </div>
+                                   <div class="sm:col-span-2 flex justify-end items-center pt-5">
+                                       <button @click="removeCourse(index)" class="p-2 text-red-500 hover:text-red-700 dark:hover:text-red-400 transition rounded-full hover:bg-red-100 dark:hover:bg-red-900/50" aria-label="Hapus Mata Kuliah">
+                                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"> <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /> </svg>
+                                       </button>
+                                   </div>
+                               </div>
+                           </template>
+                           <p x-show="ipError" x-text="ipError" class="error-text"></p>
+                           <div class="flex space-x-3 pt-2">
+                               <button @click="addCourse()" class="btn-secondary flex-grow flex items-center justify-center"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /> </svg> Tambah Matkul </button>
+                               <button @click="calculateIP()" class="btn flex-grow" :disabled="courses.length === 0 || loading">
+                                   <span x-show="!loading">Hitung IP Semester</span>
+                                   <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
+                               </button>
                            </div>
-                         </template>
-                         <p x-show="ipError" x-text="ipError" class="error-text"></p>
-                         <div class="flex space-x-3 pt-2">
-                             <button @click="addCourse()" class="btn-secondary flex-grow flex items-center justify-center"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /> </svg> Tambah Matkul </button>
-                             <button @click="calculateIP()" class="btn flex-grow" :disabled="courses.length === 0 || loading">
-                                 <span x-show="!loading">Hitung IP Semester</span>
-                                 <span x-show="loading" class="flex items-center justify-center"> Menghitung... <svg class="animate-spin ml-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"> <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle> <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path> </svg> </span>
-                             </button>
-                         </div>
-                         <div class="pt-4 border-t dark:border-gray-700">
-                            <h4 class="text-lg font-semibold mb-2">Hitung IPK Kumulatif</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="relative">
-                                    <label for="prev_ipk" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> IPK Sblm
-                                         <button type="button" @mouseenter="errors.tooltipIPKVisible = true" @mouseleave="errors.tooltipIPKVisible = false" @focus="errors.tooltipIPKVisible = true" @blur="errors.tooltipIPKVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
-                                        </button>
-                                    </label>
-                                    <div x-show="errors.tooltipIPKVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Masukkan IPK kumulatif terakhir Anda SEBELUM semester ini. Kosongkan jika semester pertama. </div>
-                                    <input type="number" step="0.01" id="prev_ipk" x-model.number="previousIPK" @input="validatePrevious(); calculateIPK();" placeholder="mis: 3.50" class="input-field" :class="{'input-error': errors.previousIPK}">
-                                    <p x-show="errors.previousIPK" x-text="errors.previousIPK" class="error-text"></p>
-                                 </div>
-                                <div class="relative">
-                                    <label for="prev_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Total SKS Sblm
-                                         <button type="button" @mouseenter="errors.tooltipSKSVisible = true" @mouseleave="errors.tooltipSKSVisible = false" @focus="errors.tooltipSKSVisible = true" @blur="errors.tooltipSKSVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
-                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
-                                         </button>
-                                    </label>
-                                     <div x-show="errors.tooltipSKSVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Total SKS yang sudah lulus SEBELUM semester ini. Kosongkan jika semester pertama. </div>
-                                    <input type="number" id="prev_sks" x-model.number="previousSKS" @input="validatePrevious(); calculateIPK();" placeholder="mis: 100" class="input-field" :class="{'input-error': errors.previousSKS}">
-                                    <p x-show="errors.previousSKS" x-text="errors.previousSKS" class="error-text"></p>
-                                 </div>
-                            </div>
-                             <div class="mt-2">
-                                <button @click="showFormulaIPK = !showFormulaIPK" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
-                                     <span x-show="!showFormulaIPK">Lihat Rumus IPK</span> <span x-show="showFormulaIPK">Sembunyikan Rumus IPK</span>
-                                </button>
-                                 <div x-show="showFormulaIPK" x-transition class="mt-1 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300">
-                                    <p><strong>Rumus IPK Kumulatif:</strong></p>
-                                    <p>((IPK Sblm × Total SKS Sblm) + (IP Semester Ini × SKS Semester Ini)) / (Total SKS Sblm + SKS Semester Ini)</p>
-                                </div>
-                            </div>
-                             <div class="flex space-x-3 mt-3">
-                                <button @click="calculateIPK()" class="btn flex-grow" :disabled="semesterIP === null || previousIPK === null || previousSKS === null || errors.previousIPK || errors.previousSKS || ipError || loading"> Hitung IPK </button>
-                                <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
-                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
-                                    Reset Data
-                                </button>
+                           <div class="pt-4 border-t dark:border-gray-700">
+                               <h4 class="text-lg font-semibold mb-2">Hitung IPK Kumulatif</h4>
+                               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                   <div class="relative">
+                                       <label for="prev_ipk" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> IPK Sblm
+                                            <button type="button" @mouseenter="errors.tooltipIPKVisible = true" @mouseleave="errors.tooltipIPKVisible = false" @focus="errors.tooltipIPKVisible = true" @blur="errors.tooltipIPKVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
+                                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
+                                           </button>
+                                       </label>
+                                       <div x-show="errors.tooltipIPKVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Masukkan IPK kumulatif terakhir Anda SEBELUM semester ini. Kosongkan jika semester pertama. </div>
+                                       <input type="number" step="0.01" id="prev_ipk" x-model.number="previousIPK" @input="validatePrevious(); calculateIPK();" placeholder="mis: 3.50" class="input-field" :class="{'input-error': errors.previousIPK}">
+                                       <p x-show="errors.previousIPK" x-text="errors.previousIPK" class="error-text"></p>
+                                    </div>
+                                   <div class="relative">
+                                       <label for="prev_sks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"> Total SKS Sblm
+                                            <button type="button" @mouseenter="errors.tooltipSKSVisible = true" @mouseleave="errors.tooltipSKSVisible = false" @focus="errors.tooltipSKSVisible = true" @blur="errors.tooltipSKSVisible = false" class="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none align-middle">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline-block"> <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /> </svg>
+                                            </button>
+                                       </label>
+                                        <div x-show="errors.tooltipSKSVisible" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="tooltip bottom-full mb-2 left-0" style="display: none;"> Total SKS yang sudah lulus SEBELUM semester ini. Kosongkan jika semester pertama. </div>
+                                       <input type="number" id="prev_sks" x-model.number="previousSKS" @input="validatePrevious(); calculateIPK();" placeholder="mis: 100" class="input-field" :class="{'input-error': errors.previousSKS}">
+                                       <p x-show="errors.previousSKS" x-text="errors.previousSKS" class="error-text"></p>
+                                    </div>
+                               </div>
+                               <div class="mt-2">
+                                   <button @click="showFormulaIPK = !showFormulaIPK" type="button" class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline">
+                                        <span x-show="!showFormulaIPK">Lihat Rumus IPK</span> <span x-show="showFormulaIPK">Sembunyikan Rumus IPK</span>
+                                   </button>
+                                   <div x-show="showFormulaIPK" x-transition class="mt-1 p-3 bg-gray-100 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300 space-y-2">
+                                        <p><strong>Langkah Perhitungan IPK Kumulatif:</strong></p>
+                                        <ol class="list-decimal list-inside space-y-1">
+                                            <li>
+                                                <strong>Hitung Total Poin Kualitas Sebelumnya (TPKSblm):</strong><br>
+                                                <code class="bg-gray-200 dark:bg-gray-600 px-1 rounded">TPKSblm = IPK Sblm × Total SKS Sblm</code>
+                                            </li>
+                                            <li>
+                                                <strong>Hitung Total Poin Kualitas Semester Ini (TPKSemIni):</strong><br>
+                                                 <code class="bg-gray-200 dark:bg-gray-600 px-1 rounded">TPKSemIni = IP Semester Ini (IPS) × Total SKS Semester Ini</code>
+                                             </li>
+                                             <li>
+                                                 <strong>Hitung Total Poin Kualitas Kumulatif (TPKKum):</strong><br>
+                                                 <code class="bg-gray-200 dark:bg-gray-600 px-1 rounded">TPKKum = TPKSblm + TPKSemIni</code>
+                                             </li>
+                                             <li>
+                                                 <strong>Hitung Total SKS Kumulatif (SKSTotal):</strong><br>
+                                                 <code class="bg-gray-200 dark:bg-gray-600 px-1 rounded">SKSTotal = Total SKS Sblm + Total SKS Semester Ini</code>
+                                             </li>
+                                             <li>
+                                                 <strong>Hitung IPK Kumulatif Baru:</strong><br>
+                                                 <code class="bg-gray-200 dark:bg-gray-600 px-1 rounded">IPK Baru = TPKKum / SKSTotal</code>
+                                            </li>
+                                        </ol>
+                                        <p class="text-[11px] italic mt-2">*IP Semester Ini (IPS) dihitung dari rata-rata bobot nilai (A=4, A-=3.7, ...) dikalikan SKS masing-masing matkul semester ini.</p>
+                                    </div>
+                               </div>
+                               <div class="flex space-x-3 mt-3">
+                                   <button @click="calculateIPK()" class="btn flex-grow" :disabled="semesterIP === null || previousIPK === null || previousSKS === null || errors.previousIPK || errors.previousSKS || ipError || loading"> Hitung IPK </button>
+                                   <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1"> <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" /> </svg>
+                                       Reset Data
+                                   </button>
+                              </div>
                            </div>
-                         </div>
                      </div>
-                      <div class="lg:col-span-1 space-y-6 flex flex-col">
+                     <div class="lg:col-span-1 space-y-6 flex flex-col">
                          <div class="bg-teal-50 dark:bg-teal-900/30 p-6 rounded-lg text-center relative">
                              <h3 class="text-xl font-semibold text-teal-800 dark:text-teal-200 mb-2">Hasil Semester Ini</h3>
                             <p class="text-gray-600 dark:text-gray-400">IP Semester (IPS):</p>
                             <p class="text-5xl font-bold text-teal-600 dark:text-teal-400" x-text="formatNumber(semesterIP, 2) ?? '--'"></p>
-                             <button @click="$store.appSetup.copyToClipboard(formatNumber(semesterIP, 2), 'IP Semester disalin!')" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Semester">
+                             <button @click="$dispatch('copyToClipboard', { value: formatNumber(semesterIP, 2), message: 'IP Semester disalin!' })" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Semester">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                              </button>
                         </div>
@@ -539,17 +560,32 @@ Alpine.data('ppdbCalculator', () => ({
                              <h3 class="text-xl font-semibold text-purple-800 dark:text-purple-200 mb-2">Hasil Kumulatif</h3>
                             <p class="text-gray-600 dark:text-gray-400">IP Kumulatif (IPK):</p>
                             <p class="text-5xl font-bold text-purple-600 dark:text-purple-400" x-text="formatNumber(cumulativeIPK, 2) ?? '--'"></p>
-                             <button @click="$store.appSetup.copyToClipboard(formatNumber(cumulativeIPK, 2), 'IP Kumulatif disalin!')" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Kumulatif">
+                             <button @click="$dispatch('copyToClipboard', { value: formatNumber(cumulativeIPK, 2), message: 'IP Kumulatif disalin!' })" type="button" class="btn-copy absolute top-4 right-4" title="Salin IP Kumulatif">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                              </button>
                              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total SKS: <span x-text="totalSKS ?? '--'"></span></p>
                          </div>
                      </div>
+                 </div> <div x-show="showTipsModal" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[70]" style="display: none;">
+                     <div @click.outside="showTipsModal = false" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-lg w-full p-6 relative" x-trap="showTipsModal">
+                         <button @click="showTipsModal = false" type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"> <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /> </svg>
+                         </button>
+                         <h3 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">💡 Tips Meningkatkan IPK</h3>
+                         <div class="prose prose-sm dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+                             <ul>
+                                 <li><strong>Konsisten Belajar:</strong> Jangan gunakan sistem kebut semalam (SKS). Cicil materi sedikit demi sedikit setiap hari.</li>
+                                 <li><strong>Aktif di Kelas:</strong> Bertanya, menjawab, atau berdiskusi menunjukkan partisipasi Anda dan membantu pemahaman.</li>
+                                 <li><strong>Pahami Bobot SKS:</strong> Fokus lebih pada mata kuliah dengan SKS besar karena pengaruhnya lebih signifikan ke IPK.</li>
+                                 <li><strong>Kelola Waktu:</strong> Buat jadwal belajar yang realistis dan patuhi. Seimbangkan antara akademik dan non-akademik.</li>
+                                 <li><strong>Manfaatkan Sumber Belajar:</strong> Jangan ragu manfaatkan perpustakaan, sumber online, atau bertanya pada dosen/asisten/teman.</li>
+                                 <li><strong>Evaluasi Diri:</strong> Setelah ujian, tinjau kembali kesalahan dan cari tahu cara memperbaikinya di masa depan.</li>
+                             </ul>
+                             <p class="text-xs mt-4"><em>Ingat, proses belajar itu penting. Jangan terlalu terbebani target, tapi jadikan motivasi!</em></p>
+                         </div>
+                     </div>
                  </div>
-             </div>
-        </section>
-
-        <section id="kalkulator-ppdb" x-data="ppdbCalculator" data-aos="fade-up">
+                 </div> </section> <section id="kalkulator-ppdb" x-data="ppdbCalculator" data-aos="fade-up">
             <div class="card">
                  <div class="flex items-center mb-6 space-x-3">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-orange-500"> <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" /> <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" /> </svg>
@@ -558,7 +594,29 @@ Alpine.data('ppdbCalculator', () => ({
                 <p class="text-sm text-gray-600 dark:text-gray-400 mt-1 mb-4">
                     Kalkulator ini menggunakan contoh rumus nilai gabungan PPDB SMA/SMK di DIY berdasarkan Rapor (40%) dan ASPD (60%). <strong class="font-semibold">Selalu cek Juknis resmi terbaru untuk aturan, bobot, dan rentang nilai yang berlaku.</strong>
                 </p>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+
+                <div class="mt-6 mb-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Sumber Informasi Resmi PPDB DIY</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        Pastikan Anda selalu merujuk ke sumber resmi untuk informasi PPDB terbaru (Juknis, jadwal, dll.). Tautan di bawah adalah contoh dan perlu diverifikasi keaktifannya untuk tahun ajaran <strong x-text="new Date().getFullYear() + '/' + (new Date().getFullYear() + 1)">2025/2026</strong>.
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>
+                            <a href="https://yogya.spmb.id/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline dark:text-indigo-400">
+                                Situs Resmi PPDB D.I. Yogyakarta (Perlu dicek URL untuk <span x-text="new Date().getFullYear() + '/' + (new Date().getFullYear() + 1)">2025/2026</span>)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://dikpora.jogjaprov.go.id" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline dark:text-indigo-400">
+                                Website Dinas Dikpora DIY
+                            </a>
+                        </li>
+                        </ul>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        "PintarHitung tidak berafiliasi dengan penyelenggara PPDB. Informasi di sini bersifat simulasi"
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                     <div class="space-y-4">
                          <div>
                              <label for="ppdb_nilai_rapor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rerata Nilai Rapor (Misal: 4 Mapel x 5 Sem)</label>
@@ -566,7 +624,7 @@ Alpine.data('ppdbCalculator', () => ({
                             <p x-show="errors.nilaiRapor" x-text="errors.nilaiRapor" class="error-text"></p>
                         </div>
                         <div>
-                             <label for="ppdb_nilai_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai ASPD (Gabungan 3 Mapel)</label>
+                             <label for="ppdb_nilai_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai ASPD (Gabungan 4 Mapel)</label>
                              <input type="number" step="any" id="ppdb_nilai_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 400); calculateNilaiGabungan();" placeholder="Total nilai ASPD (maks 400?)" class="input-field" :class="{'input-error': errors.nilaiASPD}">
                             <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
                         </div>
@@ -590,7 +648,7 @@ Alpine.data('ppdbCalculator', () => ({
                         <h3 class="text-xl font-semibold text-orange-800 dark:text-orange-200 text-center">Hasil Nilai Gabungan</h3>
                         <div class="text-center relative" x-show="nilaiGabungan !== null">
                             <p class="text-5xl font-bold text-orange-600 dark:text-orange-400" x-text="nilaiGabungan !== null ? formatNumber(nilaiGabungan, 3) : '-'"></p>
-                             <button @click="$store.appSetup.copyToClipboard(formatNumber(nilaiGabungan, 3), 'Nilai gabungan PPDB disalin!')" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
+                             <button @click="$dispatch('copyToClipboard', { value: formatNumber(nilaiGabungan, 3), message: 'Nilai gabungan PPDB disalin!' })" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                             </button>
                             <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
@@ -655,7 +713,7 @@ Alpine.data('ppdbCalculator', () => ({
                             <h3 class="text-xl font-semibold text-blue-800 dark:text-blue-200 mb-2">Hasil Rata-rata Keseluruhan</h3>
                              <div class="relative mb-4">
                                  <p class="text-5xl font-bold text-blue-600 dark:text-blue-400" x-text="averageGrade !== null ? formatNumber(averageGrade, 2) : '--'"></p>
-                                <button @click="$store.appSetup.copyToClipboard(formatNumber(averageGrade, 2), 'Rata-rata rapor disalin!')" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Rata-rata Rapor" x-show="averageGrade !== null">
+                                <button @click="$dispatch('copyToClipboard', { value: formatNumber(averageGrade, 2), message: 'Rata-rata rapor disalin!' })" type="button" class="btn-copy absolute -top-1 right-0" title="Salin Rata-rata Rapor" x-show="averageGrade !== null">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
                                 </button>
                             </div>
