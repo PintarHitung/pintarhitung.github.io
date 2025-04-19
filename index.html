@@ -150,44 +150,42 @@
                 loadFromLocalStorage() { const s=localStorage.getItem('gpaData');if(s){try{const d=JSON.parse(s);this.courses=d.courses&&d.courses.length>0?d.courses:[{id: generateId(),name:'',sks:3,grade:'A'}];this.previousIPK=d.previousIPK||null;this.previousSKS=d.previousSKS||null;}catch(e){this.courses=[{id:generateId(),name:'',sks:3,grade:'A'}];}}else{this.courses=[{id: generateId(),name:'',sks:3,grade:'A'}];} this.syncErrorsStructure(); }
             }));
 
-            // --- Kalkulator PPDB DIY (ASPD) - VERSI UPDATE ---
-            Alpine.data('ppdbCalculator', () => ({
+// --- Kalkulator PPDB DIY (ASPD) - VERSI UPDATE ---
+Alpine.data('ppdbCalculator', () => ({
                 nilaiRapor: null, nilaiASPD: null, nilaiGabungan: null,
                 kontribusiRapor: null, kontribusiASPD: null, loading: false,
-                errors: { nilaiRapor: null, nilaiASPD: null }, // Hapus akreditasiSekolah dari errors
+                errors: { nilaiRapor: null, nilaiASPD: null },
                 showFormulaPPDB: false,
-                // !! PENTING: Pastikan rentang nilai (max) untuk Rapor (400?) dan ASPD (300?) sesuai Juknis PPDB DIY terbaru.
-                validateInput(k, v, min, max, req = true) { const val = parseFloat(v); if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; } if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) { this.errors[k] = `Nilai harus <span class="math-inline">\{min\}\-</span>{max}.`; return false; } this.errors[k] = null; return true; },
+                // Fungsi validateInput tidak perlu diubah, hanya panggilannya saja
+                validateInput(k, v, min, max, req = true) { const val = parseFloat(v); if (req && (v === null || String(v).trim() === '')) { this.errors[k] = 'Wajib.'; return false; } if (v !== null && String(v).trim() !== '' && (isNaN(val) || val < min || val > max)) { this.errors[k] = `Nilai harus ${min}-${max}.`; return false; } this.errors[k] = null; return true; }, // Sedikit ubah pesan error agar lebih jelas
                 validateAll() {
                     let ok = true;
-                    this.errors = { nilaiRapor: null, nilaiASPD: null }; // Reset errors tanpa akreditasi
-                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok; // Asumsi max 400, cek Juknis
-                    ok = this.validateInput('nilaiASPD', this.nilaiASPD, 0, 300) && ok;   // Asumsi max 300, cek Juknis
-                    // Hapus validasi akreditasi
+                    this.errors = { nilaiRapor: null, nilaiASPD: null };
+                    ok = this.validateInput('nilaiRapor', this.nilaiRapor, 0, 400) && ok; // Rapor tetap maks 400
+                    // Perubahan di sini: validasi nilaiASPD menjadi 0-400
+                    ok = this.validateInput('nilaiASPD', this.nilaiASPD, 0, 400) && ok;
                     return ok;
                 },
                 calculateNilaiGabungan() {
+                    // Fungsi ini tidak perlu diubah karena hanya menggunakan nilai yg sudah divalidasi
                     this.nilaiGabungan = null; this.kontribusiRapor = null; this.kontribusiASPD = null;
-                    // Hapus reset kontribusiAkreditasi
                     if (!this.validateAll()) return;
                     this.loading = true;
                     setTimeout(() => {
                         const rapor = parseFloat(this.nilaiRapor);
                         const aspd = parseFloat(this.nilaiASPD);
-                        // Hapus const akreditasi
                         this.kontribusiRapor = rapor * 0.40; // Bobot rapor 40%
                         this.kontribusiASPD = aspd * 0.60;   // Bobot ASPD 60%
-                        // Hapus perhitungan kontribusiAkreditasi
-                        this.nilaiGabungan = this.kontribusiRapor + this.kontribusiASPD; // Update formula
+                        this.nilaiGabungan = this.kontribusiRapor + this.kontribusiASPD;
                         this.loading = false;
                     }, 50);
                 },
                 reset() {
+                    // Fungsi reset tidak perlu diubah
                     this.nilaiRapor = null; this.nilaiASPD = null; this.nilaiGabungan = null;
                     this.kontribusiRapor = null; this.kontribusiASPD = null;
-                    // Hapus reset akreditasi & kontribusinya
                     this.loading = false;
-                    this.errors = { nilaiRapor: null, nilaiASPD: null }; // Update reset errors
+                    this.errors = { nilaiRapor: null, nilaiASPD: null };
                     this.showFormulaPPDB = false;
                 }
             }));
@@ -569,7 +567,7 @@
                         </div>
                         <div>
                              <label for="ppdb_nilai_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nilai ASPD (Gabungan 3 Mapel)</label>
-                             <input type="number" step="any" id="ppdb_nilai_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); calculateNilaiGabungan();" placeholder="Total nilai ASPD (maks 300?)" class="input-field" :class="{'input-error': errors.nilaiASPD}">
+                             <input type="number" step="any" id="ppdb_nilai_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 400); calculateNilaiGabungan();" placeholder="Total nilai ASPD (maks 400?)" class="input-field" :class="{'input-error': errors.nilaiASPD}">
                             <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
                         </div>
                         <div class="mt-2">
@@ -588,26 +586,27 @@
                              <button @click="reset()" type="button" class="btn-secondary !px-4 !py-2 flex items-center"> Reset </button>
                          </div>
                     </div>
-                      <div class="bg-orange-50 dark:bg-orange-900/30 p-6 rounded-lg space-y-4">
-                         <h3 class="text-xl font-semibold text-orange-800 dark:text-orange-200 text-center">Hasil Nilai Gabungan</h3>
-                         <div class="text-center relative" x-show="nilaiGabungan !== null">
-                             <p class="text-5xl font-bold text-orange-600 dark:text-orange-400" x-text="nilaiGabungan !== null ? formatNumber(nilaiGabungan, 3) : '-'"></p>
-                              <button @click="$store.appSetup.copyToClipboard(formatNumber(nilaiGabungan, 3), 'Nilai gabungan PPDB disalin!')" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
-                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
-                             </button>
-                             <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
-                                 <p>Kontribusi Rapor (40%): <span x-text="formatNumber(kontribusiRapor, 3) ?? '--'"></span></p>
-                                 <p>Kontribusi ASPD (60%): <span x-text="formatNumber(kontribusiASPD, 3) ?? '--'"></span></p>
-                                 </div>
-                         </div>
-                         <div x-show="nilaiGabungan === null" class="text-center text-gray-500 dark:text-gray-400 py-8"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M18 15.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-6 3.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z" /> </svg> Masukkan semua nilai yang diperlukan. </div>
-                         <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
-                             <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Simulasi Perubahan Nilai ASPD</h4>
-                             <label for="ppdb_sim_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ubah Nilai ASPD (Slider):</label>
-                             <input type="range" id="ppdb_sim_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 300); if(errors.nilaiRapor === null) calculateNilaiGabungan();" min="0" max="300" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-orange-500 mt-1">
-                             <span class="text-sm text-gray-600 dark:text-gray-400">Nilai ASPD: <strong x-text="nilaiASPD ?? '--'"></strong> / 300</span>
-                             <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
-                         </div>
+                    <div class="bg-orange-50 dark:bg-orange-900/30 p-6 rounded-lg space-y-4">
+                        <h3 class="text-xl font-semibold text-orange-800 dark:text-orange-200 text-center">Hasil Nilai Gabungan</h3>
+                        <div class="text-center relative" x-show="nilaiGabungan !== null">
+                            <p class="text-5xl font-bold text-orange-600 dark:text-orange-400" x-text="nilaiGabungan !== null ? formatNumber(nilaiGabungan, 3) : '-'"></p>
+                             <button @click="$store.appSetup.copyToClipboard(formatNumber(nilaiGabungan, 3), 'Nilai gabungan PPDB disalin!')" type="button" class="btn-copy absolute top-0 right-0" title="Salin Nilai Gabungan">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 4.625-2.25-2.25m0 0-2.25 2.25M13.5 14.25V21m-3.375-6.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" /></svg>
+                            </button>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-2 space-y-1">
+                                <p>Kontribusi Rapor (40%): <span x-text="formatNumber(kontribusiRapor, 3) ?? '--'"></span></p>
+                                <p>Kontribusi ASPD (60%): <span x-text="formatNumber(kontribusiASPD, 3) ?? '--'"></span></p>
+                                </div>
+                        </div>
+                        <div x-show="nilaiGabungan === null" class="text-center text-gray-500 dark:text-gray-400 py-8"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto mb-2"> <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08M18 15.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Zm-6 3.75a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z" /> </svg> Masukkan semua nilai yang diperlukan. </div>
+                        <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-4">
+                            <h4 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">Simulasi Perubahan Nilai ASPD</h4>
+                            <label for="ppdb_sim_aspd" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ubah Nilai ASPD (Slider):</label>
+                            <input type="range" id="ppdb_sim_aspd" x-model.number="nilaiASPD" @input="validateInput('nilaiASPD', nilaiASPD, 0, 400); if(errors.nilaiRapor === null) calculateNilaiGabungan();" min="0" max="400" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-orange-500 mt-1">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Nilai ASPD: <strong x-text="nilaiASPD ?? '--'"></strong> / 400</span>
+                            <p x-show="errors.nilaiASPD" x-text="errors.nilaiASPD" class="error-text"></p>
+                        </div>
+                     </div>
                     </div>
                  </div>
             </div>
