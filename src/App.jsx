@@ -15,8 +15,7 @@ import {
   Plus,
   ChevronRight,
   Target,
-  Instagram,
-  FileText // Icon baru untuk Panduan
+  Instagram
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -555,16 +554,7 @@ const App = () => {
                     >
                         Mulai Hitung <ChevronRight size={18}/>
                     </button>
-                    
-                    {/* --- TOMBOL KE PANDUAN SEO --- */}
-                    <a 
-                        href="/panduan.html" 
-                        className="px-6 py-3 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/30 transition-all flex items-center gap-2"
-                    >
-                        <FileText size={18} />
-                        Baca Panduan Rumus
-                    </a>
-
+                    {/* UPDATED LINK AND TEXT */}
                     <a 
                         href="https://www.instagram.com/fawwazdzaaky/" 
                         target="_blank" 
