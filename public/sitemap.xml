@@ -6,4 +6,10 @@
       <changefreq>daily</changefreq>
       <priority>1.0</priority>
    </url>
-   </urlset>
+   <url>
+      <loc>https://pintarhitung.github.io/panduan.html</loc>
+      <lastmod>2025-12-21</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+   </url>
+</urlset>
