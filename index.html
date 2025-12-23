@@ -1,34 +1,95 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <link rel="canonical" href="https://pintarhitung.github.io/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PintarHitung</title>
     
-    <meta name="description" content="Simulasi nilai gabungan PPDB ASPD (DIY), Target Skor UTBK SNBT, dan Kalkulator IPK Kuliah. Akurat, gratis, dan tanpa iklan." />
-    <meta name="keywords" content="kalkulator aspd, ppdb diy, utbk snbt, hitung ipk, pintarhitung, nilai gabungan" />
+    <!-- --- SEO UTAMA --- -->
+    <!-- Title sedikit disesuaikan agar mencakup 'Kalkulator Nilai' & 'Akademik' tanpa terlalu panjang -->
+    <title>PintarHitung - Kalkulator Nilai Raport, Gabungan PPDB, IPK & UTBK</title>
+    
+    <!-- Description dirombak total berdasarkan insight: Menaruh "Web penghitung nilai raport" di depan -->
+    <meta name="description" content="Web penghitung nilai raport & rata-rata semester 1-5, kalkulator IPK, serta simulasi Nilai Gabungan PPDB DIY (ASPD). Kalkulator akademik & nilai terlengkap." />
+    
+    <!-- Keywords diupdate berdasarkan data Insight Anda -->
+    <meta name="keywords" content="pintar hitung, web penghitung nilai raport, website penghitungan nilai raport, kalkulator nilai raport, kalkulator akademik, hitung rata-rata raport, kalkulator ipk, kalkulator nilai, web menghitung nilai rata-rata raport, nilai gabungan ppdb diy, aspd diy, simulasi utbk snbt 2025" />
+    
     <meta name="author" content="Fawwaz Dzaaky" />
     <meta name="theme-color" content="#0f172a" />
     
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pintarhitung.github.io/" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- --- PRECONNECT (PERFORMANCE) --- -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- --- SOCIAL MEDIA CARDS (OG & TWITTER) --- -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PintarHitung" />
     <meta property="og:url" content="https://pintarhitung.github.io/" />
-    <meta property="og:title" content="PintarHitung - Kalkulator ASPD, UTBK SNBT & IPK Kuliah" />
-    <meta property="og:description" content="Simulasi nilai gabungan PPDB ASPD (DIY), Target Skor UTBK SNBT, dan Kalkulator IPK Kuliah. Akurat, gratis, dan tanpa iklan." />
+    <meta property="og:title" content="PintarHitung - Web Penghitung Nilai Raport & Akademik" />
+    <meta property="og:description" content="Kalkulator akademik untuk hitung rata-rata nilai raport, IPK mahasiswa, dan simulasi nilai gabungan PPDB/ASPD." />
     <meta property="og:image" content="https://files.catbox.moe/pd87xk.png" />
+    <meta property="og:image:alt" content="Preview Aplikasi PintarHitung" />
 
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://pintarhitung.github.io/" />
-    <meta property="twitter:title" content="PintarHitung - Kalkulator ASPD, UTBK SNBT & IPK Kuliah" />
-    <meta property="twitter:description" content="Simulasi nilai gabungan PPDB ASPD (DIY), Target Skor UTBK SNBT, dan Kalkulator IPK Kuliah. Akurat, gratis, dan tanpa iklan." />
+    <meta property="twitter:title" content="PintarHitung - Kalkulator Akademik Terlengkap" />
+    <meta property="twitter:description" content="Web penghitung nilai raport, kalkulator IPK, dan prediksi skor UTBK SNBT dalam satu aplikasi." />
+    <meta property="twitter:image" content="https://files.catbox.moe/pd87xk.png" />
 
+    <!-- --- ROBOTS & CRAWLERS --- -->
+    <meta name="robots" content="index, follow" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- --- STRUCTURED DATA (JSON-LD) --- -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PintarHitung",
+      "url": "https://pintarhitung.github.io/",
+      "description": "Web penghitung nilai raport semester 1-5, kalkulator IPK, dan simulasi nilai gabungan PPDB.",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript. Optimized for Chrome, Firefox, Safari.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "IDR"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Fawwaz Dzaaky"
+      },
+      "featureList": [
+        "Web Penghitung Nilai Raport & Rata-rata",
+        "Kalkulator Akademik & Nilai",
+        "Kalkulator IPK Mahasiswa",
+        "Simulasi Nilai Gabungan PPDB DIY (ASPD)",
+        "Simulasi Skor UTBK SNBT"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- --- NOSCRIPT CONTENT (SEO FALLBACK) --- -->
+    <noscript>
+      <h1>PintarHitung - Kalkulator Akademik & Nilai Raport</h1>
+      <p>Web penghitung nilai raport dan kalkulator akademik terlengkap untuk siswa & mahasiswa:</p>
+      <ul>
+        <li><strong>Penghitung Nilai Raport:</strong> Hitung rata-rata nilai semester 1-5 dengan mudah.</li>
+        <li><strong>Kalkulator IPK:</strong> Hitung Indeks Prestasi Kumulatif untuk mahasiswa.</li>
+        <li><strong>Nilai Gabungan PPDB DIY:</strong> Simulasi nilai akhir menggunakan rumus ASPD resmi.</li>
+        <li><strong>Simulasi UTBK SNBT:</strong> Cek peluang masuk jurusan impian.</li>
+      </ul>
+      <p>Silakan aktifkan JavaScript untuk menggunakan fitur kalkulator nilai ini.</p>
+    </noscript>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

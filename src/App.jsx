@@ -8,6 +8,7 @@ import {
   X, 
   Settings, 
   TrendingUp, 
+  TrendingDown,
   BookOpen, 
   Percent, 
   Save, 
@@ -15,13 +16,13 @@ import {
   Plus,
   ChevronRight,
   Target,
-  Instagram
+  Instagram,
+  FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- UTILITY HOOKS ---
 
-// Hook to persist state to LocalStorage automatically
 const useLocalStorage = (key, initialValue) => {
   const [storedValue, setStoredValue] = useState(() => {
     try {
@@ -46,6 +47,11 @@ const useLocalStorage = (key, initialValue) => {
   return [storedValue, setValue];
 };
 
+// --- STATIC CONSTANTS (Performance Optimization) ---
+const ASPD_MULTIPLIERS = { lit: 1.72, num: 1.14, sains: 1.14 };
+const UTBK_PRESETS = { kedokteran: 750, teknik: 680, soshum: 650, custom: 0 };
+const GPA_GRADE_VALUES = { 'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'D': 1.0, 'E': 0 };
+
 // --- SUB-COMPONENTS ---
 
 /* 1. ASPD PRO CALCULATOR (OFFICIAL 3 SUBJECTS) */
@@ -62,13 +68,6 @@ const ASPDCalculator = () => {
 
   const [showConfig, setShowConfig] = useState(false);
 
-  // Hardcoded Official Multipliers
-  const multipliers = {
-    lit: 1.72,   // Literasi Membaca
-    num: 1.14,   // Numerasi
-    sains: 1.14  // Sains
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (value === '' || parseFloat(value) >= 0) {
@@ -76,7 +75,6 @@ const ASPDCalculator = () => {
     }
   };
 
-  // Calculations
   const calcRapor = useMemo(() => {
     const keys = ['rapor_sem1', 'rapor_sem2', 'rapor_sem3', 'rapor_sem4', 'rapor_sem5'];
     const validValues = keys.map(k => parseFloat(scores[k])).filter(v => !isNaN(v));
@@ -86,9 +84,9 @@ const ASPDCalculator = () => {
   }, [scores, weights.rapor]);
 
   const calcASPD = useMemo(() => {
-    const sLit = (parseFloat(scores.aspd_lit) || 0) * multipliers.lit;
-    const sNum = (parseFloat(scores.aspd_num) || 0) * multipliers.num;
-    const sSains = (parseFloat(scores.aspd_sains) || 0) * multipliers.sains;
+    const sLit = (parseFloat(scores.aspd_lit) || 0) * ASPD_MULTIPLIERS.lit;
+    const sNum = (parseFloat(scores.aspd_num) || 0) * ASPD_MULTIPLIERS.num;
+    const sSains = (parseFloat(scores.aspd_sains) || 0) * ASPD_MULTIPLIERS.sains;
     const totalScore = sLit + sNum + sSains;
     return { totalScore, contribution: totalScore * (weights.aspd / 100) };
   }, [scores, weights.aspd]);
@@ -105,7 +103,7 @@ const ASPDCalculator = () => {
     calcAkreditasi.contribution
   ).toFixed(2);
 
-  const inputClass = "w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-cyan-500 focus:bg-cyan-500/10 transition-colors focus:outline-none text-sm placeholder:text-white/20";
+  const inputClass = "w-full bg-slate-900 md:bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-cyan-500 focus:bg-cyan-500/10 transition-colors focus:outline-none text-sm placeholder:text-white/20";
 
   return (
     <div className="space-y-6">
@@ -116,7 +114,7 @@ const ASPDCalculator = () => {
         </div>
         <button 
           onClick={() => setShowConfig(!showConfig)}
-          className={`p-2 rounded-xl transition-all border ${showConfig ? 'bg-cyan-500/20 border-cyan-500 text-cyan-400' : 'bg-white/5 border-white/10 text-white/50'}`}
+          className={`p-2 rounded-xl transition-all border ${showConfig ? 'bg-cyan-500/20 border-cyan-500 text-cyan-400' : 'bg-slate-800 md:bg-white/5 border-white/10 text-white/50'}`}
         >
           <Settings size={20} />
         </button>
@@ -128,7 +126,7 @@ const ASPDCalculator = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-black/20 border border-white/10 rounded-2xl p-4 overflow-hidden mb-4"
+            className="bg-slate-900 md:bg-black/20 border border-white/10 rounded-2xl p-4 overflow-hidden mb-4"
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-cyan-300 uppercase tracking-wider">Konfigurasi Bobot (%)</h3>
@@ -139,6 +137,9 @@ const ASPDCalculator = () => {
                   <label className="text-xs text-white/50 capitalize block mb-1">{key}</label>
                   <input 
                     type="number" 
+                    inputMode="decimal"
+                    min="0"
+                    max="100"
                     value={weights[key]}
                     onChange={(e) => setWeights(prev => ({...prev, [key]: parseFloat(e.target.value)}))}
                     className={inputClass}
@@ -152,7 +153,7 @@ const ASPDCalculator = () => {
 
       <div className="grid lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-3xl">
+          <div className="bg-slate-900/95 md:bg-white/5 md:backdrop-blur-md border border-white/10 p-5 rounded-3xl">
             <h3 className="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
               <BookOpen size={16} /> NILAI RAPOR (Sem 1-5)
             </h3>
@@ -166,6 +167,9 @@ const ASPDCalculator = () => {
                     onChange={handleChange}
                     placeholder="0-100"
                     type="number"
+                    inputMode="decimal"
+                    min="0"
+                    max="100"
                     className={`${inputClass} text-center px-1`}
                   />
                 </div>
@@ -173,15 +177,15 @@ const ASPDCalculator = () => {
             </div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-3xl">
+          <div className="bg-slate-900/95 md:bg-white/5 md:backdrop-blur-md border border-white/10 p-5 rounded-3xl">
             <h3 className="text-sm font-bold text-violet-400 mb-3 flex items-center gap-2">
               <School size={16} /> NILAI ASPD MURNI
             </h3>
             <div className="space-y-3">
               {[
-                { label: 'Literasi Membaca', key: 'lit', multi: multipliers.lit },
-                { label: 'Literasi Numerasi', key: 'num', multi: multipliers.num },
-                { label: 'Literasi Sains', key: 'sains', multi: multipliers.sains }
+                { label: 'Literasi Membaca', key: 'lit', multi: ASPD_MULTIPLIERS.lit },
+                { label: 'Literasi Numerasi', key: 'num', multi: ASPD_MULTIPLIERS.num },
+                { label: 'Literasi Sains', key: 'sains', multi: ASPD_MULTIPLIERS.sains }
               ].map((item) => (
                 <div key={item.key} className="flex items-center gap-3">
                   <div className="flex-1">
@@ -193,6 +197,9 @@ const ASPDCalculator = () => {
                         onChange={handleChange}
                         placeholder="0-100"
                         type="number"
+                        inputMode="decimal"
+                        min="0"
+                        max="100"
                         className={`${inputClass} pr-16`}
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-cyan-300 bg-cyan-900/30 px-2 py-0.5 rounded">
@@ -203,10 +210,9 @@ const ASPDCalculator = () => {
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-white/30 mt-3 italic">*Nilai Tukar (x1.72 / x1.14) sudah otomatis diterapkan sesuai aturan resmi.</p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center justify-between gap-4">
+          <div className="bg-slate-900/95 md:bg-white/5 md:backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
                <div className="p-2 bg-orange-500/20 rounded-lg text-orange-400"><School size={18}/></div>
                <div>
@@ -220,13 +226,16 @@ const ASPDCalculator = () => {
               onChange={handleChange}
               placeholder="98"
               type="number"
-              className="w-24 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-right focus:border-orange-500 focus:outline-none"
+              inputMode="decimal"
+              min="0"
+              max="100"
+              className="w-24 bg-slate-900 md:bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-right focus:border-orange-500 focus:outline-none"
             />
           </div>
         </div>
 
         <div className="lg:col-span-5 space-y-4">
-          <div className="h-full bg-gradient-to-b from-slate-800/80 to-slate-900/80 backdrop-blur-md border border-white/10 p-6 rounded-3xl flex flex-col relative overflow-hidden transform translate-z-0">
+          <div className="h-full bg-slate-900/95 md:bg-gradient-to-b md:from-slate-800/80 md:to-slate-900/80 md:backdrop-blur-md border border-white/10 p-6 rounded-3xl flex flex-col relative overflow-hidden transform translate-z-0">
             <div className="hidden md:block absolute top-0 right-0 w-32 h-32 bg-cyan-500/20 blur-[60px] rounded-full pointer-events-none"></div>
             <h4 className="text-white/50 text-xs uppercase tracking-widest mb-1">Nilai Akhir PPDB</h4>
             <div className="text-6xl font-bold font-space text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-violet-300 mb-6">
@@ -250,7 +259,7 @@ const ASPDCalculator = () => {
                    <div className="text-sm text-emerald-300 font-mono font-bold">+ {calcRapor.contribution.toFixed(2)}</div>
                 </div>
               </div>
-
+              
               <div className="space-y-1 pt-2 border-t border-white/5">
                 <div className="flex justify-between text-xs text-white/60">
                   <span>ASPD (3 Mapel)</span>
@@ -263,7 +272,6 @@ const ASPDCalculator = () => {
                    <div className="text-sm text-violet-300 font-mono font-bold">+ {calcASPD.contribution.toFixed(2)}</div>
                 </div>
               </div>
-
               <div className="space-y-1 pt-2 border-t border-white/5">
                 <div className="flex justify-between text-xs text-white/60">
                   <span>Akreditasi x 4</span>
@@ -292,12 +300,10 @@ const UTBKCalculator = () => {
   const [target, setTarget] = useLocalStorage('utbk_target', 0);
   const [preset, setPreset] = useState('custom');
 
-  const presets = { kedokteran: 750, teknik: 680, soshum: 650, custom: 0 };
-
   const handlePresetChange = (e) => {
     const val = e.target.value;
     setPreset(val);
-    if (val !== 'custom') setTarget(presets[val]);
+    if (val !== 'custom') setTarget(UTBK_PRESETS[val]);
   };
 
   const avg = useMemo(() => {
@@ -317,7 +323,7 @@ const UTBKCalculator = () => {
           <h2 className="text-2xl font-bold font-space text-white">Simulasi UTBK SNBT</h2>
           <p className="text-white/60 text-sm">Targetkan skor impianmu untuk PTN</p>
         </div>
-        <div className="flex gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
+        <div className="flex gap-2 bg-slate-900 md:bg-white/5 p-1 rounded-xl border border-white/10">
           <select 
             value={preset} 
             onChange={handlePresetChange}
@@ -334,13 +340,16 @@ const UTBKCalculator = () => {
             value={target > 0 ? target : ''} 
             onChange={(e) => {setTarget(e.target.value); setPreset('custom');}}
             placeholder="Target"
+            inputMode="decimal"
+            min="0"
+            max="1000"
             className="w-20 bg-transparent text-white font-bold text-center outline-none placeholder:text-white/20"
           />
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl">
+        <div className="md:col-span-2 bg-slate-900/95 md:bg-white/5 md:backdrop-blur-md border border-white/10 p-6 rounded-3xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <h4 className="md:col-span-2 text-sm font-bold text-orange-400 uppercase tracking-wide mb-2">Potensi Kognitif</h4>
             {['PU (Penalaran Umum)', 'PBM (Bacaan & Menulis)', 'PPU (Pengetahuan Umum)', 'Kuan (Kuantitatif)'].map((label, idx) => {
@@ -352,7 +361,10 @@ const UTBKCalculator = () => {
                     type="number"
                     value={inputs[key]}
                     onChange={(e) => setInputs(prev => ({...prev, [key]: e.target.value}))}
-                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-orange-500 focus:outline-none transition-all"
+                    inputMode="decimal"
+                    min="0"
+                    max="1000"
+                    className="w-full bg-slate-900 md:bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-orange-500 focus:outline-none transition-all"
                   />
                 </div>
               );
@@ -368,7 +380,10 @@ const UTBKCalculator = () => {
                     type="number"
                     value={inputs[key]}
                     onChange={(e) => setInputs(prev => ({...prev, [key]: e.target.value}))}
-                    className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none transition-all"
+                    inputMode="decimal"
+                    min="0"
+                    max="1000"
+                    className="w-full bg-slate-900 md:bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-blue-500 focus:outline-none transition-all"
                   />
                 </div>
               );
@@ -378,7 +393,7 @@ const UTBKCalculator = () => {
         <div className="flex flex-col gap-4">
             <div className={`
               flex-1 rounded-3xl p-6 border flex flex-col items-center justify-center relative overflow-hidden transform translate-z-0
-              ${avg >= target && target > 0 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-white/5 border-white/10'}
+              ${avg >= target && target > 0 ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-slate-900/95 md:bg-white/5 border-white/10'}
             `}>
               <h4 className="text-white/50 text-sm uppercase tracking-widest mb-2">Skor Rata-Rata</h4>
               <div className="text-5xl font-bold font-space text-white">{avg}</div>
@@ -422,7 +437,7 @@ const PSAJCalculator = () => {
           <p className="text-white/60 text-sm">Penilaian Sumatif Akhir Jenjang</p>
         </div>
       </div>
-      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4">
+      <div className="bg-slate-900/95 md:bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4">
         <div className="text-sm text-cyan-300 font-bold whitespace-nowrap">Bobot Nilai:</div>
         <div className="flex-1 w-full flex items-center gap-4">
           <span className="text-xs text-white/70">Tulis {ratio}%</span>
@@ -438,7 +453,7 @@ const PSAJCalculator = () => {
         {subjects.map((sub) => (
           <motion.div 
             layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} key={sub.id} 
-            className="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col md:flex-row gap-4 items-center transform translate-z-0"
+            className="bg-slate-900/95 md:bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col md:flex-row gap-4 items-center transform translate-z-0"
           >
             <div className="flex-1 w-full">
               <input value={sub.name} onChange={(e) => updateSubject(sub.id, 'name', e.target.value)}
@@ -447,10 +462,10 @@ const PSAJCalculator = () => {
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
-              <input type="number" placeholder="Tulis" value={sub.tulis} onChange={(e) => updateSubject(sub.id, 'tulis', e.target.value)}
+              <input type="number" inputMode="decimal" min="0" max="100" placeholder="Tulis" value={sub.tulis} onChange={(e) => updateSubject(sub.id, 'tulis', e.target.value)}
                 className="w-20 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10"
               />
-              <input type="number" placeholder="Praktik" value={sub.praktik} onChange={(e) => updateSubject(sub.id, 'praktik', e.target.value)}
+              <input type="number" inputMode="decimal" min="0" max="100" placeholder="Praktik" value={sub.praktik} onChange={(e) => updateSubject(sub.id, 'praktik', e.target.value)}
                 className="w-20 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10"
               />
             </div>
@@ -468,15 +483,172 @@ const PSAJCalculator = () => {
   );
 };
 
-/* 4. GPA / IPK CALCULATOR */
+/* 4. RAPOR CALCULATOR */
+const RaporCalculator = () => {
+  const [semesters, setSemesters] = useLocalStorage('rapor_data', [
+    { id: 1, name: 'Semester 1', subjects: [] }
+  ]);
+
+  const addSemester = () => {
+    setSemesters(prev => [
+      ...prev, 
+      { id: Date.now(), name: `Semester ${prev.length + 1}`, subjects: [] }
+    ]);
+  };
+
+  const removeSemester = (id) => {
+    setSemesters(prev => prev.filter(s => s.id !== id));
+  };
+
+  const addSubject = (semId) => {
+    setSemesters(prev => prev.map(s => 
+      s.id === semId ? { ...s, subjects: [...s.subjects, { id: Date.now(), name: '', score: '' }] } : s
+    ));
+  };
+
+  const autoFillSubjects = (semId) => {
+    const commonSubjects = ['Matematika', 'B. Indonesia', 'B. Inggris', 'IPA', 'IPS'];
+    setSemesters(prev => prev.map(s => {
+      if (s.id !== semId) return s;
+      const newSubjects = commonSubjects.map(name => ({ id: Date.now() + Math.random(), name, score: '' }));
+      return { ...s, subjects: [...s.subjects, ...newSubjects] };
+    }));
+  };
+
+  const updateSubject = (semId, subId, field, value) => {
+    setSemesters(prev => prev.map(s => {
+      if (s.id !== semId) return s;
+      return {
+        ...s,
+        subjects: s.subjects.map(sub => sub.id === subId ? { ...sub, [field]: value } : sub)
+      };
+    }));
+  };
+
+  const removeSubject = (semId, subId) => {
+    setSemesters(prev => prev.map(s => 
+      s.id === semId ? { ...s, subjects: s.subjects.filter(sub => sub.id !== subId) } : s
+    ));
+  };
+
+  const calculateAvg = (subjects) => {
+    const validScores = subjects.map(s => parseFloat(s.score)).filter(v => !isNaN(v));
+    if (validScores.length === 0) return 0;
+    return validScores.reduce((a, b) => a + b, 0) / validScores.length;
+  };
+
+  const grandAverage = useMemo(() => {
+    let validSemestersCount = 0;
+    let totalSemesterAverages = 0;
+
+    semesters.forEach(sem => {
+      const validScores = sem.subjects.map(s => parseFloat(s.score)).filter(v => !isNaN(v));
+      if (validScores.length > 0) {
+        const semTotal = validScores.reduce((a, b) => a + b, 0);
+        const semAvg = semTotal / validScores.length;
+        totalSemesterAverages += semAvg;
+        validSemestersCount++;
+      }
+    });
+
+    return validSemestersCount === 0 ? 0 : (totalSemesterAverages / validSemestersCount).toFixed(2);
+  }, [semesters]);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+           <h2 className="text-2xl font-bold font-space text-white">Rata-Rata Rapor</h2>
+           <p className="text-white/60 text-sm">Hitung rata-rata per semester & total</p>
+        </div>
+        <div className="text-right">
+           <p className="text-[10px] text-pink-400 uppercase tracking-widest">Grand Average</p>
+           <p className="text-xl md:text-3xl font-bold text-white font-space">{grandAverage}</p>
+        </div>
+      </div>
+      
+      <div className="grid gap-6">
+        {semesters.map((sem, index) => {
+           const avg = calculateAvg(sem.subjects).toFixed(2);
+           const prevAvg = index > 0 ? calculateAvg(semesters[index-1].subjects) : 0;
+           const isUp = parseFloat(avg) >= prevAvg;
+           // Hide trend for index 0 as per UX requirements
+           const showTrend = index > 0 && parseFloat(avg) > 0 && prevAvg > 0;
+
+           return (
+             <div key={sem.id} className="bg-slate-900/95 md:bg-gradient-to-br md:from-pink-500/10 md:to-rose-500/10 md:backdrop-blur-md border border-pink-500/20 p-6 rounded-3xl transform translate-z-0">
+                <div className="flex justify-between items-center mb-4 pb-4 border-b border-pink-500/20">
+                   <div className="flex items-center gap-3">
+                      <h3 className="text-lg font-bold text-pink-200">{sem.name}</h3>
+                      {showTrend && (
+                        <div className={`flex items-center text-xs font-bold px-2 py-0.5 rounded-full ${isUp ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                           {isUp ? <TrendingUp size={12} className="mr-1"/> : <TrendingDown size={12} className="mr-1"/>}
+                           {Math.abs(parseFloat(avg) - prevAvg).toFixed(2)}
+                        </div>
+                      )}
+                   </div>
+                   <div className="flex items-center gap-4">
+                      <span className="text-2xl font-bold text-white">{avg}</span>
+                      <button onClick={() => removeSemester(sem.id)} className="text-white/20 hover:text-rose-400"><Trash2 size={18}/></button>
+                   </div>
+                </div>
+
+                <div className="space-y-3 mb-4">
+                   {sem.subjects.map(sub => (
+                      <div key={sub.id} className="flex flex-col md:flex-row gap-2">
+                         <input 
+                           placeholder="Nama Mapel" 
+                           value={sub.name}
+                           onChange={(e) => updateSubject(sem.id, sub.id, 'name', e.target.value)}
+                           className="w-full md:flex-1 bg-black/20 border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:border-pink-500 focus:outline-none"
+                         />
+                         <div className="flex gap-2">
+                             <input 
+                               type="number" 
+                               placeholder="0-100" 
+                               inputMode="decimal"
+                               min="0"
+                               max="100"
+                               value={sub.score}
+                               onChange={(e) => updateSubject(sem.id, sub.id, 'score', e.target.value)}
+                               className="flex-1 md:w-20 bg-black/20 border border-white/5 rounded-lg px-3 py-2 text-white text-sm text-center focus:border-pink-500 focus:outline-none"
+                             />
+                             <button onClick={() => removeSubject(sem.id, sub.id)} className="px-3 rounded-lg bg-white/5 hover:bg-rose-500/20 text-white/20 hover:text-rose-400 transition-colors"><X size={16}/></button>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+
+                <div className="flex gap-2">
+                   <button onClick={() => addSubject(sem.id)} className="flex-1 py-2 rounded-lg border border-dashed border-white/20 text-white/50 text-sm hover:bg-white/5 hover:text-white transition-all flex items-center justify-center gap-2">
+                      <Plus size={14} /> Mapel
+                   </button>
+                   {sem.subjects.length === 0 && (
+                     <button onClick={() => autoFillSubjects(sem.id)} className="flex-1 py-2 rounded-lg bg-pink-500/20 text-pink-300 text-sm hover:bg-pink-500/30 transition-all">
+                        Isi Mapel Utama
+                     </button>
+                   )}
+                </div>
+             </div>
+           );
+        })}
+      </div>
+
+      <button onClick={addSemester} className="w-full py-4 rounded-2xl bg-slate-900/95 md:bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+         <Plus size={20}/> Tambah Semester
+      </button>
+    </div>
+  );
+};
+
+/* 5. GPA / IPK CALCULATOR */
 const GPACalculator = () => {
     const [courses, setCourses] = useLocalStorage('ipk_courses', [{ id: 1, name: '', sks: '', grade: 'A' }]);
-    const gradeValues = { 'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'D': 1.0, 'E': 0 };
     const addCourse = () => setCourses(prev => [...prev, { id: Date.now(), name: '', sks: '', grade: 'A' }]);
     const removeCourse = (id) => setCourses(prev => prev.filter(c => c.id !== id));
     const updateCourse = (id, field, value) => setCourses(prev => prev.map(c => c.id === id ? { ...c, [field]: value } : c));
     const totalSKS = courses.reduce((acc, curr) => acc + (parseFloat(curr.sks) || 0), 0);
-    const totalPoints = courses.reduce((acc, curr) => acc + ((parseFloat(curr.sks) || 0) * gradeValues[curr.grade]), 0);
+    const totalPoints = courses.reduce((acc, curr) => acc + ((parseFloat(curr.sks) || 0) * GPA_GRADE_VALUES[curr.grade]), 0);
     const ipk = totalSKS > 0 ? (totalPoints / totalSKS).toFixed(2) : "0.00";
   
     return (
@@ -488,16 +660,18 @@ const GPACalculator = () => {
         <div className="grid md:grid-cols-3 gap-6">
              <div className="md:col-span-2 space-y-3">
                 {courses.map(c => (
-                     <div key={c.id} className="flex gap-2 items-center bg-white/5 p-2 rounded-xl border border-white/10">
+                     <div key={c.id} className="bg-slate-900/95 md:bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col md:flex-row gap-2 items-center">
                         <input placeholder="Mata Kuliah" value={c.name} onChange={(e) => updateCourse(c.id, 'name', e.target.value)}
-                             className="flex-1 bg-transparent px-2 outline-none text-white text-sm" />
-                        <input placeholder="SKS" type="number" value={c.sks} onChange={(e) => updateCourse(c.id, 'sks', e.target.value)}
-                             className="w-16 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10 text-sm" />
-                         <select value={c.grade} onChange={(e) => updateCourse(c.id, 'grade', e.target.value)}
-                            className="bg-black/20 text-white rounded-lg px-2 py-1 text-sm border border-white/10 outline-none">
-                             {Object.keys(gradeValues).map(g => <option key={g} value={g}>{g}</option>)}
-                         </select>
-                         <button onClick={() => removeCourse(c.id)} className="p-2 text-white/30 hover:text-rose-400"><Trash2 size={16}/></button>
+                             className="w-full md:flex-1 bg-transparent px-2 py-1 outline-none text-white text-sm border-b md:border-none border-white/10" />
+                        <div className="flex gap-2 w-full md:w-auto">
+                            <input placeholder="SKS" type="number" inputMode="decimal" min="0" value={c.sks} onChange={(e) => updateCourse(c.id, 'sks', e.target.value)}
+                                className="flex-1 md:w-16 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10 text-sm" />
+                            <select value={c.grade} onChange={(e) => updateCourse(c.id, 'grade', e.target.value)}
+                                className="flex-1 bg-black/20 text-white rounded-lg px-2 py-1 text-sm border border-white/10 outline-none">
+                                {Object.keys(GPA_GRADE_VALUES).map(g => <option key={g} value={g}>{g}</option>)}
+                            </select>
+                            <button onClick={() => removeCourse(c.id)} className="p-2 text-white/30 hover:text-rose-400 bg-white/5 rounded-lg"><Trash2 size={16}/></button>
+                        </div>
                      </div>
                 ))}
                 <button onClick={addCourse} className="text-sm text-cyan-400 hover:text-cyan-300 flex items-center gap-1 mt-2">
@@ -526,18 +700,26 @@ const App = () => {
 
   const menuItems = [
     { id: 'beranda', label: 'Beranda', icon: LayoutDashboard },
+    { id: 'rapor', label: 'Hitung Rapor', icon: FileText },
     { id: 'aspd', label: 'ASPD Pro', icon: School },
     { id: 'utbk', label: 'UTBK SNBT', icon: GraduationCap },
     { id: 'psaj', label: 'PSAJ / Ujian', icon: BookOpen },
     { id: 'ipk', label: 'Hitung IPK', icon: Percent },
   ];
 
+  // Map for short labels on mobile
+  const getMobileLabel = (id, label) => {
+    if (id === 'rapor') return 'Rapor';
+    if (id === 'ipk') return 'IPK';
+    return label.split(" ")[0];
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'beranda':
         return (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 p-8 rounded-3xl backdrop-blur-md relative overflow-hidden transform translate-z-0">
+             <div className="bg-slate-900/95 md:bg-gradient-to-r md:from-cyan-500/20 md:to-blue-500/20 border border-cyan-500/30 p-8 rounded-3xl md:backdrop-blur-md relative overflow-hidden transform translate-z-0">
                 <div className="absolute top-0 right-0 p-10 opacity-10 transform translate-x-1/4 -translate-y-1/4">
                     <Calculator size={300} />
                 </div>
@@ -554,12 +736,11 @@ const App = () => {
                     >
                         Mulai Hitung <ChevronRight size={18}/>
                     </button>
-                    {/* UPDATED LINK AND TEXT */}
                     <a 
                         href="https://www.instagram.com/fawwazdzaaky/" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="px-6 py-3 rounded-full font-bold border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all flex items-center gap-2 text-white backdrop-blur-sm"
+                        className="px-6 py-3 rounded-full font-bold border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all flex items-center gap-2 text-white md:backdrop-blur-sm"
                     >
                         <Instagram size={18} />
                         <span>Follow Developer</span>
@@ -567,8 +748,9 @@ const App = () => {
                 </div>
              </div>
 
-             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  {[
+                     { title: 'Hitung Rapor', desc: 'Rekap nilai & grafik trend', id: 'rapor', color: 'from-pink-500/20 to-rose-500/20' },
                      { title: 'Simulasi ASPD', desc: 'Formula resmi 3 Mapel', id: 'aspd', color: 'from-emerald-500/20 to-teal-500/20' },
                      { title: 'Target UTBK', desc: 'Set skor impian PTN', id: 'utbk', color: 'from-orange-500/20 to-amber-500/20' },
                      { title: 'Kalkulator IPK', desc: 'Pantau performa kuliah', id: 'ipk', color: 'from-violet-500/20 to-purple-500/20' }
@@ -576,7 +758,7 @@ const App = () => {
                      <button 
                         key={card.id}
                         onClick={() => setActiveTab(card.id)}
-                        className={`bg-gradient-to-br ${card.color} border border-white/10 p-6 rounded-2xl text-left hover:border-white/30 transition-all group`}
+                        className={`bg-slate-900/95 md:bg-gradient-to-br ${card.color} border border-white/10 p-6 rounded-2xl text-left hover:border-white/30 transition-all group`}
                      >
                          <h3 className="text-xl font-bold text-white mb-1 group-hover:translate-x-1 transition-transform">{card.title}</h3>
                          <p className="text-white/50 text-sm">{card.desc}</p>
@@ -585,6 +767,7 @@ const App = () => {
              </div>
           </div>
         );
+      case 'rapor': return <RaporCalculator />;
       case 'aspd': return <ASPDCalculator />;
       case 'utbk': return <UTBKCalculator />;
       case 'psaj': return <PSAJCalculator />;
@@ -594,10 +777,10 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-inter relative overflow-x-hidden selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-inter relative overflow-x-hidden selection:bg-cyan-500/30">
       {/* PERFORMANCE OPTIMIZED BACKGROUND */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="md:hidden absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-slate-900 to-cyan-900/20"></div>
+        <div className="md:hidden absolute inset-0 bg-slate-950"></div>
         <div className="hidden md:block absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/30 rounded-full blur-[120px] animate-pulse"></div>
         <div className="hidden md:block absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[120px]"></div>
         <div className="hidden md:block absolute top-[20%] right-[20%] w-[20%] h-[20%] bg-fuchsia-600/20 rounded-full blur-[100px] animate-bounce duration-[10s]"></div>
@@ -626,14 +809,19 @@ const App = () => {
               </button>
             ))}
           </nav>
-          <div className="p-6 text-center text-xs text-white/30">v2.2 Stable • React</div>
+          <div className="p-6 text-center text-xs text-white/30">v2.3 Stable • React</div>
         </aside>
 
-        <div className="md:hidden fixed bottom-0 left-0 w-full bg-slate-900/95 border-t border-white/10 z-50 px-4 py-2 flex justify-between items-center safe-area-bottom">
-           {menuItems.slice(0, 5).map(item => (
-               <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${activeTab === item.id ? 'text-cyan-400' : 'text-white/40'}`}>
+        {/* FIXED: GRID BOTTOM NAV (Aligned & Distributed + pb-6) */}
+        <div className="md:hidden fixed bottom-0 left-0 w-full bg-slate-900 border-t border-white/10 z-50 px-0 pt-2 pb-6 grid grid-cols-6 gap-0 safe-area-bottom">
+           {menuItems.map(item => (
+               <button 
+                  key={item.id} 
+                  onClick={() => setActiveTab(item.id)} 
+                  className={`flex flex-col items-center justify-center gap-1 p-2 transition-colors ${activeTab === item.id ? 'text-cyan-400' : 'text-white/40'}`}
+               >
                    <item.icon size={20} />
-                   <span className="text-[10px]">{item.label.split(" ")[0]}</span>
+                   <span className="text-[10px] whitespace-nowrap">{getMobileLabel(item.id, item.label)}</span>
                </button>
            ))}
         </div>
