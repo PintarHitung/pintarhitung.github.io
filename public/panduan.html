@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <!-- SEO UTAMA -->
-    <title>Panduan Resmi ASPD DIY 2025 & Simulasi Skor UTBK - PintarHitung</title>
-    <meta name="description" content="Pelajari cara menghitung nilai gabungan PPDB SMA/SMK DIY 2025 (ASPD) dan strategi mencapai target skor UTBK SNBT secara akurat. Gratis dan sesuai aturan resmi.">
-    <meta name="keywords" content="rumus aspd diy 2025, cara hitung nilai gabungan ppdb jogja, target skor utbk kedokteran, simulasi snbt, pintarhitung, nilai gabungan smp jogja">
+    <link rel="icon" type="image/png" href="logo.png" />
+
+    <!-- --- SEO ADVANCED --- -->
+    <title>Strategi Lolos SNBP 2025: Cara Hitung Raport & Analisis Peluang - PintarHitung</title>
+    <meta name="description" content="Bongkar algoritma penilaian SNBP 2025. Pahami aturan 50:50, pengaruh indeks sekolah, dan cara menghitung nilai raport semester 1-5 agar lolos PTN impian.">
+    <meta name="keywords" content="cara menghitung rata rata nilai raport snbp, strategi lolos snbp 2025, mapel pendukung prodi, indeks sekolah snmptn, pintarhitung, kalkulator raport">
     <meta name="author" content="Fawwaz Dzaaky">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://pintarhitung.github.io/panduan.html">
@@ -15,8 +16,8 @@
     <!-- Open Graph / Sosmed -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://pintarhitung.github.io/panduan.html">
-    <meta property="og:title" content="Bongkar Rumus ASPD & Strategi UTBK 2025 - PintarHitung">
-    <meta property="og:description" content="Panduan paling lengkap buat pejuang PPDB Jogja dan PTN Impian. Cek rumus terbaru di sini!">
+    <meta property="og:title" content="Jangan Asal Hitung! Ini Algoritma SNBP 2025 - PintarHitung">
+    <meta property="og:description" content="Panduan lengkap strategi masuk PTN jalur raport. Mitos vs Fakta, Indeks Sekolah, dan Aturan 50:50.">
     <meta property="og:image" content="https://files.catbox.moe/pd87xk.png">
     <meta name="theme-color" content="#0f172a">
 
@@ -37,231 +38,426 @@
                         space: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
-                        slate: { 900: '#0f172a', 800: '#1e293b' }
+                        slate: { 900: '#0f172a', 950: '#020617' }
                     }
                 }
             }
         }
     </script>
 
-    <!-- Advanced Schema JSON-LD (AI-Ready) -->
+    <!-- Schema.org Data -->
     <script type="application/ld+json">
-    [
-      {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": "Panduan Lengkap Hitung Nilai ASPD & UTBK 2025",
-        "description": "Tutorial cara menghitung nilai gabungan untuk PPDB Jogja dan simulasi target skor UTBK.",
-        "image": "https://files.catbox.moe/pd87xk.png",
-        "author": { "@type": "Person", "name": "Fawwaz Dzaaky" },
-        "publisher": {
-          "@type": "Organization",
-          "name": "PintarHitung",
-          "logo": { "@type": "ImageObject", "url": "https://pintarhitung.github.io/vite.svg" }
-        },
-        "datePublished": "2025-12-21"
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Berapa bobot ASPD dalam PPDB DIY 2025?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Bobot ASPD dalam Nilai Gabungan PPDB DIY adalah sebesar 55%."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Berapa skor aman UTBK untuk jurusan Kedokteran?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Skor aman rata-rata untuk masuk jurusan Kedokteran di universitas top adalah antara 720 hingga 780 ke atas."
-            }
-          }
-        ]
-      }
-    ]
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Strategi Lolos SNBP 2025 & Cara Hitung Raport",
+      "description": "Panduan mendalam tentang mekanisme penilaian SNBP, termasuk komponen nilai rata-rata dan mapel pendukung.",
+      "author": { "@type": "Person", "name": "Fawwaz Dzaaky" },
+      "publisher": { "@type": "Organization", "name": "PintarHitung" }
+    }
     </script>
+
+    <style>
+        /* Global Scroll Padding for Fixed Header */
+        html {
+            scroll-padding-top: 100px;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        .glow-cyan { box-shadow: 0 0 60px -15px rgba(6, 182, 212, 0.2); }
+        .text-glow { text-shadow: 0 0 20px rgba(6, 182, 212, 0.5); }
+        
+        /* Mobile Menu Animation */
+        #mobile-menu {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        #mobile-menu.hidden-menu {
+            transform: translateY(-20px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        #mobile-menu.visible-menu {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans antialiased selection:bg-cyan-500/30">
+<body class="bg-slate-950 text-slate-300 font-sans antialiased selection:bg-cyan-500/30">
 
     <!-- BACKGROUND EFFECTS -->
     <div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
-        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-cyan-600/20 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-violet-600/20 rounded-full blur-[120px]"></div>
+        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px]"></div>
     </div>
 
     <!-- NAVBAR -->
-    <nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="/" class="flex items-center gap-2 font-space font-bold text-xl text-white hover:text-cyan-400 transition-colors">
+    <nav class="fixed top-0 w-full z-50 bg-slate-900/90 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2 font-space font-bold text-xl text-white hover:text-cyan-400 transition-colors z-50">
                 <i data-lucide="calculator" class="text-cyan-400"></i> PintarHitung
             </a>
-            <!-- Middle Nav Links Removed for a Cleaner Look -->
-            <a href="/" class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-sm hover:shadow-lg hover:shadow-cyan-500/20 transition-all flex items-center gap-2">
-                Buka Aplikasi <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex gap-8 text-sm font-medium text-white/60">
+                <a href="#algoritma" class="hover:text-white transition-colors">Algoritma 50:50</a>
+                <a href="#strategi" class="hover:text-white transition-colors">Strategi</a>
+                <a href="#mitos" class="hover:text-white transition-colors">Mitos vs Fakta</a>
+                <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
+            </div>
+
+            <!-- CTA & Mobile Toggle -->
+            <div class="flex items-center gap-4 z-50">
+                <a href="/" class="hidden md:flex px-5 py-2 bg-white text-slate-900 rounded-full font-bold text-sm hover:bg-cyan-50 transition-all hover:scale-105 items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                    Buka Aplikasi <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button id="menu-btn" class="md:hidden text-white p-2 hover:bg-white/10 rounded-lg transition-colors">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown (New) -->
+        <div id="mobile-menu" class="absolute top-full left-0 w-full bg-slate-900 border-b border-white/10 p-6 hidden-menu md:hidden flex flex-col gap-4 shadow-2xl">
+            <a href="#algoritma" class="mobile-link block p-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium">Algoritma 50:50</a>
+            <a href="#strategi" class="mobile-link block p-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium">Strategi</a>
+            <a href="#mitos" class="mobile-link block p-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium">Mitos vs Fakta</a>
+            <a href="#faq" class="mobile-link block p-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium">FAQ</a>
+            <div class="h-px bg-white/10 my-2"></div>
+            <a href="/" class="block p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-center">
+                Buka Aplikasi Sekarang
             </a>
         </div>
     </nav>
 
     <!-- HERO SECTION -->
-    <header class="pt-32 pb-20 px-6 text-center max-w-4xl mx-auto">
-        <span class="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-cyan-300 text-xs font-bold tracking-wider mb-6 animate-pulse">
-            EDISI TERBARU 2025
-        </span>
-        <h1 class="text-4xl md:text-7xl font-space font-bold text-white mb-6 leading-tight">
-            Strategi Lolos <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400">Sekolah & PTN</span> Impian
+    <header class="pt-32 pb-20 px-6 text-center max-w-5xl mx-auto relative">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold tracking-[0.2em] uppercase mb-8 animate-fade-in-up">
+            <i data-lucide="alert-triangle" class="w-3 h-3"></i> Warning: Persaingan Makin Ketat
+        </div>
+        
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-space font-bold text-white mb-8 leading-[1.1] tracking-tight">
+            Nilai Tinggi Saja <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 text-glow">Tidak Cukup.</span>
         </h1>
-        <p class="text-lg text-white/60 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Semua yang kamu butuhkan untuk memahami sistem penilaian PPDB Jogja dan simulasi target skor UTBK SNBT dalam satu tempat.
+        
+        <p class="text-xl text-white/60 mb-12 leading-relaxed max-w-2xl mx-auto font-light">
+            90% siswa gagal di SNBP bukan karena bodoh, tapi karena <strong>buta strategi</strong>. Pelajari algoritma penilaian yang sering diabaikan pejuang PTN.
         </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="#algoritma" class="px-8 py-4 bg-white/5 border border-white/10 hover:bg-white/10 rounded-full text-white font-bold flex items-center gap-2 transition-all group">
+                Pelajari Algoritmanya <i data-lucide="chevron-down" class="group-hover:translate-y-1 transition-transform"></i>
+            </a>
+        </div>
     </header>
 
-    <!-- ARTICLE CONTENT -->
-    <main class="max-w-4xl mx-auto px-6 pb-24 space-y-16">
+    <main class="max-w-5xl mx-auto px-6 pb-32 space-y-32">
 
-        <!-- RINGKASAN CEPAT (AI-FRIENDLY BOX) -->
-        <section class="bg-gradient-to-r from-slate-800 to-slate-800/50 border border-white/10 rounded-3xl p-6 md:p-8">
-            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <i data-lucide="zap" class="text-yellow-400"></i> Ringkasan Eksekutif
-            </h2>
-            <div class="grid md:grid-cols-2 gap-6 text-sm text-white/80">
-                <div class="space-y-2">
-                    <p class="font-bold text-emerald-400">PPDB DIY (ASPD):</p>
-                    <p>Gabungan ASPD (55%), Rapor (40%), dan Akreditasi (5%). ASPD literasi memiliki bobot paling tinggi.</p>
-                </div>
-                <div class="space-y-2">
-                    <p class="font-bold text-violet-400">UTBK SNBT:</p>
-                    <p>Fokus pada IRT. Targetkan skor rata-rata di atas 650 untuk peluang aman di mayoritas jurusan favorit.</p>
-                </div>
+        <!-- SECTION 1: ALGORITMA 50:50 -->
+        <section id="algoritma">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-space font-bold text-white mb-4">Bedah Rumus SNBP 2025</h2>
+                <p class="text-white/50">Jangan hanya hitung rata-rata biasa. Sistem menggunakan pembobotan khusus.</p>
             </div>
-        </section>
 
-        <!-- SECTION 1: ASPD -->
-        <article id="aspd-guide" class="scroll-mt-24">
-            <h2 class="text-3xl font-space font-bold text-white mb-8 flex items-center gap-4">
-                <span class="w-10 h-10 flex items-center justify-center bg-emerald-500/20 text-emerald-400 rounded-xl text-lg">1</span>
-                Panduan Nilai Gabungan PPDB Jogja
-            </h2>
-            <div class="bg-white/5 border border-white/10 p-8 rounded-3xl backdrop-blur-sm">
-                <div class="prose prose-invert prose-lg text-white/80 max-w-none">
-                    <p class="mb-6 italic">
-                        Bagaimana cara menghitung nilai gabungan PPDB SMA/SMK DIY? Berikut adalah rincian formulasi resmi sesuai Pergub terbaru.
-                    </p>
-                    
-                    <div class="overflow-hidden rounded-2xl border border-white/10 mb-8">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-white/5 text-white">
-                                <tr>
-                                    <th class="p-4">Komponen</th>
-                                    <th class="p-4">Bobot</th>
-                                    <th class="p-4">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/5">
-                                <tr>
-                                    <td class="p-4 font-medium">Asesmen (ASPD)</td>
-                                    <td class="p-4 text-emerald-400 font-bold">55%</td>
-                                    <td class="p-4">3 Mapel (Lit, Num, Sains)</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-medium">Rata-rata Rapor</td>
-                                    <td class="p-4 text-emerald-400 font-bold">40%</td>
-                                    <td class="p-4">Semester 1 - 5</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-medium">Akreditasi</td>
-                                    <td class="p-4 text-emerald-400 font-bold">5%</td>
-                                    <td class="p-4">Nilai Sekolah Asal</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <h3 class="text-xl font-bold text-white mb-4">Bobot Mapel ASPD (Multiplier)</h3>
-                    <p class="mb-4 text-white/70">
-                        Penting untuk diketahui bahwa setiap mapel ASPD memiliki "Nilai Tukar" yang berbeda.
-                    </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-4 bg-cyan-500/10 rounded-xl border border-cyan-500/20">
-                            <span class="block text-xs text-cyan-300 font-bold mb-1">Literasi Membaca</span>
-                            <span class="text-2xl font-space font-bold">x 1.72</span>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <!-- Visual Chart -->
+                <div class="glass-card p-8 rounded-[40px] relative overflow-hidden group hover:border-cyan-500/30 transition-all">
+                    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="w-48 h-48 rounded-full border-[12px] border-slate-800 flex items-center justify-center relative">
+                            <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8" />
+                                <path class="text-cyan-500" stroke-dasharray="50, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8" />
+                                <path class="text-violet-500" stroke-dasharray="50, 100" stroke-dashoffset="-50" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8" />
+                            </svg>
+                            <div class="text-center">
+                                <span class="block text-3xl font-bold text-white">100%</span>
+                                <span class="text-[10px] text-white/40 uppercase tracking-widest">Komponen</span>
+                            </div>
                         </div>
-                        <div class="p-4 bg-cyan-500/10 rounded-xl border border-cyan-500/20">
-                            <span class="block text-xs text-cyan-300 font-bold mb-1">Numerasi & Sains</span>
-                            <span class="text-2xl font-space font-bold">x 1.14</span>
+                        <div class="flex gap-8 mt-8 w-full justify-center">
+                            <div class="text-center">
+                                <div class="w-3 h-3 bg-cyan-500 rounded-full mx-auto mb-2"></div>
+                                <h4 class="text-cyan-400 font-bold text-xl">50%</h4>
+                                <p class="text-xs text-white/50">Rata-Rata<br>Seluruh Mapel</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="w-3 h-3 bg-violet-500 rounded-full mx-auto mb-2"></div>
+                                <h4 class="text-violet-400 font-bold text-xl">50%</h4>
+                                <p class="text-xs text-white/50">Mapel Pendukung<br>Prodi Pilihan</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </article>
 
-        <!-- SECTION 2: UTBK -->
-        <article id="utbk-guide" class="scroll-mt-24">
-            <h2 class="text-3xl font-space font-bold text-white mb-8 flex items-center gap-4">
-                <span class="w-10 h-10 flex items-center justify-center bg-violet-500/20 text-violet-400 rounded-xl text-lg">2</span>
-                Strategi Target Skor UTBK SNBT
-            </h2>
-            <div class="bg-white/5 border border-white/10 p-8 rounded-3xl backdrop-blur-sm">
-                <div class="prose prose-invert prose-lg text-white/80 max-w-none">
-                    <p class="mb-6">
-                        Menembus PTN top seperti UI, UGM, atau ITB memerlukan pemahaman tentang distribusi skor. Menggunakan rata-rata skor dari tahun sebelumnya adalah cara terbaik untuk menetapkan target.
-                    </p>
-                    
-                    <ul class="space-y-4">
-                        <li class="flex items-start gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-violet-400 transition-colors group">
-                            <div class="w-12 h-12 flex items-center justify-center bg-violet-500/20 text-violet-400 rounded-xl font-bold shrink-0">1</div>
-                            <div>
-                                <h4 class="text-white font-bold group-hover:text-violet-400 transition-colors">Fokus Penalaran Kognitif</h4>
-                                <p class="text-sm text-white/60">Komponen Penalaran Umum dan Kuantitatif seringkali menjadi pembeda skor yang signifikan antar peserta.</p>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 hover:border-violet-400 transition-colors group">
-                            <div class="w-12 h-12 flex items-center justify-center bg-violet-500/20 text-violet-400 rounded-xl font-bold shrink-0">2</div>
-                            <div>
-                                <h4 class="text-white font-bold group-hover:text-violet-400 transition-colors">Konsistensi Literasi</h4>
-                                <p class="text-sm text-white/60">Literasi Bahasa Indonesia dan Inggris memiliki teks yang panjang. Latihan membaca cepat sangat krusial.</p>
-                            </div>
-                        </li>
-                    </ul>
-
-                    <div class="mt-8 p-6 bg-violet-500/10 border border-violet-500/20 rounded-2xl flex items-center gap-4">
-                        <i data-lucide="info" class="text-violet-400 shrink-0"></i>
-                        <p class="text-sm text-white/80">
-                            Gunakan alat simulasi di halaman utama <b>PintarHitung</b> untuk memasukkan target skor jurusan impianmu secara spesifik.
+                <!-- Explanation -->
+                <div class="space-y-6">
+                    <div class="glass p-6 rounded-2xl border-l-4 border-l-cyan-500">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="book" class="text-cyan-400 w-4 h-4"></i> Rata-Rata Umum (50%)</h3>
+                        <p class="text-sm text-white/60 leading-relaxed">
+                            Mencakup <strong>SEMUA</strong> mata pelajaran di rapor (termasuk Mulok, Agama, PJOK, dll). Jadi, jangan remehkan mapel non-akademik, karena mereka menyumbang setengah dari nasibmu.
+                        </p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border-l-4 border-l-violet-500">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="target" class="text-violet-400 w-4 h-4"></i> Minat Bakat (50%)</h3>
+                        <p class="text-sm text-white/60 leading-relaxed">
+                            Nilai mapel yang relevan dengan jurusan tujuanmu. Misal: Mau masuk <strong>Kedokteran</strong>? Maka nilai Biologi & Kimia kamu bobotnya dihitung dua kali lipat!
+                        </p>
+                    </div>
+                    <div class="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl flex gap-3 items-start">
+                        <i data-lucide="lightbulb" class="text-yellow-400 shrink-0 mt-1"></i>
+                        <p class="text-xs text-yellow-200/80 leading-relaxed">
+                            <strong>Tips Pro:</strong> Gunakan fitur simulasi PintarHitung untuk melihat potensi nilaimu jika bobot 50:50 ini diterapkan.
                         </p>
                     </div>
                 </div>
             </div>
-        </article>
+        </section>
 
-        <!-- CTA SECTION -->
-        <section class="text-center py-12 px-6 bg-gradient-to-b from-cyan-900/40 to-slate-900 border border-cyan-500/30 rounded-[40px] relative overflow-hidden group">
-            <div class="absolute inset-0 bg-cyan-500/10 blur-3xl group-hover:bg-cyan-500/20 transition-all duration-700"></div>
-            <div class="relative z-10">
-                <h2 class="text-3xl md:text-4xl font-space font-bold text-white mb-6">Siap Hitung Peluangmu?</h2>
-                <p class="text-white/60 mb-8 max-w-lg mx-auto leading-relaxed italic">
-                    "Strategi tanpa eksekusi adalah halusinasi." Cek nilai simulasi kamu sekarang sebelum terlambat.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/" class="px-8 py-4 bg-cyan-500 text-slate-900 font-bold rounded-full hover:scale-105 hover:shadow-[0_0_40px_rgba(6,182,212,0.4)] transition-all duration-300">
-                        Mulai Simulasi Sekarang
-                    </a>
-                    <a href="https://www.instagram.com/fawwazdzaaky/" class="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-full hover:bg-white/10 transition-all">
-                        Ada Pertanyaan? DM Dev
-                    </a>
+        <!-- SECTION 2: STRATEGI -->
+        <section id="strategi">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="h-px flex-1 bg-white/10"></div>
+                <h2 class="text-2xl font-space font-bold text-white uppercase tracking-[0.2em]">Rahasia Dapur Panitia</h2>
+                <div class="h-px flex-1 bg-white/10"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="glass-card p-8 rounded-3xl hover:-translate-y-2 transition-transform duration-300">
+                    <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 mb-6">
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Grafik Konsistensi</h3>
+                    <p class="text-sm text-white/50 leading-relaxed">
+                        Sistem menyukai grafik yang <strong>landai tapi naik</strong>. Kenaikan drastis di semester 5 justru bisa dianggap anomali (mencurigakan). Pastikan nilaimu stabil.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card p-8 rounded-3xl hover:-translate-y-2 transition-transform duration-300 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 bg-rose-500/10 w-24 h-24 rounded-full blur-xl"></div>
+                    <div class="w-12 h-12 bg-rose-500/20 rounded-xl flex items-center justify-center text-rose-400 mb-6 relative z-10">
+                        <i data-lucide="building-2"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3 relative z-10">Indeks Sekolah</h3>
+                    <p class="text-sm text-white/50 leading-relaxed relative z-10">
+                        Nilai 90 di sekolah A beda harganya dengan nilai 90 di sekolah B. Akreditasi sekolah & track record alumni di PTN tujuan sangat menentukan faktor pengali nilaimu.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-8 rounded-3xl hover:-translate-y-2 transition-transform duration-300">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-blue-400 mb-6">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-3">Sertifikat "Sakti"</h3>
+                    <p class="text-sm text-white/50 leading-relaxed">
+                        Minimalisir sertifikat webinar. Fokus pada: OSN/Lomba Berjenjang, Ketua OSIS (untuk IPB/Unpad), atau Hafidz Quran. Sertifikat harus linear dengan jurusan.
+                    </p>
                 </div>
             </div>
         </section>
 
+        <!-- SECTION 3: MITOS VS FAKTA -->
+        <section id="mitos">
+            <h2 class="text-3xl font-space font-bold text-white text-center mb-10">Mitos vs Fakta</h2>
+            <div class="grid gap-4">
+                <!-- Item 1 -->
+                <div class="group relative bg-slate-900 border border-white/5 rounded-2xl overflow-hidden grid md:grid-cols-2">
+                    <div class="p-8 bg-rose-500/5 border-b md:border-b-0 md:border-r border-rose-500/10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i data-lucide="x-circle" class="text-rose-500"></i>
+                            <span class="text-xs font-bold text-rose-400 uppercase tracking-widest">Mitos</span>
+                        </div>
+                        <p class="text-white font-medium">"Mapel Agama & Penjaskes nilai jelek gapapa, kan gak ngaruh."</p>
+                    </div>
+                    <div class="p-8 bg-emerald-500/5">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i data-lucide="check-circle-2" class="text-emerald-500"></i>
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Fakta</span>
+                        </div>
+                        <p class="text-white/80 text-sm">Ingat aturan 50% Rata-rata Umum! Nilai jelek di mapel apapun akan menarik turun Grand Average kamu secara signifikan.</p>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="group relative bg-slate-900 border border-white/5 rounded-2xl overflow-hidden grid md:grid-cols-2">
+                    <div class="p-8 bg-rose-500/5 border-b md:border-b-0 md:border-r border-rose-500/10">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i data-lucide="x-circle" class="text-rose-500"></i>
+                            <span class="text-xs font-bold text-rose-400 uppercase tracking-widest">Mitos</span>
+                        </div>
+                        <p class="text-white font-medium">"Harus Juara 1 Nasional biar aman."</p>
+                    </div>
+                    <div class="p-8 bg-emerald-500/5">
+                        <div class="flex items-center gap-3 mb-2">
+                            <i data-lucide="check-circle-2" class="text-emerald-500"></i>
+                            <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Fakta</span>
+                        </div>
+                        <p class="text-white/80 text-sm">Tidak harus. Sertifikat pengurus organisasi (Ketua OSIS/MPK) atau Pramuka Garuda juga punya nilai tinggi untuk jurusan non-sains (Hukum/Politik).</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Callout Context -->
+            <div class="mt-8 p-6 rounded-2xl bg-indigo-900/20 border border-indigo-500/30 flex gap-4">
+                <i data-lucide="info" class="text-indigo-400 shrink-0 mt-1"></i>
+                <div class="space-y-1">
+                    <h4 class="text-indigo-300 font-bold text-sm">Catatan Kurikulum Merdeka (P5)</h4>
+                    <p class="text-xs text-white/60 leading-relaxed">
+                        Banyak yang bertanya soal nilai P5. Jawabannya: <strong>Nilai P5 umumnya tidak dirata-ratakan</strong> dalam seleksi SNBP karena bersifat kualitatif (Deskripsi Karakter), bukan angka. Fokuslah pada nilai Sumatif/Akhir Semester.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: FAQ -->
+        <section id="faq">
+            <h2 class="text-3xl font-space font-bold text-white mb-10">Pertanyaan Yang Sering Menghantui</h2>
+            <div class="space-y-4">
+                
+                <details class="glass p-6 rounded-2xl group cursor-pointer transition-all hover:bg-white/5">
+                    <summary class="flex justify-between items-center font-medium text-white">
+                        <span class="flex items-center gap-3"><i data-lucide="shuffle" class="text-cyan-400 w-5 h-5"></i> Saya anak IPA mau Lintas Jurusan ke Hukum, bisa?</span>
+                        <i data-lucide="chevron-down" class="group-open:rotate-180 transition-transform text-white/50"></i>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-white/10 text-sm text-white/60 leading-relaxed pl-8">
+                        Bisa, tapi berisiko. Di Kurikulum Merdeka ini lebih fleksibel, tapi kamu harus cek <strong>Mapel Pendukung</strong>-nya. Masuk Hukum butuh nilai bagus di Sosiologi/PKN. Jika di rapormu tidak ada nilai Sosiologi (karena kamu IPA murni), poinmu akan kalah dengan anak IPS yang punya nilai mapel tersebut.
+                    </div>
+                </details>
+
+                <details class="glass p-6 rounded-2xl group cursor-pointer transition-all hover:bg-white/5">
+                    <summary class="flex justify-between items-center font-medium text-white">
+                        <span class="flex items-center gap-3"><i data-lucide="users" class="text-cyan-400 w-5 h-5"></i> Nilai rata-rata 88, tapi Ranking Paralel ke-20. Aman?</span>
+                        <i data-lucide="chevron-down" class="group-open:rotate-180 transition-transform text-white/50"></i>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-white/10 text-sm text-white/60 leading-relaxed pl-8">
+                        Ranking paralel menentukan apakah kamu masuk kuota <strong>Eligible</strong> sekolah (biasanya Top 40% untuk Akreditasi A). Jika kamu masuk kuota itu, kamu aman untuk mendaftar. Setelah mendaftar, ranking paralel tidak terlalu dilihat PTN, yang dilihat adalah nilai rapormu vs nilai rapor pesaing dari sekolah lain.
+                    </div>
+                </details>
+
+                <details class="glass p-6 rounded-2xl group cursor-pointer transition-all hover:bg-white/5">
+                    <summary class="flex justify-between items-center font-medium text-white">
+                        <span class="flex items-center gap-3"><i data-lucide="trending-down" class="text-cyan-400 w-5 h-5"></i> Semester 4 nilaiku anjlok, Semester 5 naik lagi. Fatal?</span>
+                        <i data-lucide="chevron-down" class="group-open:rotate-180 transition-transform text-white/50"></i>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-white/10 text-sm text-white/60 leading-relaxed pl-8">
+                        Tidak otomatis tertolak. Sistem melihat tren <strong>keseluruhan</strong>. Jika penurunan hanya terjadi sekali dan tidak drastis (misal: 85 -> 83 -> 86), itu masih wajar. Yang bahaya adalah tren terjun bebas (85 -> 80 -> 75).
+                    </div>
+                </details>
+
+                <details class="glass p-6 rounded-2xl group cursor-pointer transition-all hover:bg-white/5">
+                    <summary class="flex justify-between items-center font-medium text-white">
+                        <span class="flex items-center gap-3"><i data-lucide="alert-octagon" class="text-rose-400 w-5 h-5"></i> Apa benar ada Blacklist Sekolah?</span>
+                        <i data-lucide="chevron-down" class="group-open:rotate-180 transition-transform text-white/50"></i>
+                    </summary>
+                    <div class="mt-4 pt-4 border-t border-white/10 text-sm text-white/60 leading-relaxed pl-8">
+                        <strong class="text-rose-400">FAKTA.</strong> Jika kakak kelasmu diterima SNBP tahun lalu tapi tidak diambil (daftar ulang), sekolahmu akan kena sanksi pengurangan kuota atau bahkan tidak dilirik lagi oleh PTN tersebut. Pastikan kamu memilih jurusan yang benar-benar ingin diambil.
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        <!-- CTA FINAL -->
+        <section class="text-center py-20 relative">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-cyan-900/10 rounded-full blur-3xl -z-10"></div>
+            <h2 class="text-4xl md:text-5xl font-space font-bold text-white mb-6">Jangan Cuma Dibaca.</h2>
+            <p class="text-white/50 max-w-lg mx-auto mb-10 text-lg">
+                Teori tanpa data itu halusinasi. Masukkan nilai rapormu sekarang dan lihat posisimu di peta persaingan.
+            </p>
+            <a href="/" class="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-full hover:scale-105 hover:shadow-[0_0_50px_rgba(6,182,212,0.5)] transition-all duration-300">
+                <i data-lucide="calculator"></i> Hitung Peluang Saya
+            </a>
+        </section>
+
     </main>
 
-    <!-- Script Icons -->
+    <!-- FOOTER -->
+    <footer class="border-t border-white/5 bg-black/20 backdrop-blur-lg">
+        <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <div class="font-space font-bold text-xl text-white mb-1">PintarHitung</div>
+                <p class="text-xs text-white/30">Your Personal Academic Strategist.</p>
+            </div>
+            <div class="flex gap-6">
+                <a href="https://www.instagram.com/fawwazdzaaky/" target="_blank" class="text-white/30 hover:text-white transition-colors">
+                    <i data-lucide="instagram" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="text-white/30 hover:text-white transition-colors">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+        <div class="text-center py-6 border-t border-white/5 text-[10px] text-white/20 uppercase tracking-[0.2em]">
+            &copy; 2025 Fawwaz Dzaaky • Made in Indonesia
+        </div>
+    </footer>
+
     <script>
         lucide.createIcons();
+        
+        // Auto-close accordion logic for cleaner UX
+        const details = document.querySelectorAll("details");
+        details.forEach((targetDetail) => {
+            targetDetail.addEventListener("click", () => {
+                details.forEach((detail) => {
+                    if (detail !== targetDetail) {
+                        detail.removeAttribute("open");
+                    }
+                });
+            });
+        });
+
+        // Mobile Menu Logic
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        let isMenuOpen = false;
+
+        menuBtn.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            if (isMenuOpen) {
+                mobileMenu.classList.remove('hidden-menu');
+                mobileMenu.classList.add('visible-menu');
+            } else {
+                mobileMenu.classList.remove('visible-menu');
+                mobileMenu.classList.add('hidden-menu');
+            }
+        });
+
+        // Close menu when link is clicked
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                isMenuOpen = false;
+                mobileMenu.classList.remove('visible-menu');
+                mobileMenu.classList.add('hidden-menu');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (isMenuOpen && !mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                isMenuOpen = false;
+                mobileMenu.classList.remove('visible-menu');
+                mobileMenu.classList.add('hidden-menu');
+            }
+        });
     </script>
 </body>
 </html>

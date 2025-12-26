@@ -3,26 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Halaman Tidak Ditemukan - PintarHitung</title>
-            <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-</head>
-<body class="bg-[#0f172a] text-white h-screen flex flex-col items-center justify-center text-center p-6 font-sans">
+    <title>404: Halaman Bolos Sekolah - PintarHitung</title>
+    <link rel="icon" type="image/png" href="logo.png" />
     
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/20 rounded-full blur-[120px]"></div>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        space: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: { 900: '#0f172a', 950: '#020617' }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-15px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Fix untuk tinggi layar mobile browser modern */
+        .min-h-screen-dvh {
+            min-height: 100vh; /* Fallback */
+            min-height: 100dvh; /* Dynamic viewport height */
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-300 font-sans min-h-screen-dvh flex flex-col relative overflow-x-hidden selection:bg-cyan-500/30">
+
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[80px] animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/20 rounded-full blur-[80px]"></div>
     </div>
 
-    <h1 class="text-9xl font-bold font-['Space_Grotesk'] text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 mb-4">404</h1>
-    <h2 class="text-2xl font-bold mb-4">Waduh, Salah Jalan Nih?</h2>
-    <p class="text-white/60 max-w-md mb-8">
-        Halaman yang kamu cari mungkin lagi bolos atau emang belum dibuat. Mending balik hitung nilai aja yuk!
-    </p>
-    
-    <a href="/" class="px-8 py-3 bg-cyan-500 text-slate-900 font-bold rounded-full hover:bg-cyan-400 transition-all hover:scale-105">
-        Kembali ke Beranda
-    </a>
+    <nav class="absolute top-0 left-0 right-0 z-50 w-full p-4 sm:p-6 flex justify-center md:justify-start max-w-7xl mx-auto">
+        <a href="/" class="flex items-center gap-2 font-space font-bold text-lg sm:text-xl text-white hover:text-cyan-400 transition-colors bg-slate-950/50 px-3 py-1 rounded-full backdrop-blur-md border border-white/5 md:bg-transparent md:backdrop-blur-none md:border-none md:p-0">
+            <i data-lucide="calculator" class="text-cyan-400 w-5 h-5"></i> PintarHitung
+        </a>
+    </nav>
 
+    <main class="flex-1 flex items-center justify-center px-4 py-24 sm:py-20 relative z-10 w-full">
+        
+        <div class="glass-card w-full max-w-[90%] sm:max-w-lg p-6 sm:p-10 rounded-3xl text-center shadow-2xl relative">
+            
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-slate-900 rounded-full border border-white/10 flex items-center justify-center shadow-lg animate-float z-20">
+                <i data-lucide="ghost" class="w-10 h-10 text-cyan-400"></i>
+            </div>
+
+            <h1 class="text-5xl sm:text-7xl md:text-8xl font-space font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-400 mt-8 mb-2 leading-tight tracking-tight">
+                404
+            </h1>
+            
+            <h2 class="text-lg sm:text-2xl font-bold text-white mb-3 px-2">
+                Halaman Bolos Sekolah!
+            </h2>
+            
+            <p class="text-slate-400 text-xs sm:text-base mb-8 leading-relaxed px-1 sm:px-4">
+                Waduh, halaman yang kamu cari sepertinya tidak masuk kelas hari ini, atau mungkin kamu salah ketik URL?
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/" class="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl sm:rounded-full hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-105 transition-all flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Kelas
+                </a>
+                <a href="/panduan.html" class="px-5 py-2.5 bg-white/5 border border-white/10 text-white font-bold rounded-xl sm:rounded-full hover:bg-white/10 transition-all flex items-center justify-center gap-2 text-sm">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> Baca Panduan
+                </a>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-white/5">
+                <p class="text-[10px] text-white/30 uppercase tracking-widest mb-3">Jalan Pintas</p>
+                <div class="flex flex-wrap justify-center gap-3 sm:gap-5 text-xs sm:text-sm text-cyan-400/80 font-medium">
+                    <a href="/" class="hover:text-cyan-300 hover:underline">Hitung Raport</a>
+                    <a href="/" class="hover:text-cyan-300 hover:underline">Simulasi UTBK</a>
+                    <a href="/" class="hover:text-cyan-300 hover:underline">Cek IPK</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-6 text-[10px] text-white/20 uppercase tracking-widest relative z-10">
+        &copy; 2025 PintarHitung • Lost in Space
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
