@@ -228,7 +228,8 @@ const ASPDCalculator = () => {
             <h3 className="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2">
               <BookOpen size={16} /> NILAI RAPOR (Sem 1-5)
             </h3>
-            <div className="grid grid-cols-5 gap-2">
+            {/* FIXED 1: ASPD Rapor Grid - Responsive (3 cols mobile, 5 cols desktop) */}
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
               {[1, 2, 3, 4, 5].map(sem => (
                 <div key={sem}>
                   <label className="text-[9px] text-center block text-white/40 mb-1">SEM {sem}</label>
@@ -258,11 +259,11 @@ const ASPDCalculator = () => {
                 { label: 'Literasi Numerasi', key: 'num', multi: ASPD_MULTIPLIERS.num },
                 { label: 'Literasi Sains', key: 'sains', multi: ASPD_MULTIPLIERS.sains }
               ].map((item) => (
-                /* RESPONSIVE LAYOUT FIX: Label Top on Mobile, Left on Desktop */
+                /* FIXED 5: ASPD Subject Inputs - Label Top on Mobile, Left on Desktop */
                 <div key={item.key} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                  <div className="flex-1">
+                  <div className="flex-1 w-full">
                     <label className="text-xs text-white/70 block mb-1">{item.label}</label>
-                    <div className="relative">
+                    <div className="relative w-full">
                       <input
                         name={`aspd_${item.key}`}
                         value={scores[`aspd_${item.key}`]}
@@ -284,7 +285,8 @@ const ASPDCalculator = () => {
             </div>
           </div>
 
-          <div className="bg-slate-900/80 md:bg-white/5 md:backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center justify-between gap-4">
+          {/* FIXED 2: Akreditasi Layout - Stack on Mobile */}
+          <div className="bg-slate-900/80 md:bg-white/5 md:backdrop-blur-md border border-white/10 p-5 rounded-3xl flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
                <div className="p-2 bg-orange-500/20 rounded-lg text-orange-400"><School size={18}/></div>
                <div>
@@ -301,7 +303,7 @@ const ASPDCalculator = () => {
               inputMode="decimal"
               min="0"
               max="100"
-              className="w-24 bg-slate-800/50 md:bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-right focus:border-orange-500 focus:outline-none"
+              className={`w-full sm:w-24 ${inputClass} text-right`} 
             />
           </div>
         </div>
@@ -752,7 +754,7 @@ const GPACalculator = () => {
         <div className="grid md:grid-cols-3 gap-6">
              <div className="md:col-span-2 space-y-3">
                 {courses.map(c => (
-                     /* RESPONSIVE LAYOUT: STACK IN MOBILE */
+                     /* FIXED 4: IPK Stack Layout on Mobile */
                      <div key={c.id} className="bg-slate-900/95 md:bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col md:flex-row gap-2 items-center">
                         <input placeholder="Mata Kuliah" value={c.name} onChange={(e) => updateCourse(c.id, 'name', e.target.value)}
                              className="w-full md:flex-1 bg-transparent px-2 py-1 outline-none text-white text-sm border-b md:border-none border-white/10" />
@@ -813,7 +815,7 @@ const App = () => {
                 <p className="text-white/70 text-base md:text-lg max-w-xl">
                     Selamat datang di PintarHitung v2.6. Alat bantu hitung nilai akademik modern yang sudah disesuaikan dengan aturan resmi terbaru.
                 </p>
-                {/* RESPONSIVE BUTTON LAYOUT: Stack on mobile, Row on desktop */}
+                {/* FIXED 3: Beranda (Home) Buttons - Stack on Mobile */}
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
                     <button 
                         onClick={() => setActiveTab('rapor')}
