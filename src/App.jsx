@@ -252,13 +252,14 @@ const ASPDCalculator = () => {
             <h3 className="text-sm font-bold text-violet-400 mb-3 flex items-center gap-2">
               <School size={16} /> NILAI ASPD MURNI
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[
                 { label: 'Literasi Membaca', key: 'lit', multi: ASPD_MULTIPLIERS.lit },
                 { label: 'Literasi Numerasi', key: 'num', multi: ASPD_MULTIPLIERS.num },
                 { label: 'Literasi Sains', key: 'sains', multi: ASPD_MULTIPLIERS.sains }
               ].map((item) => (
-                <div key={item.key} className="flex items-center gap-3">
+                /* RESPONSIVE LAYOUT FIX: Label Top on Mobile, Left on Desktop */
+                <div key={item.key} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
                   <div className="flex-1">
                     <label className="text-xs text-white/70 block mb-1">{item.label}</label>
                     <div className="relative">
@@ -523,21 +524,22 @@ const PSAJCalculator = () => {
             layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} key={sub.id} 
             className="bg-slate-900/80 md:bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col md:flex-row gap-4 items-center transform translate-z-0"
           >
+            {/* RESPONSIVE LAYOUT: STACK IN MOBILE */}
             <div className="flex-1 w-full">
               <input value={sub.name} onChange={(e) => updateSubject(sub.id, 'name', e.target.value)}
                 className="bg-transparent border-b border-white/10 text-white font-medium w-full focus:outline-none focus:border-cyan-500 px-1 py-1"
                 placeholder="Nama Mapel"
               />
             </div>
-            <div className="flex gap-2 w-full md:w-auto">
+            <div className="flex gap-2 w-full md:w-auto mt-2 md:mt-0">
               <input type="number" inputMode="decimal" min="0" max="100" placeholder="Tulis" value={sub.tulis} onChange={(e) => updateSubject(sub.id, 'tulis', e.target.value)}
-                className="w-20 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10"
+                className="flex-1 md:w-20 bg-black/20 rounded-lg px-2 py-2 text-center text-white border border-white/10"
               />
               <input type="number" inputMode="decimal" min="0" max="100" placeholder="Praktik" value={sub.praktik} onChange={(e) => updateSubject(sub.id, 'praktik', e.target.value)}
-                className="w-20 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10"
+                className="flex-1 md:w-20 bg-black/20 rounded-lg px-2 py-2 text-center text-white border border-white/10"
               />
             </div>
-            <div className="flex items-center gap-4 w-full md:w-auto justify-between">
+            <div className="flex items-center gap-4 w-full md:w-auto justify-between mt-2 md:mt-0">
               <div className="text-xl font-bold font-space text-cyan-300 w-16 text-center">
                 {calculatePSAJScore(sub.tulis, sub.praktik, ratio).toFixed(1)}
               </div>
@@ -589,6 +591,7 @@ const SemesterItem = React.memo(({
 
       <div className="space-y-3 mb-4">
           {sem.subjects.map(sub => (
+            /* RESPONSIVE LAYOUT: STACK IN MOBILE */
             <div key={sub.id} className="flex flex-col md:flex-row gap-2">
                 <input 
                   placeholder="Nama Mapel" 
@@ -749,17 +752,18 @@ const GPACalculator = () => {
         <div className="grid md:grid-cols-3 gap-6">
              <div className="md:col-span-2 space-y-3">
                 {courses.map(c => (
+                     /* RESPONSIVE LAYOUT: STACK IN MOBILE */
                      <div key={c.id} className="bg-slate-900/95 md:bg-white/5 p-3 rounded-xl border border-white/10 flex flex-col md:flex-row gap-2 items-center">
                         <input placeholder="Mata Kuliah" value={c.name} onChange={(e) => updateCourse(c.id, 'name', e.target.value)}
                              className="w-full md:flex-1 bg-transparent px-2 py-1 outline-none text-white text-sm border-b md:border-none border-white/10" />
-                        <div className="flex gap-2 w-full md:w-auto">
+                        <div className="grid grid-cols-3 gap-2 w-full md:w-auto mt-2 md:mt-0">
                             <input placeholder="SKS" type="number" inputMode="decimal" min="0" value={c.sks} onChange={(e) => updateCourse(c.id, 'sks', e.target.value)}
-                                className="flex-1 md:w-16 bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10 text-sm" />
+                                className="bg-black/20 rounded-lg px-2 py-1 text-center text-white border border-white/10 text-sm w-full" />
                             <select value={c.grade} onChange={(e) => updateCourse(c.id, 'grade', e.target.value)}
-                                className="flex-1 bg-black/20 text-white rounded-lg px-2 py-1 text-sm border border-white/10 outline-none">
+                                className="bg-black/20 text-white rounded-lg px-2 py-1 text-sm border border-white/10 outline-none w-full">
                                 {Object.keys(GPA_GRADE_VALUES).map(g => <option key={g} value={g}>{g}</option>)}
                             </select>
-                            <button onClick={() => removeCourse(c.id)} className="p-2 text-white/30 hover:text-rose-400 bg-white/5 rounded-lg"><Trash2 size={16}/></button>
+                            <button onClick={() => removeCourse(c.id)} className="p-2 text-white/30 hover:text-rose-400 bg-white/5 rounded-lg flex items-center justify-center w-full"><Trash2 size={16}/></button>
                         </div>
                      </div>
                 ))}
@@ -797,18 +801,20 @@ const App = () => {
       case 'beranda':
         return (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-b border-white/10 md:bg-gradient-to-r md:from-cyan-500/20 md:to-blue-500/20 md:border md:border-cyan-500/30 p-8 rounded-3xl md:backdrop-blur-md relative overflow-hidden transform translate-z-0">
+             {/* RESPONSIVE PADDING: p-6 mobile, p-8 desktop */}
+             <div className="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-b border-white/10 md:bg-gradient-to-r md:from-cyan-500/20 md:to-blue-500/20 md:border md:border-cyan-500/30 p-6 md:p-8 rounded-3xl md:backdrop-blur-md relative overflow-hidden transform translate-z-0">
                 {/* Fixed: Pointer events none to allow clicks below */}
                 <div className="absolute top-0 right-0 p-10 opacity-10 transform translate-x-1/4 -translate-y-1/4 pointer-events-none">
                     <Calculator size={300} />
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold font-space text-white mb-4">
+                <h1 className="text-3xl md:text-5xl font-bold font-space text-white mb-4">
                     Halo, <span className="text-cyan-400">Sang Juara!</span>
                 </h1>
-                <p className="text-white/70 text-lg max-w-xl">
+                <p className="text-white/70 text-base md:text-lg max-w-xl">
                     Selamat datang di PintarHitung v2.6. Alat bantu hitung nilai akademik modern yang sudah disesuaikan dengan aturan resmi terbaru.
                 </p>
-                <div className="flex flex-row flex-nowrap gap-2 mt-6">
+                {/* RESPONSIVE BUTTON LAYOUT: Stack on mobile, Row on desktop */}
+                <div className="flex flex-col sm:flex-row gap-3 mt-6">
                     <button 
                         onClick={() => setActiveTab('rapor')}
                         className="flex-1 bg-white text-slate-900 px-4 py-3 md:px-6 rounded-full font-bold hover:bg-cyan-50 transition-colors flex items-center justify-center gap-2 text-sm md:text-base whitespace-nowrap"
@@ -929,8 +935,9 @@ const App = () => {
            ))}
         </div>
 
+        {/* GLOBAL SAFE PADDING: px-4 on mobile */}
         <main className="flex-1 md:ml-72 p-4 md:p-10 mb-20 md:mb-0">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto px-2 md:px-0">
              <div className="md:hidden flex items-center justify-between mb-8">
                 <h1 className="text-xl font-bold font-space text-white flex items-center gap-2">
                     <Calculator className="text-cyan-400" size={24} /> PintarHitung
