@@ -1,0 +1,13 @@
+[Desktop Entry]
+X-SnapInstanceName=ubuntu-desktop-bootstrap
+Type=Application
+Version=1.0
+Name=Install Ubuntu 24.04.3 LTS
+Comment=Install this system permanently to your hard disk
+Keywords=ubiquity;
+X-SnapAppName=ubuntu-desktop-bootstrap
+Exec=env BAMF_DESKTOP_FILE_HINT=/var/lib/snapd/desktop/applications/ubuntu-desktop-bootstrap_ubuntu-desktop-bootstrap.desktop /snap/bin/ubuntu-desktop-bootstrap
+Icon=ubiquity
+Terminal=false
+Categories=GTK;System;Settings;
+
