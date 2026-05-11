@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://pintarhitung.github.io/sitemap.xml
