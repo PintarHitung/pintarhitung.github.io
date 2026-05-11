@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+/* =============================================
+   DESIGN TOKENS
+   ============================================= */
+:root {
+  --bg-base:     #080a0f;
+  --bg-surface:  #0d1117;
+  --bg-card:     #111827;
+  --bg-overlay:  rgba(255,255,255,0.04);
+
+  --accent-cyan:    #22d3ee;
+  --accent-blue:    #3b82f6;
+  --accent-emerald: #10b981;
+  --accent-violet:  #8b5cf6;
+  --accent-amber:   #f59e0b;
+  --accent-rose:    #f43f5e;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: rgba(241,245,249,0.6);
+  --text-muted:     rgba(241,245,249,0.28);
+
+  --border-subtle: rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.14);
+
+  --radius-sm:  10px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+}
+
+/* =============================================
+   BASE
+   ============================================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* =============================================
+   TYPOGRAPHY
+   ============================================= */
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* =============================================
+   HIDE NUMBER SPINNERS
+   ============================================= */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* =============================================
+   SCROLLBAR
+   ============================================= */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* =============================================
+   SELECTION
+   ============================================= */
+::selection { background: rgba(34,211,238,0.25); }
+
+/* =============================================
+   SAFE AREA (iOS/Android notch)
+   ============================================= */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+/* =============================================
+   CUSTOM COMPONENTS
+   ============================================= */
+
+/* Glass card */
+.glass-card {
+  background: rgba(13,17,23,0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+/* Input base */
+.input-base {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.input-base:focus {
+  border-color: var(--accent-cyan);
+  background: rgba(34,211,238,0.05);
+}
+.input-base::placeholder {
+  color: var(--text-muted);
+}
+
+/* Score Input - larger touch target */
+.input-score {
+  width: 5rem;
+  text-align: center;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  padding: 0.75rem 0.5rem;
+}
+
+/* Btn primary */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #22d3ee, #3b82f6);
+  color: #080a0f;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border-radius: var(--radius-xl);
+  padding: 0.875rem 1.75rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.btn-primary:active { transform: scale(0.97); opacity: 0.9; }
+
+/* Btn ghost */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--bg-overlay);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); border-color: var(--border-strong); }
+.btn-ghost:active { transform: scale(0.97); }
+
+/* Dashed add button */
+.btn-dashed {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.btn-dashed:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.25);
+}
+
+/* Stat card */
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+}
+
+/* Insight card types */
+.insight-positive { border-left: 3px solid var(--accent-emerald); }
+.insight-warning   { border-left: 3px solid var(--accent-amber); }
+.insight-info      { border-left: 3px solid var(--accent-blue); }
+
+/* Ambient glow — no GPU kill on mobile */
+@media (prefers-reduced-motion: no-preference) {
+  .ambient-glow {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .ambient-glow::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(34,211,238,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .ambient-glow::after {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    left: -10%;
+    width: 40vw;
+    height: 40vw;
+    background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+}
+
+/* Share card — for html2canvas */
+.share-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  width: 340px;
+  max-width: 100%;
+}

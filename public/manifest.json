@@ -1,0 +1,12 @@
+{
+  "name": "PintarHitung",
+  "short_name": "PintarHitung",
+  "description": "Analisis nilai raport SMA/SMK — trend, insight, dan prediksi SNBP",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080a0f",
+  "theme_color": "#080a0f",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
