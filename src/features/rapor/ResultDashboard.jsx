@@ -122,7 +122,7 @@ const DevSection = () => (
           Crafted by
         </p>
         <p className="font-display font-bold text-base" style={{ color: 'var(--text-primary)' }}>
-          @fawwazdzaaky
+          @fawwazdzaky
         </p>
         <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
           PintarHitung v3.0 · Build in public · 2026
